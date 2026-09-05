@@ -1,0 +1,1 @@
+console.log("Crochet Handcrafted Shop site loaded successfully.");
