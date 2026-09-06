@@ -13,3 +13,10 @@ h1 {
 h2{
     color:#d17a9c
 }
+ol li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    list-style-position: inside;
+}
