@@ -1,11 +1,11 @@
 :root {
-  --color-bg: #F3F6FB;
-  --color-text: #16202E;
-  --color-muted: #566276;
-  --color-primary: #12233F;   /* deep navy - réseau/technologie */
+  --color-bg: #ebe6ca;
+  --color-text: #503d0b;
+  --color-muted: #bb8330;
+  --color-primary: #724f27;   /* deep navy - réseau/technologie */
   --color-accent: #F2994A;    /* orange - accessoires/énergie */
-  --color-surface: #FFFFFF;
-  --color-border: #D9E1EC;
+  --color-surface: #c9b987;
+  --color-border: #d8c987;
   --radius: 6px;
   --max-width: 960px;
 }
