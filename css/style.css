@@ -2,7 +2,7 @@
    Crochet Handcrafted Shop
    Palette taken from the shop's own photo: indigo fabric,
    marigold yellow and red yarn.
-   Signature detail: the dashed "stitch" line (headers, cards, image).
+   Signature detail: scalloped edges (header and footer), like a crochet shell border.
    ========================================================== */
 
 :root {
@@ -15,9 +15,9 @@
   --indigo-soft: #DEE4F8;
   --indigo-line: #9AA6DC;
 
-  --marigold: #F6B91B;
-  --marigold-soft: #FFEFC0;
-  --marigold-line: #D99A00;
+  --marigold: #69e4de;
+  --marigold-soft: #f0f4f5;
+  --marigold-line: #87b9bd;
 
   --crimson: #C4263B;
   --crimson-dark: #9E1B2E;
@@ -144,18 +144,19 @@ select:focus-visible {
   position: relative;
   background-color: var(--indigo);
   color: #fff;
-  padding: 1.1rem 1.5rem 1.6rem;
+  padding: 1.1rem 1.5rem 1.3rem;
 }
 
-/* the stitch line running under the header */
+/* scalloped edge, like a crochet shell border */
 .site-header::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0.65rem;
-  border-top: 2px dashed var(--marigold);
-  opacity: 0.85;
+  bottom: -10px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 0, var(--indigo) 10px, transparent 10.5px) repeat-x;
+  background-size: 20px 10px;
 }
 
 .site-header .header-inner {
@@ -303,8 +304,7 @@ main {
   aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: 999px 999px var(--radius-lg) var(--radius-lg);
-  outline: 3px dashed var(--crimson);
-  outline-offset: 10px;
+  box-shadow: 12px 12px 0 var(--marigold);
 }
 
 /* ---------- Cards ---------- */
@@ -318,19 +318,16 @@ main {
 
 .card {
   background-color: var(--marigold-soft);
-  border: 2px dashed var(--marigold-line);
   border-radius: var(--radius-lg);
   padding: 1.75rem;
 }
 
 .card:nth-child(2) {
   background-color: var(--crimson-soft);
-  border-color: var(--crimson-line);
 }
 
 .card:nth-child(3) {
   background-color: var(--indigo-soft);
-  border-color: var(--indigo-line);
 }
 
 .card h3 {
@@ -344,9 +341,6 @@ aside.note {
   margin-top: 3.5rem;
   background-color: var(--marigold);
   color: var(--ink);
-  border: 2px dashed var(--ink);
-  outline: 6px solid var(--marigold);
-  outline-offset: -10px;
   border-radius: var(--radius-lg);
   padding: 1.75rem 2rem;
 }
@@ -386,8 +380,7 @@ aside.note a:hover {
   aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: var(--radius-lg);
-  outline: 3px dashed var(--indigo-line);
-  outline-offset: 8px;
+  box-shadow: 10px 10px 0 var(--marigold);
 }
 
 .gallery figcaption {
@@ -446,7 +439,7 @@ aside.note a:hover {
 
 .contact-section {
   background-color: var(--white);
-  border: 2px dashed var(--indigo-line);
+  border: 2px solid var(--indigo-soft);
   border-radius: var(--radius-lg);
   padding: 2rem;
 }
@@ -522,7 +515,7 @@ button.submit:hover {
 }
 
 fieldset {
-  border: 2px dashed var(--indigo-line);
+  border: 2px solid var(--indigo-soft);
   border-radius: var(--radius-md);
   margin: 0 0 1.25rem 0;
   padding: 0.8rem 1rem;
@@ -536,11 +529,23 @@ legend {
 /* ---------- Footer ---------- */
 
 .site-footer {
+  position: relative;
   background-color: var(--ink);
   color: var(--indigo-soft);
   padding: 2rem 1.5rem;
   text-align: center;
   font-size: 0.95rem;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 10px, var(--ink) 10px, transparent 10.5px) repeat-x;
+  background-size: 20px 10px;
 }
 
 .site-footer p {
