@@ -1,3 +1,5 @@
+.env
+.env.*
 .vscode/ 
 .env.local
 node_modules/

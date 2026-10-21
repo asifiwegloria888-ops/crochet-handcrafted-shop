@@ -5,6 +5,6 @@
   "description": "Crochet Handcrafted Shop - site + order API (Vercel)",
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.10.1"
   }
 }
