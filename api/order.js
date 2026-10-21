@@ -94,7 +94,7 @@ module.exports = async (req, res) => {
   // ---- 1. Save in the database ----
   let id;
   try {
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(process.env.POSTGRES_URL);
     await sql`
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
