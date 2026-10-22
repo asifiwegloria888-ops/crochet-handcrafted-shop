@@ -147,7 +147,8 @@ module.exports = async (req, res) => {
         </table>
         <h3>How to pay the deposit</h3>
         <p style="background:#fff7f2;padding:12px;border-radius:8px">${esc(instructions).replace(/\r?\n/g, "<br>")}</p>
-        <p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, reply to this email with the transaction ID or a screenshot. I start your order as soon as I receive the deposit.</p>
+        <p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, send me the transaction ID or a screenshot on WhatsApp (or reply to this email). I start your order as soon as I receive the deposit.</p>
+        <p style="margin:18px 0"><a href="https://wa.me/+256 791 908 861?text=${encodeURIComponent('Hello, I paid the deposit for order ' + ref)}" style="background:#25D366;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Send payment proof on WhatsApp</a></p>
         <p>Crochet Handcrafted Shop</p>
       </div>`,
     });
