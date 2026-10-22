@@ -193,3 +193,15 @@ footer a { color: #fff; }
 .btn:hover { background: var(--rose); text-decoration: none !important; }
 
 .produit.cache { display: none; }
+
+/* ---- Header: smaller menu, nice on phones ---- */
+header .site-title { margin: 0; }
+header .site-title a { font-size: 1.6rem; }
+header .main-nav li a { font-size: 1rem; }
+
+@media (max-width: 600px) {
+  header { padding: 16px 10px 10px; }
+  header .site-title a { font-size: 1.3rem; }
+  header .main-nav ul { gap: 4px; margin-top: 8px; }
+  header .main-nav li a { font-size: 0.95rem; padding: 6px 12px; }
+}
