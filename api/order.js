@@ -11,14 +11,21 @@ const crypto = require("crypto");
 const SIZE_PRICES = {
   "Crop top": { "Small": 25000, "Medium": 28000, "Large": 32000, "XL": 36000 },
   "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
-  "Sweater": {"Small":50000, "Medium": 60000, "Large": 80000,"XL":90000},
-  "Dress": {"Small": 50000, "Medium": 60000, "Large": 80000,"XL":100000},
-  "Small bag": {"Small": 15000, "Big": 25000},
-  "Crochet flower": {"Small": 50000, "Big":80000}
+  "Sweater": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
+  "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
+  "Small bag": { "Small": 15000, "Big": 25000 },
+  "Crochet flower": { "Small": 50000, "Big": 80000 },
 };
 
 // Items with one single price
+const PRICES = {
+  "Scrunchies": 5000,
+  "Hair scrunchie": 5000,
+};
+
+// Items with fixed sizes but no fixed price (you quote the price yourself)
 const SIZES_ONLY = {
+  "Skirt": ["Small", "Medium", "Large", "XL"],
   "Crop top": ["Small", "Medium", "Large","XL"],
   "Ruffle crochet hat": ["Child","Adult"],
   "Sweater": ["Small", "Medium", "Large","XL"],
@@ -28,10 +35,16 @@ const SIZES_ONLY = {
   "Skirt": ["Small", "Medium", "Large", "XL"]
 };
 
+function unitPriceFor(item, size) {
+  if (SIZE_PRICES[item]) return SIZE_PRICES[item][size] || null;
+  return PRICES[item] || null;
+}
+
 function sizesFor(item) {
-  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]) ;
+  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]);
   return SIZES_ONLY[item] || null;
 }
+
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
