@@ -14,17 +14,31 @@
 
   // Display only: the real price is always decided by the server.
   // KEEP THESE TWO BLOCKS IDENTICAL TO api/order.js (same names, same spelling).
-  var SIZE_PRICES = {
-    "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
-    "Small bag": { "Small": 15000, "Big": 25000 },
-    "Crochet flower": { "Small": 50000, "Big": 80000 },
-    "Sweater": {"Small":50000, "Medium": 60000, "Large": 80000,"XL":90000},
-    "Dress": {"Small": 50000, "Medium": 60000, "Large": 80000,"XL":100000},
-    "Small bag": {"Small": 15000, "Big": 25000},
-    "Crochet flower": {"Small": 50000, "Big":80000}
-  };
-  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
+ var SIZE_PRICES = {
+  "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
+  "Sweater": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
+  "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
+  "Small bag": { "Small": 15000, "Big": 25000 },
+  "Crochet flower": { "Small": 50000, "Big": 80000 }
+};
+var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
 
+// Items with fixed sizes but no fixed price (same as api/order.js)
+var SIZES_ONLY = {
+  
+  "Skirt": ["Small", "Medium", "Large", "XL"],
+  "Crop top": ["Small", "Medium", "Large","XL"],
+  "Ruffle crochet hat": ["Child","Adult"],
+  "Sweater": ["Small", "Medium", "Large","XL"],
+  "Small bag": ["Small","Big"],
+  "Crochet flower": ["Small","Big"],
+  "Dress": ["Small", "Medium", "Large","XL"],
+  "Skirt": ["Small", "Medium", "Large", "XL"]
+};
+function sizesFor(item) {
+  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]);
+  return SIZES_ONLY[item] || null;
+}
   function money(n) {
     return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
   }
@@ -37,28 +51,29 @@
 
   // Shows the size list (with prices) for items that have fixed sizes, a free text field otherwise.
   function updateSize() {
-    var sizes = SIZE_PRICES[itemSelect.value];
-    if (sizes) {
-      var previous = sizeSelect.value;
-      sizeSelect.innerHTML = "";
-      Object.keys(sizes).forEach(function (name) {
-        var opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name + " - " + money(sizes[name]);
-        sizeSelect.appendChild(opt);
-      });
-      if (sizes[previous]) sizeSelect.value = previous;
-      sizeSelect.hidden = false;
-      sizeSelect.disabled = false;
-      sizeFree.hidden = true;
-      sizeFree.disabled = true;
-    } else {
-      sizeSelect.hidden = true;
-      sizeSelect.disabled = true;
-      sizeFree.hidden = false;
-      sizeFree.disabled = false;
-    }
+  var item = itemSelect.value;
+  var names = sizesFor(item);
+  if (names) {
+    var previous = sizeSelect.value;
+    sizeSelect.innerHTML = "";
+    names.forEach(function (name) {
+      var opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = SIZE_PRICES[item] ? name + " - " + money(SIZE_PRICES[item][name]) : name;
+      sizeSelect.appendChild(opt);
+    });
+    if (names.indexOf(previous) !== -1) sizeSelect.value = previous;
+    sizeSelect.hidden = false;
+    sizeSelect.disabled = false;
+    sizeFree.hidden = true;
+    sizeFree.disabled = true;
+  } else {
+    sizeSelect.hidden = true;
+    sizeSelect.disabled = true;
+    sizeFree.hidden = false;
+    sizeFree.disabled = false;
   }
+}
 
   function updatePrice() {
     var price = unitPrice();

@@ -18,14 +18,19 @@ const SIZE_PRICES = {
 };
 
 // Items with one single price
-const PRICES = {
-  "Scrunchies": 5000,
-  "Hair scrunchie": 5000,
+const SIZES_ONLY = {
+  "Crop top": ["Small", "Medium", "Large","XL"],
+  "Ruffle crochet hat": ["Child","Adult"],
+  "Sweater": ["Small", "Medium", "Large","XL"],
+  "Small bag": ["Small","Big"],
+  "Crochet flower": ["Small","Big"],
+  "Dress": ["Small", "Medium", "Large","XL"],
+  "Skirt": ["Small", "Medium", "Large", "XL"]
 };
 
-function unitPriceFor(item, size) {
-  if (SIZE_PRICES[item]) return SIZE_PRICES[item][size] || null;
-  return PRICES[item] || null;
+function sizesFor(item) {
+  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]) ;
+  return SIZES_ONLY[item] || null;
 }
 
 const esc = (s) =>
@@ -60,8 +65,10 @@ function validate(body) {
   if (!Number.isInteger(order.quantity) || order.quantity < 1 || order.quantity > 100)
     errors.push("Quantity must be between 1 and 100.");
   if (order.address.length < 5) errors.push("Please enter your delivery address.");
-   order.unitPrice = unitPriceFor(order.item, order.size);
-  if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
+  order.unitPrice = unitPriceFor(order.item, order.size);
+  const allowedSizes = sizesFor(order.item);
+  if (allowedSizes && !allowedSizes.includes(order.size)) errors.push("Please choose a size.");
+  order.total = order.unitPrice ? order.unitPrice * order.quantity : null;
 
   order.unitPrice = unitPriceFor(order.item, order.size);
   if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
