@@ -85,6 +85,11 @@
                 <input type="email" id="email" name="email" autocomplete="email" required>
                 <span class="hint">Your confirmation will be sent here.</span>
             </div>
+            <div class="field">
+                <label for="address">Delivery address</label>
+                <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="Area, street, landmark near your home..." required></textarea>
+                <span class="hint">The more exact, the easier the delivery.</span>
+            </div>
 
             <div class="row">
                 <div class="field">
@@ -93,9 +98,9 @@
                         <option>Scrunchies</option>
                         <option>Crop top</option>
                         <option>Ruffle crochet hat</option>
-                        <option>Blanket</option>
+                        <option>crochet flower</option>
                         <option>Baby hat</option>
-                        <option>Tote bag</option>
+                        <option>small bag</option>
                         <option>Skirt</option>
                         <option>Dress</option>
                         <option>Hair accessory</option>
@@ -115,10 +120,12 @@
                     <input type="text" id="colors" name="colors" placeholder="e.g. yellow and red">
                 </div>
                 <div class="field">
-                    <label for="size">Size</label>
-                    <input type="text" id="size" name="size" placeholder="e.g. medium, 120 x 80 cm">
+                    <label for="size-select">Size</label>
+                    <select id="size-select" name="size" hidden></select>
+                    <input type="text" id="size-free" name="size" placeholder="e.g. medium, 120 x 80 cm">
                 </div>
             </div>
+            <p id="price-note" class="hint" style="font-weight:bold;"></p>
 
             <div class="field">
                 <label for="notes">Anything else?</label>

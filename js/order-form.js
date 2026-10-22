@@ -1,4 +1,4 @@
-// Order form: prefills from the catalog link, then sends the order to /api/order.
+// Order form: prefills from the catalog link, shows the price by size, sends the order to /api/order.
 (function () {
   var form = document.getElementById("order-form");
   if (!form) return;
@@ -7,11 +7,77 @@
   var button = form.querySelector("button[type='submit']");
   var itemSelect = document.getElementById("item");
   var photoInput = document.getElementById("photo");
+  var sizeSelect = document.getElementById("size-select");
+  var sizeFree = document.getElementById("size-free");
+  var qtyInput = document.getElementById("quantity");
+  var priceNote = document.getElementById("price-note");
 
   // Display only: the real price is always decided by the server.
-  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000, "Crop top": 25000, "Ruffle crochet hat": 20000 };
+  // KEEP THESE TWO BLOCKS IDENTICAL TO api/order.js (same names, same spelling).
+  var SIZE_PRICES = {
+    "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
+    "Small bag": { "Small": 15000, "Big": 25000 },
+    "Crochet flower": { "Small": 50000, "Big": 80000 },
+    "Sweater": {"Small":50000, "Medium": 60000, "Large": 80000,"XL":90000},
+    "Dress": {"Small": 50000, "Medium": 60000, "Large": 80000,"XL":100000},
+    "Small bag": {"Small": 15000, "Big": 25000},
+    "Crochet flower": {"Small": 50000, "Big":80000}
+  };
+  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
+
   function money(n) {
     return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
+  }
+
+  function unitPrice() {
+    var item = itemSelect.value;
+    if (SIZE_PRICES[item]) return SIZE_PRICES[item][sizeSelect.value] || null;
+    return PRICES[item] || null;
+  }
+
+  // Shows the size list (with prices) for items that have fixed sizes, a free text field otherwise.
+  function updateSize() {
+    var sizes = SIZE_PRICES[itemSelect.value];
+    if (sizes) {
+      var previous = sizeSelect.value;
+      sizeSelect.innerHTML = "";
+      Object.keys(sizes).forEach(function (name) {
+        var opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name + " - " + money(sizes[name]);
+        sizeSelect.appendChild(opt);
+      });
+      if (sizes[previous]) sizeSelect.value = previous;
+      sizeSelect.hidden = false;
+      sizeSelect.disabled = false;
+      sizeFree.hidden = true;
+      sizeFree.disabled = true;
+    } else {
+      sizeSelect.hidden = true;
+      sizeSelect.disabled = true;
+      sizeFree.hidden = false;
+      sizeFree.disabled = false;
+    }
+  }
+
+  function updatePrice() {
+    var price = unitPrice();
+    var qty = parseInt(qtyInput.value, 10);
+    if (price && qty > 0) {
+      priceNote.textContent = money(price) + " each, estimated total " + money(price * qty) + " (to be confirmed)";
+    } else {
+      priceNote.textContent = "Price to be confirmed after your order.";
+    }
+    var box = document.getElementById("order-product");
+    if (box) {
+      var label = box.querySelector(".order-product-name");
+      label.textContent = itemSelect.value + (price ? " - " + money(price) + " each" : "");
+    }
+  }
+
+  function refresh() {
+    updateSize();
+    updatePrice();
   }
 
   // ---- Prefill from creation.html?item=Crop%20top&photo=4 ----
@@ -22,7 +88,7 @@
   if (wantedItem && wantedItem.length <= 50) {
     var known = false;
     Array.prototype.forEach.call(itemSelect.options, function (opt) {
-      if (opt.value === wantedItem) known = true;
+      if (opt.value === wantedItem || opt.text === wantedItem) known = true;
     });
     // an item that is not in the list yet (new product) is added on the fly
     if (!known) {
@@ -42,14 +108,10 @@
     box.hidden = false;
   }
 
-  function updateProduct() {
-    if (!box) return;
-    var label = box.querySelector(".order-product-name");
-    var price = PRICES[itemSelect.value];
-    label.textContent = itemSelect.value + (price ? " - " + money(price) + " each" : "");
-  }
-  itemSelect.addEventListener("change", updateProduct);
-  updateProduct();
+  itemSelect.addEventListener("change", refresh);
+  sizeSelect.addEventListener("change", updatePrice);
+  qtyInput.addEventListener("input", updatePrice);
+  refresh();
 
   // ---- Submit ----
   function show(message, type) {
@@ -82,6 +144,7 @@
           form.reset();
           if (box) box.hidden = true;
           photoInput.value = "";
+          refresh();
         } else {
           show(result.json.error || "Something went wrong. Please try again.", "error");
         }

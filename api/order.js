@@ -7,12 +7,26 @@ const crypto = require("crypto");
 
 // Prices in UGX. The server decides the price, never the browser.
 // Items without a price are quoted by the shop owner.
+// Items with sizes: price depends on the size chosen
+const SIZE_PRICES = {
+  "Crop top": { "Small": 25000, "Medium": 28000, "Large": 32000, "XL": 36000 },
+  "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
+  "Sweater": {"Small":50000, "Medium": 60000, "Large": 80000,"XL":90000},
+  "Dress": {"Small": 50000, "Medium": 60000, "Large": 80000,"XL":100000},
+  "Small bag": {"Small": 15000, "Big": 25000},
+  "Crochet flower": {"Small": 50000, "Big":80000}
+};
+
+// Items with one single price
 const PRICES = {
   "Scrunchies": 5000,
   "Hair scrunchie": 5000,
-  "Crop top": 25000,
-  "Ruffle crochet hat": 20000,
 };
+
+function unitPriceFor(item, size) {
+  if (SIZE_PRICES[item]) return SIZE_PRICES[item][size] || null;
+  return PRICES[item] || null;
+}
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -36,6 +50,7 @@ function validate(body) {
     quantity: parseInt(body.quantity, 10),
     notes: clean(body.notes, 1500),
     photo: /^\d{1,3}$/.test(clean(body.photo, 3)) ? clean(body.photo, 3) : "",
+    address: clean(body.address, 300),
   };
 
   const errors = [];
@@ -44,8 +59,12 @@ function validate(body) {
   if (!order.item) errors.push("Please choose an item.");
   if (!Number.isInteger(order.quantity) || order.quantity < 1 || order.quantity > 100)
     errors.push("Quantity must be between 1 and 100.");
+  if (order.address.length < 5) errors.push("Please enter your delivery address.");
+   order.unitPrice = unitPriceFor(order.item, order.size);
+  if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
 
-  order.unitPrice = PRICES[order.item] || null;
+  order.unitPrice = unitPriceFor(order.item, order.size);
+  if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
   order.total = order.unitPrice ? order.unitPrice * order.quantity : null;
 
   return { order, errors };
@@ -66,6 +85,7 @@ function detailsTable(o) {
     ${row("Colors", o.colors)}
     ${row("Size", o.size)}
     ${row("Notes", o.notes)}
+    ${row("Delivery address", o.address)}
   </table>`;
 }
 
@@ -103,10 +123,11 @@ module.exports = async (req, res) => {
       )`;
     await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS photo TEXT`;
     await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS unit_price INT`;
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS address TEXT`
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, unit_price)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, unit_price,address)
       VALUES (${order.name}, ${order.email}, ${order.phone}, ${order.item}, ${order.colors},
-              ${order.size}, ${order.quantity}, ${order.notes}, ${order.photo}, ${order.unitPrice})
+              ${order.size}, ${order.quantity}, ${order.notes}, ${order.photo}, ${order.unitPrice},${order.address})
       RETURNING id`;
     id = rows[0].id;
   } catch (err) {
