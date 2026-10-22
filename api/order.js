@@ -3,6 +3,7 @@
 
 const { neon } = require("@neondatabase/serverless");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 // Prices in UGX. The server decides the price, never the browser.
 // Items without a price are quoted by the shop owner.
@@ -15,6 +16,10 @@ const PRICES = {
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// Secret link used by the owner to confirm an order (see api/confirm.js)
+const sign = (id) =>
+  crypto.createHmac("sha256", process.env.CONFIRM_SECRET || "").update(String(id)).digest("hex").slice(0, 32);
 
 const clean = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -127,6 +132,11 @@ module.exports = async (req, res) => {
         ? `<p style="margin-top:12px">Photo chosen by the customer: <strong>${order.photo}.jpeg</strong></p>`
         : "";
 
+    const confirmButton =
+      siteUrl && process.env.CONFIRM_SECRET
+        ? `<p style="margin:18px 0"><a href="${siteUrl}/api/confirm?id=${id}&t=${sign(id)}" style="background:#c9607f;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Confirm order and ask 50% deposit</a></p>`
+        : "";
+
     const results = await Promise.allSettled([
       // to the customer
       transporter.sendMail({
@@ -136,7 +146,7 @@ module.exports = async (req, res) => {
         subject: `We received your order ${reference}`,
         html: `<div style="font-family:Arial,sans-serif;color:#1B2150;max-width:560px">
           <h2 style="color:#2A3584">Thank you, ${esc(order.name)}!</h2>
-          <p>We have received your order <strong>${reference}</strong>. I will contact you soon to confirm the details and the price.</p>
+          <p>We have received your order <strong>${reference}</strong>. I will contact you soon to confirm the details and the price. To start your order, a 50% deposit is requested once the price is confirmed.</p>
           ${detailsTable(order)}
           <p style="margin-top:20px">You can reply directly to this email if you want to change anything.</p>
           <p>Crochet Handcrafted Shop</p>
@@ -158,7 +168,8 @@ module.exports = async (req, res) => {
           <hr style="border:none;border-top:1px solid #DEE4F8;margin:12px 0">
           ${detailsTable(order)}
           ${photoLink}
-          <p style="margin-top:20px">Reply to this email to answer the customer directly.</p>
+          ${confirmButton}
+          <p style="margin-top:20px">Or reply to this email to answer the customer directly.</p>
         </div>`,
       }),
     ]);
