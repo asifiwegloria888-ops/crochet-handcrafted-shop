@@ -2,10 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Crochet Handcrafted Shop</title>
     <link rel="stylesheet" href="css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Styles for the home page only. They use your colors from style.css */
 
+        /* Welcome section: text on the left, big photo on the right */
+        .home-hero {
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 48px;
+            align-items: center;
+            padding: 48px 20px 24px;
+        }
+        .home-hero .label {
+            display: inline-block;
+            background: #fff;
+            color: var(--rose-fonce);
+            border: 2px solid var(--rose);
+            border-radius: 20px;
+            padding: 2px 14px;
+            font-size: 0.9rem;
+            margin: 0 0 14px;
+        }
+        .home-hero h1 {
+            text-align: left;
+            font-size: clamp(2rem, 5vw, 3.1rem);
+            line-height: 1.15;
+            margin: 0 0 16px;
+        }
+        .home-hero p { text-align: left; margin: 0 0 24px; }
+        .home-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+        .btn-outline {
+            background: #fff;
+            color: var(--rose-fonce) !important;
+            border: 2px solid var(--rose-fonce);
+            padding: 8px 20px;
+        }
+        .btn-outline:hover { background: var(--rose-fonce); color: #fff !important; }
+
+        .home-photo { padding: 0 14px 14px 0; }
+        .home-photo img {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            margin: 0;
+            border-radius: 220px 220px 24px 24px;
+            box-shadow: 14px 14px 0 var(--rose);
+        }
+
+        /* What we do */
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        .service-card {
+            background: #fff;
+            border-radius: 16px;
+            border-top: 5px solid var(--rose);
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        }
+        .service-card h3 { margin: 0 0 8px; color: var(--rose-fonce); text-align: center; }
+        .service-card p { margin: 0; }
+
+        /* A few creations */
+        .featured {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
+        }
+        .featured-item {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding-bottom: 18px;
+        }
+        .featured-item img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        .featured-item h3 { margin: 14px 0 0; color: var(--rose-fonce); }
+        .featured-item .prix { margin: 4px 0 12px; font-weight: bold; }
+        .center { text-align: center; }
+
+        /* About me */
+        .about {
+            max-width: 760px;
+            background: #fff;
+            border-radius: 20px;
+            margin: 24px auto;
+            padding: 8px 28px 28px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Opening hours */
+        .hours {
+            max-width: 860px;
+            margin: 32px auto;
+            background: var(--rose);
+            color: #fff;
+            border-radius: 20px;
+            padding: 8px 20px 28px;
+            text-align: center;
+        }
+        .hours h2 { color: #fff; }
+        .hours h2::after { background: #fff; }
+        .hours p { margin: 0; }
+        .hours a { color: #fff !important; text-decoration: underline; }
+
+        @media (max-width: 760px) {
+            .home-hero { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; text-align: center; }
+            .home-hero h1, .home-hero p { text-align: center; }
+            .home-actions { justify-content: center; }
+            .home-photo { max-width: 380px; margin: 0 auto; }
+        }
+    </style>
 </head>
 <body>
     <header class="site-header">
@@ -21,59 +144,81 @@
             </nav>
         </div>
     </header>
+
     <main id="main-content">
-    <section class="hero">
-        <div class="hero-text">
+        <section class="home-hero">
+            <div class="home-text">
+                <span class="label">Handmade with love</span>
+                <h1>Welcome to Crochet Handcrafted Shop</h1>
+                <p>Welcome to my little corner of handmade crochet treasures.
+                    Every piece here is lovingly crafted by hand,
+                    from cozy blankets to delicate accessories.</p>
+                <div class="home-actions">
+                    <a class="btn" href="order.html">Order now</a>
+                    <a class="btn btn-outline" href="creation.html">Browse our creations</a>
+                </div>
+            </div>
+            <div class="home-photo">
+                <img src="creation.jpeg" width="960" height="1280"
+                     alt="Three crochet hair scrunchies in yellow, red and olive green">
+            </div>
+        </section>
 
-            <h1>welcome to  Crochet Handcrafted Shop</h1>
-            <p class="tagline">
-                Welcome to my little corner of handmade crochet treasures.
-         Every piece here is lovingly crafted by hand, 
-         from cozy blankets to delicate accessories.</p>
+        <section aria-labelledby="services-heading">
+            <h2 id="services-heading">What we do</h2>
+            <div class="services">
+                <article class="service-card">
+                    <h3>Handmade crochet creations</h3>
+                    <p>Cozy blankets, cute baby hats, tote bags, skirts, dresses, crop tops and many more.
+                        Each lovingly crafted by hand with soft, quality yarn.</p>
+                </article>
+                <article class="service-card">
+                    <h3>Custom orders &amp; accessories</h3>
+                    <p>Choose your colors, size, and style. I also make hair accessories, hair scrunchies,
+                        and home decor, made just for you.</p>
+                </article>
+            </div>
+        </section>
 
-          <h2>About me </h2>
-          <p class="tagline">Hello! I'm a passionate crocheter with a love for creating unique,
-         handmade items. 
-        With years of experience and a keen eye for detail, 
-        I strive to bring joy and beauty to every piece I create.</p>
-         <p >
-            <a href="contact.html">contact us</a>
-            or <a href="creation.html">browser our creations</a>
+        <section aria-labelledby="featured-heading">
+            <h2 id="featured-heading">Some of my creations</h2>
+            <div class="featured">
+                <article class="featured-item">
+                    <img src="1.jpeg" alt="Orange crochet scrunchie" loading="lazy">
+                    <h3>Scrunchies</h3>
+                    <p class="prix">5 000 UGX</p>
+                    <a class="btn" href="order.html?item=Scrunchies&amp;photo=1">ORDER NOW</a>
+                </article>
+                <article class="featured-item">
+                    <img src="4.jpeg" alt="Red crochet crop top with white flowers" loading="lazy">
+                    <h3>Crop top</h3>
+                    <p class="prix">25 000 UGX</p>
+                    <a class="btn" href="order.html?item=Crop%20top&amp;photo=4">ORDER NOW</a>
+                </article>
+                <article class="featured-item">
+                    <img src="3.jpeg" alt="Ruffle crochet hat" loading="lazy">
+                    <h3>Ruffle crochet hat</h3>
+                    <p class="prix">20 000 UGX</p>
+                    <a class="btn" href="order.html?item=Ruffle%20crochet%20hat&amp;photo=3">ORDER NOW</a>
+                </article>
+            </div>
+            <p class="center"><a class="btn btn-outline" href="creation.html">See all creations</a></p>
+        </section>
 
-         </p>
+        <section class="about" aria-labelledby="about-heading">
+            <h2 id="about-heading">About me</h2>
+            <p>Hello! I'm a passionate crocheter with a love for creating unique,
+                handmade items. With years of experience and a keen eye for detail,
+                I strive to bring joy and beauty to every piece I create.</p>
+        </section>
 
-        </div>
-        <div class="hero-image">
-            <img src="creation.jpeg"
-            alt="hair scrunchies" width="300">
-        </div>
-    </section>
-    <section aria-labelledby="services-heading">
-        <h2 id="services-heading">what we do</h2>
-        <div class="card-grid">
-            <article class="card">
-                <h2>handmade crochet creations</h2>
-                <p>cozy blankets, cute baby hats, tote bags, skirt, dresses, crop top and many more. 
-                    Each lovingly crafted by hand with soft, quality yarn.
-                </p>
-            </article>
-            <article class="card">
-                <h2>custom orders & accessories</h2>
-                <p>choose your colors, size, and style. I also make hair accessories, hair scrunchies,
-                     and home decor; made just for you.</p>
-
-            </article>
-
-        </div>
-    </section>
-    <aside class="note" aria-labelledby="hours-heading">
-      <h2 id="hours-heading">Opening hours</h2>
-      <p>sunday to friday, 8:00 AM to 8:00 PM. Customer orders available anytime. <a href="contact.html">contact us</a>.</p>
-    </aside>
-
-    <script src="js/main.js"></script>
-
+        <aside class="hours" aria-labelledby="hours-heading">
+            <h2 id="hours-heading">Opening hours</h2>
+            <p>Sunday to Friday, 8:00 AM to 8:00 PM. Customer orders available anytime.
+                <a href="contact.html">Contact us</a>.</p>
+        </aside>
     </main>
+
     <footer class="site-footer">
         <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
         <p><a href="contact.html">contact us</a></p>

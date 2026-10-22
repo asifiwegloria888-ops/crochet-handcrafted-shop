@@ -9,7 +9,7 @@
   var photoInput = document.getElementById("photo");
 
   // Display only: the real price is always decided by the server.
-  var PRICES = { "Hair scrunchie": 5000, "Crop top": 25000, "Ruffle crochet hat": 20000 };
+  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000, "Crop top": 25000, "Ruffle crochet hat": 20000 };
   function money(n) {
     return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
   }
@@ -19,10 +19,18 @@
   var wantedItem = params.get("item");
   var wantedPhoto = params.get("photo");
 
-  if (wantedItem) {
+  if (wantedItem && wantedItem.length <= 50) {
+    var known = false;
     Array.prototype.forEach.call(itemSelect.options, function (opt) {
-      if (opt.value === wantedItem) itemSelect.value = wantedItem;
+      if (opt.value === wantedItem) known = true;
     });
+    // an item that is not in the list yet (new product) is added on the fly
+    if (!known) {
+      var extra = document.createElement("option");
+      extra.textContent = wantedItem;
+      itemSelect.insertBefore(extra, itemSelect.firstChild);
+    }
+    itemSelect.value = wantedItem;
   }
 
   var box = document.getElementById("order-product");

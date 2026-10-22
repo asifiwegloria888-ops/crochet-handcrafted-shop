@@ -12,3 +12,17 @@ boutons.forEach((b) => {
     });
   });
 });
+
+// Each "ORDER NOW" button sends the name and photo of its own card to the order page.
+// New items added to creation.html work automatically, nothing to edit here.
+document.querySelectorAll(".produit").forEach((carte) => {
+  const bouton = carte.querySelector(".btn");
+  const image = carte.querySelector("img");
+  const nom = carte.querySelector("h3");
+  if (!bouton || !image || !nom) return;
+
+  const params = new URLSearchParams({ item: nom.textContent.trim() });
+  const photo = (image.getAttribute("src").match(/(\d+)\.jpeg/) || [])[1];
+  if (photo) params.set("photo", photo);
+  bouton.href = "order.html?" + params.toString();
+});

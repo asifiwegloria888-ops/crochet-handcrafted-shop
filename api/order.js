@@ -7,24 +7,11 @@ const nodemailer = require("nodemailer");
 // Prices in UGX. The server decides the price, never the browser.
 // Items without a price are quoted by the shop owner.
 const PRICES = {
+  "Scrunchies": 5000,
   "Hair scrunchie": 5000,
   "Crop top": 25000,
   "Ruffle crochet hat": 20000,
 };
-
-const ITEMS = [
-  "Hair scrunchie",
-  "Crop top",
-  "Ruffle crochet hat",
-  "Blanket",
-  "Baby hat",
-  "Tote bag",
-  "Skirt",
-  "Dress",
-  "Hair accessory",
-  "Home decor",
-  "Other",
-];
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -49,7 +36,7 @@ function validate(body) {
   const errors = [];
   if (order.name.length < 2) errors.push("Please enter your name.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.email)) errors.push("Please enter a valid email address.");
-  if (!ITEMS.includes(order.item)) errors.push("Please choose an item.");
+  if (!order.item) errors.push("Please choose an item.");
   if (!Number.isInteger(order.quantity) || order.quantity < 1 || order.quantity > 100)
     errors.push("Quantity must be between 1 and 100.");
 
