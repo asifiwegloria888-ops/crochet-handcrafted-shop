@@ -14,30 +14,23 @@
 
   // Display only: the real price is always decided by the server.
   // KEEP THESE TWO BLOCKS IDENTICAL TO api/order.js (same names, same spelling).
- var SIZE_PRICES = {
-  "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
-  "Sweater": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
-  "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
-  "Small bag": { "Small": 15000, "Big": 25000 },
-  "Crochet flower": { "Small": 50000, "Big": 80000 }
-};
-var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
-var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Outside Kampala": 10000 };
-var deliverySelect = document.getElementById("delivery");
+  var SIZE_PRICES = {
+    "Crop top": { "Small": 25000, "Medium": 28000, "Large": 32000, "XL": 36000 },
+    "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
+    "Sweater": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
+    "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
+    "Small bag": { "Small": 15000, "Big": 25000 },
+    "Crochet flower": { "Small": 50000, "Big": 80000 }
+  };
+  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
+  var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Mukono": 5000, "Outside Kampala": 10000 };
+  var deliverySelect = document.getElementById("delivery");
 
-// Items with fixed sizes but no fixed price (same as api/order.js)
-var SIZES_ONLY = {
-  
-  "Skirt": ["Small", "Medium", "Large", "XL"],
-  "Crop top": ["Small", "Medium", "Large","XL"],
-  "Ruffle crochet hat": ["Child","Adult"],
-  "Sweater": ["Small", "Medium", "Large","XL"],
-  "Small bag": ["Small","Big"],
-  "Crochet flower": ["Small","Big"],
-  "Dress": ["Small", "Medium", "Large","XL"],
-  "Skirt": ["Small", "Medium", "Large", "XL"]
-};
-function sizesFor(item) {
+  // Items with fixed sizes but no fixed price (same as api/order.js)
+  var SIZES_ONLY = {
+    "Skirt": ["Small", "Medium", "Large", "XL"]
+  };
+  function sizesFor(item) {
   if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]);
   return SIZES_ONLY[item] || null;
 }
@@ -126,9 +119,6 @@ function sizesFor(item) {
     box.hidden = false;
   }
 
-  itemSelect.addEventListener("change", refresh);
-  sizeSelect.addEventListener("change", updatePrice);
-  qtyInput.addEventListener("input", updatePrice);
   itemSelect.addEventListener("change", refresh);
   sizeSelect.addEventListener("change", updatePrice);
   qtyInput.addEventListener("input", updatePrice);

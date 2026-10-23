@@ -51,6 +51,7 @@ function formPage(res, order, ref, token, error) {
 <div class="box">
   <p><strong>${esc(order.name)}</strong><br>${esc(order.email)}${order.phone ? "<br>" + esc(order.phone) : ""}</p>
   <p>${esc(order.item)} x ${esc(order.quantity)}<br>Colors: ${esc(order.colors || "-")}<br>Size: ${esc(order.size || "-")}<br>Notes: ${esc(order.notes || "-")}</p>
+  <p><strong>Delivery:</strong> ${esc(order.delivery || "-")}${order.delivery_fee ? " (" + esc(money(order.delivery_fee)) + ")" : ""}<br>Address: ${esc(order.address || "-")}</p>
   ${error ? `<p class="err">${esc(error)}</p>` : ""}
   <form method="POST" action="${esc(action)}">
     <label for="total">Total price (UGX)</label>
@@ -140,7 +141,8 @@ module.exports = async (req, res) => {
         <h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
         <p>Hello ${esc(order.name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>
         <table style="border-collapse:collapse;font-size:15px">
-          <tr><td style="padding:6px 12px 6px 0"><strong>Item</strong></td><td>${esc(order.item)} x ${esc(order.quantity)}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Item</strong></td><td>${esc(order.item)}${order.size ? " (" + esc(order.size) + ")" : ""} x ${esc(order.quantity)}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Delivery</strong></td><td>${esc(order.delivery || "-")}${order.delivery_fee ? " (" + esc(money(order.delivery_fee)) + ")" : ""}</td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Total price</strong></td><td>${esc(money(total))}</td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(balance))}</td></tr>
@@ -148,7 +150,7 @@ module.exports = async (req, res) => {
         <h3>How to pay the deposit</h3>
         <p style="background:#fff7f2;padding:12px;border-radius:8px">${esc(instructions).replace(/\r?\n/g, "<br>")}</p>
         <p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, send me the transaction ID or a screenshot on WhatsApp (or reply to this email). I start your order as soon as I receive the deposit.</p>
-        <p style="margin:18px 0"><a href="https://wa.me/+256 791 908 861?text=${encodeURIComponent('Hello, I paid the deposit for order ' + ref)}" style="background:#25D366;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Send payment proof on WhatsApp</a></p>
+        <p style="margin:18px 0"><a href="https://wa.me/256791908861?text=${encodeURIComponent('Hello, I paid the deposit for order ' + ref)}" style="background:#25D366;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Send payment proof on WhatsApp</a></p>
         <p>Crochet Handcrafted Shop</p>
       </div>`,
     });

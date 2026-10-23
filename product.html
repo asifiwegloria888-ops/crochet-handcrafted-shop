@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Item | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .pd { max-width: 900px; margin: 0 auto; padding: 0 14px 30px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; text-align: left; }
+        .pd > div { min-width: 0; }
+        .pd p { text-align: left; }
+        .pd-main { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 16px; margin: 0; }
+        .pd-thumbs { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; }
+        .pd-thumbs img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; margin: 0; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+        .pd-thumbs img.on { border-color: var(--rose-fonce); }
+        .pd label { display: block; font-weight: bold; margin: 12px 0 4px; color: var(--rose-fonce); }
+        .pd select, .pd input { width: 100%; padding: 12px; border: 1px solid var(--rose); border-radius: 10px; font-size: 1rem; font-family: inherit; background: #fff; }
+        .pd table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        .pd td { padding: 6px 4px; border-bottom: 1px solid #f0d5dd; }
+        .pd td:last-child { text-align: right; font-weight: bold; white-space: nowrap; }
+        .pd-total { font-weight: bold; font-size: 1.15rem; margin: 12px 0; }
+        .pd-msg { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: #e3f4e8; color: #1b5e34; }
+        .pd-msg:empty { display: none; }
+        @media (max-width: 700px) { .pd { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <nav class="main-nav" aria-label="main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="creation.html" aria-current="page">Creation</a></li>
+                    <li><a href="album.html">Album</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order.html">Order</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1 id="pd-title">Item</h1>
+        <div id="pd-box" class="pd">
+            <div>
+                <img id="pd-main" class="pd-main" src="" alt="">
+                <div id="pd-thumbs" class="pd-thumbs"></div>
+            </div>
+            <div>
+                <p id="pd-desc"></p>
+                <table id="pd-table"></table>
+                <label for="pd-size">Size</label>
+                <select id="pd-size"></select>
+                <label for="pd-qty">Quantity</label>
+                <input type="number" id="pd-qty" min="1" max="100" value="1">
+                <p class="pd-total" id="pd-total"></p>
+                <button type="button" class="submit" id="pd-add">Add to cart</button>
+                <p id="pd-msg" class="pd-msg" role="status"></p>
+                <p><a href="creation.html">&larr; Back to creations</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
+        <p><a href="contact.html">contact us</a></p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var name = params.get("item");
+      var p = Object.prototype.hasOwnProperty.call(PRODUCTS, name) ? PRODUCTS[name] : null;
+      var $ = function (id) { return document.getElementById(id); };
+      if (!p) {
+        $("pd-title").textContent = "Item not found";
+        $("pd-box").hidden = true;
+        return;
+      }
+      var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; };
+      var photo = params.get("photo");
+      if (p.photos.indexOf(photo) === -1) photo = p.photos[0];
+
+      document.title = name + " | Crochet Handcrafted Shop";
+      $("pd-title").textContent = name;
+      $("pd-desc").textContent = p.desc;
+
+      // price table + size list
+      var table = $("pd-table"), sizeSel = $("pd-size");
+      if (p.sizes) {
+        Object.keys(p.sizes).forEach(function (s) {
+          var tr = document.createElement("tr");
+          var a = document.createElement("td"); a.textContent = s;
+          var b = document.createElement("td"); b.textContent = money(p.sizes[s]);
+          tr.appendChild(a); tr.appendChild(b); table.appendChild(tr);
+          var o = document.createElement("option"); o.value = s; o.textContent = s; sizeSel.appendChild(o);
+        });
+      } else {
+        var tr = document.createElement("tr");
+        var a = document.createElement("td"); a.textContent = "Price";
+        var b = document.createElement("td"); b.textContent = money(p.price);
+        tr.appendChild(a); tr.appendChild(b); table.appendChild(tr);
+        sizeSel.parentNode.removeChild(sizeSel.previousElementSibling);
+        sizeSel.parentNode.removeChild(sizeSel);
+      }
+
+      // gallery
+      var main = $("pd-main"), thumbs = $("pd-thumbs");
+      function setPhoto(id) {
+        photo = id; main.src = id + ".jpeg"; main.alt = name;
+        Array.prototype.forEach.call(thumbs.children, function (t) { t.classList.toggle("on", t.dataset.id === id); });
+      }
+      p.photos.forEach(function (id) {
+        var t = document.createElement("img");
+        t.src = id + ".jpeg"; t.alt = name; t.dataset.id = id; t.loading = "lazy";
+        t.addEventListener("click", function () { setPhoto(id); });
+        thumbs.appendChild(t);
+      });
+      setPhoto(photo);
+
+      function unit() { return p.sizes ? p.sizes[sizeSel.value] : p.price; }
+      function total() {
+        var q = parseInt($("pd-qty").value, 10);
+        $("pd-total").textContent = q > 0 ? "Total: " + money(unit() * q) : "";
+      }
+      if (p.sizes) sizeSel.addEventListener("change", total);
+      $("pd-qty").addEventListener("input", total);
+      total();
+
+      // add to cart (saved in this browser; the cart page comes next)
+      $("pd-add").addEventListener("click", function () {
+        var q = parseInt($("pd-qty").value, 10);
+        if (!(q >= 1 && q <= 100)) return;
+        var size = p.sizes ? sizeSel.value : "";
+        var cart = [];
+        try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) {}
+        var found = cart.filter(function (l) { return l.item === name && l.size === size && l.photo === photo; })[0];
+        if (found) found.qty = Math.min(100, found.qty + q);
+        else cart.push({ item: name, size: size, qty: q, photo: photo });
+        try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {}
+        $("pd-msg").textContent = "Added to your cart. You can choose another item or open the cart.";
+      });
+    })();
+    </script>
+</body>
+</html>

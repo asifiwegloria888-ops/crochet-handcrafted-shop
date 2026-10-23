@@ -28,23 +28,18 @@ const DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000,"Mukono": 5000, "Outside Ka
 // Items with fixed sizes but no fixed price (you quote the price yourself)
 const SIZES_ONLY = {
   "Skirt": ["Small", "Medium", "Large", "XL"],
-  "Crop top": ["Small", "Medium", "Large","XL"],
-  "Ruffle crochet hat": ["Child","Adult"],
-  "Sweater": ["Small", "Medium", "Large","XL"],
-  "Small bag": ["Small","Big"],
-  "Crochet flower": ["Small","Big"],
-  "Dress": ["Small", "Medium", "Large","XL"],
-  "Skirt": ["Small", "Medium", "Large", "XL"]
 };
 
+const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+
 function unitPriceFor(item, size) {
-  if (SIZE_PRICES[item]) return SIZE_PRICES[item][size] || null;
-  return PRICES[item] || null;
+  if (has(SIZE_PRICES, item)) return has(SIZE_PRICES[item], size) ? SIZE_PRICES[item][size] : null;
+  return has(PRICES, item) ? PRICES[item] : null;
 }
 
 function sizesFor(item) {
-  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]);
-  return SIZES_ONLY[item] || null;
+  if (has(SIZE_PRICES, item)) return Object.keys(SIZE_PRICES[item]);
+  return has(SIZES_ONLY, item) ? SIZES_ONLY[item] : null;
 }
 
 
@@ -84,13 +79,8 @@ function validate(body) {
   order.unitPrice = unitPriceFor(order.item, order.size);
   const allowedSizes = sizesFor(order.item);
   if (allowedSizes && !allowedSizes.includes(order.size)) errors.push("Please choose a size.");
-  order.total = order.unitPrice ? order.unitPrice * order.quantity : null;
 
-  order.unitPrice = unitPriceFor(order.item, order.size);
-  if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
-  order.total = order.unitPrice ? order.unitPrice * order.quantity : null;
-
-  if (!Object.prototype.hasOwnProperty.call(DELIVERY_FEES, order.delivery)) errors.push("Please choose a delivery option.");
+  if (!has(DELIVERY_FEES, order.delivery)) errors.push("Please choose a delivery option.");
   order.deliveryFee = DELIVERY_FEES[order.delivery] || 0;
   order.total = order.unitPrice ? order.unitPrice * order.quantity + order.deliveryFee : null;
 
