@@ -23,7 +23,7 @@ const PRICES = {
   "Hair scrunchie": 5000,
 };
 
-const DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Outside Kampala": 10000 };
+const DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000,"Mukono": 5000, "Outside Kampala": 10000 };
 
 // Items with fixed sizes but no fixed price (you quote the price yourself)
 const SIZES_ONLY = {

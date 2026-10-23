@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Album | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .album { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; max-width: 1000px; margin: 0 auto; padding: 0 12px; }
+        .album button { border: 0; padding: 0; background: none; cursor: zoom-in; border-radius: 12px; overflow: hidden; }
+        .album img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; margin: 0; border-radius: 12px; }
+        .lb { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none; z-index: 1000; flex-direction: column; }
+        .lb.open { display: flex; }
+        .lb-stage { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; }
+        .lb-stage img { max-width: 100%; max-height: 100%; margin: 0; border-radius: 0; box-shadow: none; cursor: zoom-in; }
+        .lb-stage.zoomed { display: block; }
+        .lb-stage.zoomed img { max-width: none; max-height: none; width: 200%; cursor: zoom-out; }
+        .lb-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 14px; }
+        .lb-bar button, .lb-bar a { background: #c9607f; color: #fff; border: 0; border-radius: 10px; padding: 10px 16px; font-size: 1rem; text-decoration: none; cursor: pointer; }
+        .lb-bar a[hidden] { display: none; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <nav class="main-nav" aria-label="main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="creation.html">Creation</a></li>
+                    <li><a href="album.html" aria-current="page">Album</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order.html">Order</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>Album</h1>
+        <p class="intro">Tap a photo to see it bigger. Tap again to zoom.</p>
+
+        <div class="album" id="album">
+            <button data-src="1.jpeg" data-item="Scrunchies"><img src="1.jpeg" alt="Crochet model 1" loading="lazy"></button>
+            <button data-src="2.jpeg" data-item="Scrunchies"><img src="2.jpeg" alt="Crochet model 2" loading="lazy"></button>
+            <button data-src="3.jpeg" data-item="Ruffle crochet hat"><img src="3.jpeg" alt="Crochet model 3" loading="lazy"></button>
+            <button data-src="4.jpeg" data-item="Crop top"><img src="4.jpeg" alt="Crochet model 4" loading="lazy"></button>
+            <button data-src="5.jpeg" data-item="Crop top"><img src="5.jpeg" alt="Crochet model 5" loading="lazy"></button>
+            <button data-src="6.jpeg" data-item="Scrunchies"><img src="6.jpeg" alt="Crochet model 6" loading="lazy"></button>
+            <button data-src="7.jpeg" data-item="Scrunchies"><img src="7.jpeg" alt="Crochet model 7" loading="lazy"></button>
+            <button data-src="8.jpeg" data-item="Crop top"><img src="8.jpeg" alt="Crop top" loading="lazy"></button>
+            <button data-src="9.jpeg" data-item="Crop top"><img src="9.jpeg" alt="Crochet model 9" loading="lazy"></button>
+            <button data-src="10.jpeg" data-item="Scrunchies"><img src="10.jpeg" alt="Crochet model 10" loading="lazy"></button>
+            <button data-src="11.jpeg" data-item="Crop top"><img src="11.jpeg" alt="Crochet model 11" loading="lazy"></button>
+            <button data-src="12.jpeg" data-item="Crop top"><img src="12.jpeg" alt="Crochet model 12" loading="lazy"></button>
+            <button data-src="13.jpeg" data-item="Crop top"><img src="13.jpeg" alt="Crochet model 13" loading="lazy"></button>
+            <button data-src="14.jpeg" data-item="Crop top"><img src="14.jpeg" alt="Crochet model 14" loading="lazy"></button>
+            <button data-src="15.jpeg" data-item="Crop top"><img src="15.jpeg" alt="Crochet model 15" loading="lazy"></button>
+            <button data-src="16.jpeg" data-item="Crop top"><img src="16.jpeg" alt="Crochet model 16" loading="lazy"></button>
+            <button data-src="17.jpeg" data-item="Crop top"><img src="17.jpeg" alt="Crochet model 17" loading="lazy"></button>
+            <button data-src="18.jpeg" data-item="Crop top"><img src="18.jpeg" alt="Crochet model 18" loading="lazy"></button>
+            <button data-src="19.jpeg" data-item="Crop top"><img src="19.jpeg" alt="Crochet model 19" loading="lazy"></button>
+            <button data-src="20.jpeg" data-item="Crop top"><img src="20.jpeg" alt="Crochet model 20" loading="lazy"></button>
+            <button data-src="21.jpeg" data-item="Sweater"><img src="21.jpeg" alt="Crochet model 21" loading="lazy"></button>
+            <button data-src="22.jpeg" data-item="Small bag"><img src="22.jpeg" alt="Crochet model 22" loading="lazy"></button>
+            <button data-src="24.jpeg" data-item="Dress"><img src="24.jpeg" alt="Dress" loading="lazy"></button>
+            <button data-src="25.jpeg" data-item="Crochet flower"><img src="25.jpeg" alt="Crochet model 25" loading="lazy"></button>
+            <button data-src="26.jpeg" data-item="Crochet flower"><img src="26.jpeg" alt="Crochet model 26" loading="lazy"></button>
+            <button data-src="27.jpeg" data-item="Ruffle crochet hat"><img src="27.jpeg" alt="Crochet model 27" loading="lazy"></button>
+            <button data-src="28.jpeg" data-item="Sweater"><img src="28.jpeg" alt="Crochet model 28" loading="lazy"></button>
+            <button data-src="29.jpeg" data-item="Flower crochet"><img src="29.jpeg" alt="Crochet model 29" loading="lazy"></button>
+            <button data-src="30.jpeg" data-item="Dress"><img src="30.jpeg" alt="Crochet model 30" loading="lazy"></button>
+            <button data-src="31.jpeg" data-item="Dress"><img src="31.jpeg" alt="Crochet model 30" loading="lazy"></button>
+        </div>
+    </main>
+
+    <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
+        <div class="lb-stage" id="lb-stage"><img id="lb-img" src="" alt=""></div>
+        <div class="lb-bar">
+            <button id="lb-prev" aria-label="Previous">&larr;</button>
+            <a id="lb-order" href="order.html" hidden>Order this model</a>
+            <button id="lb-close" aria-label="Close">Close</button>
+            <button id="lb-next" aria-label="Next">&rarr;</button>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
+        <p><a href="contact.html">contact us</a></p>
+    </footer>
+
+    <script>
+    (function () {
+      var items = Array.prototype.slice.call(document.querySelectorAll("#album button"));
+      var lb = document.getElementById("lb"), stage = document.getElementById("lb-stage");
+      var img = document.getElementById("lb-img"), order = document.getElementById("lb-order");
+      var current = 0;
+
+      function show(i) {
+        current = (i + items.length) % items.length;
+        var b = items[current];
+        stage.classList.remove("zoomed");
+        img.src = b.dataset.src;
+        img.alt = b.querySelector("img").alt;
+        var item = b.dataset.item;
+        if (item) {
+          var photo = b.dataset.src.replace(/\.jpe?g$/i, "");
+          order.href = "order.html?item=" + encodeURIComponent(item).replace(/%20/g, "+") + "&photo=" + photo;
+          order.hidden = false;
+        } else { order.hidden = true; }
+      }
+      function open(i) { show(i); lb.classList.add("open"); }
+      function close() { lb.classList.remove("open"); }
+
+      items.forEach(function (b, i) { b.addEventListener("click", function () { open(i); }); });
+      img.addEventListener("click", function () { stage.classList.toggle("zoomed"); });
+      document.getElementById("lb-close").addEventListener("click", close);
+      document.getElementById("lb-prev").addEventListener("click", function () { show(current - 1); });
+      document.getElementById("lb-next").addEventListener("click", function () { show(current + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (!lb.classList.contains("open")) return;
+        if (e.key === "Escape") close();
+        if (e.key === "ArrowLeft") show(current - 1);
+        if (e.key === "ArrowRight") show(current + 1);
+      });
+    })();
+    </script>
+</body>
+</html>

@@ -205,3 +205,8 @@ header .main-nav li a { font-size: 1rem; }
   header .main-nav ul { gap: 4px; margin-top: 8px; }
   header .main-nav li a { font-size: 0.95rem; padding: 6px 12px; }
 }
+.tailles { font-size: 0.85rem; margin: 4px 0 10px; color: #7a6a6e; }
+.main-nav a[aria-current="page"] {
+  font-weight: bold;
+  border-bottom: 2px solid #fff;
+}
