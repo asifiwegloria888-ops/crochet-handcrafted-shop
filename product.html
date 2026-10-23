@@ -54,6 +54,8 @@
                 <select id="pd-size"></select>
                 <label for="pd-qty">Quantity</label>
                 <input type="number" id="pd-qty" min="1" max="100" value="1">
+                <label for="pd-colors">Colours (optional)</label>
+                <input type="text" id="pd-colors" maxlength="200" placeholder="Ex: red and white">
                 <p class="pd-total" id="pd-total"></p>
                 <button type="button" class="submit" id="pd-add">Add to cart</button>
                 <p id="pd-msg" class="pd-msg" role="status"></p>
@@ -136,9 +138,10 @@
         var size = p.sizes ? sizeSel.value : "";
         var cart = [];
         try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) {}
-        var found = cart.filter(function (l) { return l.item === name && l.size === size && l.photo === photo; })[0];
+        var colors = $("pd-colors").value.trim();
+        var found = cart.filter(function (l) { return l.item === name && l.size === size && l.photo === photo && (l.colors || "") === colors; })[0];
         if (found) found.qty = Math.min(100, found.qty + q);
-        else cart.push({ item: name, size: size, qty: q, photo: photo });
+        else cart.push({ item: name, size: size, qty: q, photo: photo, colors: colors });
         try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {}
         var msg = $("pd-msg");
         msg.textContent = "Added to your cart. You can choose another item or ";
