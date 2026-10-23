@@ -23,6 +23,8 @@ const PRICES = {
   "Hair scrunchie": 5000,
 };
 
+const DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Outside Kampala": 10000 };
+
 // Items with fixed sizes but no fixed price (you quote the price yourself)
 const SIZES_ONLY = {
   "Skirt": ["Small", "Medium", "Large", "XL"],
@@ -69,6 +71,7 @@ function validate(body) {
     notes: clean(body.notes, 1500),
     photo: /^\d{1,3}$/.test(clean(body.photo, 3)) ? clean(body.photo, 3) : "",
     address: clean(body.address, 300),
+    delivery: clean(body.delivery, 50),
   };
 
   const errors = [];
@@ -87,6 +90,10 @@ function validate(body) {
   if (SIZE_PRICES[order.item] && !order.unitPrice) errors.push("Please choose a size.");
   order.total = order.unitPrice ? order.unitPrice * order.quantity : null;
 
+  if (!Object.prototype.hasOwnProperty.call(DELIVERY_FEES, order.delivery)) errors.push("Please choose a delivery option.");
+  order.deliveryFee = DELIVERY_FEES[order.delivery] || 0;
+  order.total = order.unitPrice ? order.unitPrice * order.quantity + order.deliveryFee : null;
+
   return { order, errors };
 }
 
@@ -96,7 +103,7 @@ function row(label, value) {
 
 function detailsTable(o) {
   const price = o.unitPrice
-    ? `${money(o.unitPrice)} each, estimated total ${money(o.total)} (to be confirmed)`
+    ? `${money(o.unitPrice)} each, estimated total with delivery ${money(o.total)} (to be confirmed)`
     : "To be confirmed";
   return `<table style="border-collapse:collapse;font-size:15px">
     ${row("Item", o.item)}
@@ -106,6 +113,7 @@ function detailsTable(o) {
     ${row("Size", o.size)}
     ${row("Notes", o.notes)}
     ${row("Delivery address", o.address)}
+    ${row("Delivery", o.delivery + " (" + money(o.deliveryFee) + ")")}
   </table>`;
 }
 
@@ -143,11 +151,13 @@ module.exports = async (req, res) => {
       )`;
     await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS photo TEXT`;
     await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS unit_price INT`;
-    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS address TEXT`
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS address TEXT`;
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery TEXT`;
+    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_fee INT`;
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, unit_price,address)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, unit_price,address,delivery, delivery_fee)
       VALUES (${order.name}, ${order.email}, ${order.phone}, ${order.item}, ${order.colors},
-              ${order.size}, ${order.quantity}, ${order.notes}, ${order.photo}, ${order.unitPrice},${order.address})
+              ${order.size}, ${order.quantity}, ${order.notes}, ${order.photo}, ${order.unitPrice},${order.address},${order.delivery}, ${order.deliveryFee})
       RETURNING id`;
     id = rows[0].id;
   } catch (err) {

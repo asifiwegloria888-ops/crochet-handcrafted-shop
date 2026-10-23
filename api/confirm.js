@@ -41,7 +41,7 @@ button{margin-top:18px;width:100%;background:#c9607f;color:#fff;border:none;padd
 }
 
 function formPage(res, order, ref, token, error) {
-  const guess = order.unit_price ? order.unit_price * order.quantity : "";
+  const guess = order.unit_price ? order.unit_price * order.quantity + (order.delivery_fee || 0) : "";
   const action = `/api/confirm?id=${order.id}&t=${encodeURIComponent(token)}`;
   return send(
     res,

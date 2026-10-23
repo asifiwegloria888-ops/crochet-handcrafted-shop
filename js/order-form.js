@@ -22,6 +22,8 @@
   "Crochet flower": { "Small": 50000, "Big": 80000 }
 };
 var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
+var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Outside Kampala": 10000 };
+var deliverySelect = document.getElementById("delivery");
 
 // Items with fixed sizes but no fixed price (same as api/order.js)
 var SIZES_ONLY = {
@@ -79,7 +81,8 @@ function sizesFor(item) {
     var price = unitPrice();
     var qty = parseInt(qtyInput.value, 10);
     if (price && qty > 0) {
-      priceNote.textContent = money(price) + " each, estimated total " + money(price * qty) + " (to be confirmed)";
+      var fee = DELIVERY_FEES[deliverySelect.value] || 0;
+      priceNote.textContent = money(price) + " each, delivery " + money(fee) + ", estimated total " + money(price * qty + fee) + " (to be confirmed)";
     } else {
       priceNote.textContent = "Price to be confirmed after your order.";
     }
@@ -126,6 +129,10 @@ function sizesFor(item) {
   itemSelect.addEventListener("change", refresh);
   sizeSelect.addEventListener("change", updatePrice);
   qtyInput.addEventListener("input", updatePrice);
+  itemSelect.addEventListener("change", refresh);
+  sizeSelect.addEventListener("change", updatePrice);
+  qtyInput.addEventListener("input", updatePrice);
+  deliverySelect.addEventListener("change", updatePrice);
   refresh();
 
   // ---- Submit ----
