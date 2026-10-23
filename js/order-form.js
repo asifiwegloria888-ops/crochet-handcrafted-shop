@@ -18,6 +18,33 @@
   function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; }
   var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
 
+  // ---- Ready date rules (same as in api/order.js, which checks again on the server) ----
+  // Days to wait after the order date. Anything not listed waits 7 days.
+  // If the cart mixes products, the LONGEST delay applies.
+  var DEFAULT_LEAD_DAYS = 7;
+  var LEAD_DAYS = { "sweater": 14, "dress": 14, "scrunchies": 3 };
+  var KAMPALA_OFFSET_MS = 3 * 60 * 60 * 1000; // Uganda is UTC+3
+
+  function leadDays(cartLines) {
+    var days = 0;
+    cartLines.forEach(function (l) {
+      var key = String(l.item || "").trim().toLowerCase();
+      var d = has(LEAD_DAYS, key) ? LEAD_DAYS[key] : DEFAULT_LEAD_DAYS;
+      if (d > days) days = d;
+    });
+    return days || DEFAULT_LEAD_DAYS;
+  }
+  function isoPlusDays(n) {
+    var d = new Date(Date.now() + KAMPALA_OFFSET_MS);
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  function prettyDate(iso) {
+    return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
+      weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
+    });
+  }
+
   function unitPrice(l) {
     var p = has(PRODUCTS, l.item) ? PRODUCTS[l.item] : null;
     if (!p) return null;
@@ -35,6 +62,34 @@
     return;
   }
   $("order-main").hidden = false;
+
+  // ---- Ready date field (created here, placed just before the submit button) ----
+  var minLead = leadDays(lines);
+  var minReady = isoPlusDays(minLead);
+  var dateField = $("ready-date-field");
+  if (!dateField) {
+    dateField = document.createElement("div");
+    dateField.id = "ready-date-field";
+    dateField.className = "field";
+    var dateLabel = document.createElement("label");
+    dateLabel.setAttribute("for", "ready_date");
+    dateLabel.textContent = "Date you want your order to be ready *";
+    var dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.id = "ready_date";
+    dateInput.name = "ready_date";
+    dateInput.required = true;
+    var dateHelp = document.createElement("small");
+    dateHelp.id = "ready-date-help";
+    dateField.appendChild(dateLabel);
+    dateField.appendChild(dateInput);
+    dateField.appendChild(dateHelp);
+    button.parentNode.insertBefore(dateField, button);
+  }
+  var readyInput = $("ready_date");
+  readyInput.min = minReady;
+  $("ready-date-help").textContent =
+    "Required. Earliest date: " + prettyDate(minReady) + " (" + minLead + " days after today).";
 
   // delivery options come from js/products.js
   Object.keys(DELIVERY_FEES).forEach(function (key) {
@@ -77,9 +132,13 @@
     addressInput.disabled = pickup;
     addressInput.required = !pickup;
     var fee = DELIVERY_FEES[deliverySelect.value];
+    // exact delivery charge on its own line, then the total
     if (fee === null) {
       $("os-fee").textContent = "price confirmed by me";
       $("os-total").textContent = money(subtotal) + " + delivery";
+    } else if (fee === 0) {
+      $("os-fee").textContent = "Free (pick up)";
+      $("os-total").textContent = money(subtotal);
     } else {
       $("os-fee").textContent = money(fee || 0);
       $("os-total").textContent = money(subtotal + (fee || 0));
@@ -95,7 +154,22 @@
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+
+    // ready date: required, and not before today + lead days
+    var chosen = readyInput.value;
+    if (!chosen) {
+      showError("Please choose the date you want your order to be ready.");
+      readyInput.focus();
+      return;
+    }
+    if (chosen < minReady) {
+      showError("The ready date must be " + minLead + " days or more after today. Earliest: " + prettyDate(minReady) + ".");
+      readyInput.focus();
+      return;
+    }
+
     var data = Object.fromEntries(new FormData(form).entries());
+    data.ready_date = chosen;
     data.items = lines.map(function (l) {
       return { item: l.item, size: l.size || "", qty: l.qty, colors: l.colors || "", photo: l.photo || "" };
     });
