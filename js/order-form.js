@@ -41,9 +41,9 @@
     var fee = DELIVERY_FEES[key];
     var opt = document.createElement("option");
     opt.value = key;
-    opt.textContent = fee === 0
-      ? "Pick up (free)"
-      : (key === "Outside Kampala" ? "Delivery outside Kampala" : "Delivery in " + key) + " - " + money(fee);
+    if (fee === null) opt.textContent = "Delivery to my address (price confirmed by me)";
+    else if (fee === 0) opt.textContent = "Pick up (free)";
+    else opt.textContent = key + " - " + money(fee);
     deliverySelect.appendChild(opt);
   });
 
@@ -67,10 +67,23 @@
   });
   $("os-subtotal").textContent = money(subtotal);
 
+  var addressField = $("address-field");
+  var addressInput = $("address");
+
   function updateTotal() {
-    var fee = DELIVERY_FEES[deliverySelect.value] || 0;
-    $("os-fee").textContent = money(fee);
-    $("os-total").textContent = money(subtotal + fee);
+    // no address needed to pick up the order yourself
+    var pickup = DELIVERY_FEES[deliverySelect.value] === 0;
+    addressField.hidden = pickup;
+    addressInput.disabled = pickup;
+    addressInput.required = !pickup;
+    var fee = DELIVERY_FEES[deliverySelect.value];
+    if (fee === null) {
+      $("os-fee").textContent = "price confirmed by me";
+      $("os-total").textContent = money(subtotal) + " + delivery";
+    } else {
+      $("os-fee").textContent = money(fee || 0);
+      $("os-total").textContent = money(subtotal + (fee || 0));
+    }
   }
   deliverySelect.addEventListener("change", updateTotal);
   updateTotal();

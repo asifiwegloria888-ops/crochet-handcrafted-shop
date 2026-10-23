@@ -39,7 +39,8 @@ var PRODUCTS = {
 };
 
 // Delivery options: the key is what the customer picks, the value is the fee in UGX.
-var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Mukono": 5000, "Outside Kampala": 10000 };
+// "Delivery" has no fixed fee (null): the customer types his address and YOU tell him the price when you confirm.
+var DELIVERY_FEES = { "Pickup": 0, "Delivery": null };
 
 // Lets the server (Node) use this same file. The browser ignores this line.
 if (typeof module !== "undefined" && module.exports) {

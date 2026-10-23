@@ -184,7 +184,7 @@
           if (wn) { ph.appendChild(document.createTextNode("  ")); var wa = el("a", "", "WhatsApp"); wa.href = "https://wa.me/" + wn; wa.target = "_blank"; wa.rel = "noopener"; ph.appendChild(wa); }
           who.appendChild(ph);
         }
-        who.appendChild(el("p", "small", "Delivery: " + o.delivery + " (" + money(o.delivery_fee) + ")"));
+        who.appendChild(el("p", "small", (o.delivery === "Pickup" ? "Pick up (free)" : o.delivery === "Delivery" ? "Delivery to his address" : "Delivery: " + o.delivery) + (o.delivery_quote ? " (price to quote)" : o.delivery === "Pickup" ? "" : " (" + money(o.delivery_fee || 0) + ")")));
         if (o.address) who.appendChild(el("p", "small", "Address: " + o.address));
         if (o.notes) who.appendChild(el("p", "small", "Notes: " + o.notes));
         cols.appendChild(who);
@@ -204,10 +204,10 @@
           t.appendChild(tr);
         });
         var tt = el("tr");
-        var lab = el("td", "", o.status === "new" ? "Estimated total" : "Total"); lab.colSpan = 2; lab.style.fontWeight = "bold";
+        var lab = el("td", "", o.status === "new" ? (o.delivery_quote ? "Items (delivery to quote)" : "Estimated total") : "Total"); lab.colSpan = 2; lab.style.fontWeight = "bold";
         tt.appendChild(lab);
-        var val = o.status === "new" ? o.estimate : (o.total != null ? o.total : o.estimate);
-        tt.appendChild(el("td", "r", val != null ? money(val) : "to confirm")).style.fontWeight = "bold";
+        var val = o.status === "new" ? (o.delivery_quote ? o.items_subtotal : o.estimate) : (o.total != null ? o.total : o.estimate);
+        tt.appendChild(el("td", "r", val != null ? money(val) + (o.status === "new" && o.delivery_quote ? " + delivery" : "") : "to confirm")).style.fontWeight = "bold";
         t.appendChild(tt);
         if (o.deposit != null && o.status !== "new") {
           var dr = el("tr"); var dl = el("td", "small", "Deposit 50% asked"); dl.colSpan = 2; dr.appendChild(dl);
@@ -228,6 +228,7 @@
             run(ok, { action: "confirm", id: o.id, total: total },
               "Send the confirmation to " + o.email + " asking a deposit of " + money(Math.ceil(total / 2)) + "?");
           });
+          if (o.delivery_quote) act.appendChild(el("p", "err", "Add the delivery price to the items total, then confirm."));
           act.appendChild(el("span", "small", "Total (UGX):")); act.appendChild(inp); act.appendChild(ok);
         }
         if (o.status === "confirmed") {

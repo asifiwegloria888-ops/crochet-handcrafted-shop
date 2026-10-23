@@ -27,12 +27,14 @@ module.exports = async (req, res) => {
   const errors = [...priced.errors];
   if (customer.name.length < 2) errors.push("Please enter your name.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) errors.push("Please enter a valid email address.");
-  if (customer.address.length < 5) errors.push("Please enter your delivery address.");
   if (!L.has(L.DELIVERY_FEES, customer.delivery)) errors.push("Please choose a delivery option.");
+  else if (L.DELIVERY_FEES[customer.delivery] === null && customer.address.length < 10)
+    errors.push("Please write your full delivery address (town, area, landmark) so I can quote the delivery price.");
+  if (customer.delivery === "Pickup") customer.address = "";
   if (errors.length) return res.status(400).json({ error: errors.join(" ") });
 
-  const fee = L.DELIVERY_FEES[customer.delivery];
-  const total = priced.subtotal + fee;
+  const fee = L.DELIVERY_FEES[customer.delivery]; // null = price quoted by the owner
+  const total = fee == null ? null : priced.subtotal + fee;
   const items = priced.items;
   const summary = items.map((i) => `${i.item}${i.size ? " (" + i.size + ")" : ""} x${i.quantity}`).join(", ").slice(0, 400);
   const quantity = items.reduce((s, i) => s + i.quantity, 0);
@@ -88,10 +90,12 @@ module.exports = async (req, res) => {
             .map((i) => (site ? `<a href="${L.esc(site)}/${i.photo}.jpeg">${L.esc(i.item)}: ${i.photo}.jpeg</a>` : `${L.esc(i.item)}: ${i.photo}.jpeg`))
             .join("<br>")}</p>`
         : "";
+      const btn = "display:inline-block;background:#c9607f;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px";
       const buttons =
         site && process.env.CONFIRM_SECRET
-          ? `<p style="margin:18px 0"><a href="${site}/api/confirm?id=${order.id}&t=${L.sign(order.id)}" style="background:#c9607f;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Open order: confirm and manage the 50% deposit</a></p>
-             <p style="margin:6px 0">Or manage all orders in your <a href="${site}/admin.html">admin page</a>.</p>`
+          ? `<p style="margin:20px 0 6px"><a href="${site}/api/confirm?id=${order.id}&t=${L.sign(order.id)}" style="${btn}">Manage this order</a></p>
+             <p style="margin:0 0 6px;font-size:13px;color:#7a6a6e">Confirm the price, ask the 50% deposit, mark it received.</p>
+             <p style="margin:6px 0">Or open your <a href="${site}/admin.html">admin page</a> to see all orders.</p>`
           : "";
       await transporter.sendMail({
         from,

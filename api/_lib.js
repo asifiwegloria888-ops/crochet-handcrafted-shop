@@ -102,7 +102,11 @@ function orderLines(o) {
   ];
 }
 
+// A delivery with no fixed fee ("Other area"): the owner quotes it when confirming.
+const needsQuote = (o) => !!o.delivery && o.delivery_fee == null;
+
 function estimateOf(o) {
+  if (needsQuote(o)) return null;
   if (o.total != null) return o.total;
   const lines = orderLines(o);
   if (lines.some((l) => l.line_total == null)) return null;
@@ -136,14 +140,17 @@ function mailer() {
 const siteUrl = () => (process.env.SITE_URL || "").replace(/\/$/, "");
 
 function waButton(ref) {
-  const number = (process.env.WHATSAPP_NUMBER || "256791908861").replace(/\D/g, "");
+  const number = (process.env.WHATSAPP_NUMBER || "243978253950").replace(/\D/g, "");
   const text = encodeURIComponent("Hello, I'm writing about my order " + ref);
-  return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="background:#25D366;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Chat with me on WhatsApp</a></p>`;
+  return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px">WhatsApp me</a></p>`;
 }
 
 const TD = 'style="padding:6px 8px;border-bottom:1px solid #f0d5dd;vertical-align:top"';
 
-function itemsTable(order) {
+const deliveryLabel = (d) =>
+  d === "Pickup" ? "Pick up" : d === "Delivery" ? "Delivery to the address below" : d ? "Delivery (" + d + ")" : "-";
+
+function itemsTable(order, confirmedTotal) {
   const lines = orderLines(order);
   const rows = lines
     .map(
@@ -153,13 +160,31 @@ function itemsTable(order) {
       <td ${TD} align="right">${l.line_total != null ? esc(money(l.line_total)) : "to be quoted"}</td></tr>`
     )
     .join("");
-  const fee = order.delivery_fee || 0;
+  const quote = needsQuote(order);
+  const priced = lines.every((l) => l.line_total != null);
+  const itemsSum = priced ? lines.reduce((s, l) => s + l.line_total, 0) : null;
   const estimate = estimateOf(order);
+
+  let deliveryCell, totalLabel, totalCell;
+  if (confirmedTotal != null) {
+    deliveryCell = quote ? "included in the total" : esc(money(order.delivery_fee || 0));
+    totalLabel = "Total price";
+    totalCell = esc(money(confirmedTotal));
+  } else if (quote) {
+    deliveryCell = "to be quoted";
+    totalLabel = "Items (delivery price to be quoted)";
+    totalCell = itemsSum != null ? esc(money(itemsSum)) + " + delivery" : "to be confirmed";
+  } else {
+    deliveryCell = esc(money(order.delivery_fee || 0));
+    totalLabel = "Estimated total";
+    totalCell = estimate != null ? esc(money(estimate)) : "to be confirmed";
+  }
+
   return `<table style="border-collapse:collapse;font-size:15px;width:100%;max-width:520px">
     <tr><th align="left" ${TD}>Item</th><th align="left" ${TD}>Qty</th><th align="right" ${TD}>Price</th></tr>
     ${rows}
-    <tr><td ${TD} colspan="2">Delivery (${esc(order.delivery || "-")})</td><td ${TD} align="right">${esc(money(fee))}</td></tr>
-    <tr><td ${TD} colspan="2"><strong>Estimated total</strong></td><td ${TD} align="right"><strong>${estimate != null ? esc(money(estimate)) : "to be confirmed"}</strong></td></tr>
+    <tr><td ${TD} colspan="2">${esc(deliveryLabel(order.delivery))}</td><td ${TD} align="right">${deliveryCell}</td></tr>
+    <tr><td ${TD} colspan="2"><strong>${totalLabel}</strong></td><td ${TD} align="right"><strong>${totalCell}</strong></td></tr>
   </table>
   ${order.address ? `<p style="margin:10px 0"><strong>Delivery address:</strong> ${esc(order.address)}</p>` : ""}
   ${order.notes ? `<p style="margin:10px 0"><strong>Notes:</strong> ${esc(order.notes)}</p>` : ""}`;
@@ -184,9 +209,8 @@ async function doConfirm(sql, order, total) {
       html: WRAP(`
         <h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
         <p>Hello ${esc(order.name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>
-        ${itemsTable(order)}
+        ${itemsTable(order, total)}
         <table style="border-collapse:collapse;font-size:15px;margin-top:12px">
-          <tr><td style="padding:6px 12px 6px 0"><strong>Total price</strong></td><td>${esc(money(total))}</td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(total - deposit))}</td></tr>
         </table>
@@ -233,6 +257,6 @@ async function doDeposit(sql, order) {
 
 module.exports = {
   PRODUCTS, DELIVERY_FEES, has, esc, clean, money, refOf, userError, db, ensureSchema,
-  priceItems, orderLines, estimateOf, sign, validToken, mailer, siteUrl, waButton,
+  priceItems, orderLines, estimateOf, needsQuote, deliveryLabel, sign, validToken, mailer, siteUrl, waButton,
   itemsTable, WRAP, doConfirm, doDeposit,
 };

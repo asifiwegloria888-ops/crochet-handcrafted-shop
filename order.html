@@ -105,13 +105,14 @@
                         <span class="hint">Your confirmation will be sent here.</span>
                     </div>
                     <div class="field">
-                        <label for="address">Delivery address</label>
-                        <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="Area, street, landmark near your home..." required></textarea>
-                        <span class="hint">The more exact, the easier the delivery.</span>
-                    </div>
-                    <div class="field">
-                        <label for="delivery">Delivery option</label>
+                        <label for="delivery">Pick up or delivery?</label>
                         <select id="delivery" name="delivery" required></select>
+                        <span class="hint">Choose "Delivery" and write your address below. I will tell you the delivery price by email before you pay.</span>
+                    </div>
+                    <div class="field" id="address-field">
+                        <label for="address">Your delivery address</label>
+                        <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="Town, area, street, landmark near your home..."></textarea>
+                        <span class="hint">The more exact, the easier the delivery.</span>
                     </div>
                     <div class="field">
                         <label for="notes">Anything else?</label>
