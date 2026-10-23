@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your cart | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .cart-wrap { max-width: 760px; margin: 0 auto; padding: 0 14px 30px; }
+        .cart-line { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; background: #fff;
+            border-radius: 16px; padding: 12px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); text-align: left; }
+        .cart-line img { width: 84px; height: 84px; object-fit: cover; margin: 0; border-radius: 12px; box-shadow: none; }
+        .cart-line p { margin: 0; text-align: left; }
+        .cart-name { font-weight: bold; color: var(--rose-fonce); font-size: 1.1rem; }
+        .cart-meta { font-size: 0.9rem; color: #7a6a6e; }
+        .cart-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+        .cart-controls label { font-size: 0.85rem; font-weight: bold; color: var(--rose-fonce); }
+        .cart-controls input { padding: 8px; border: 1px solid var(--rose); border-radius: 10px; font-size: 1rem; font-family: inherit; background: #fff; }
+        .cart-qty { width: 74px; }
+        .cart-colors { flex: 1 1 160px; min-width: 0; }
+        .cart-remove { background: none; border: none; color: #9b1c1c; text-decoration: underline; cursor: pointer; font-size: 0.9rem; font-family: inherit; padding: 4px; }
+        .cart-linetotal { font-weight: bold; margin-left: auto; }
+        .cart-summary { background: #fff; border: 2px solid var(--rose); border-radius: 16px; padding: 16px; margin-top: 18px; }
+        .cart-summary p { margin: 4px 0; text-align: left; }
+        .cart-total { font-size: 1.25rem; font-weight: bold; color: var(--rose-fonce); }
+        .cart-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+        .cart-actions .btn { border: none; cursor: pointer; font-family: inherit; font-size: 1rem; }
+        .btn-light { background: #fff; color: var(--rose-fonce) !important; border: 2px solid var(--rose-fonce) !important; }
+        .btn-light:hover { background: var(--rose-fonce); color: #fff !important; }
+        .cart-empty { text-align: center; padding: 30px 10px; }
+        .cart-empty[hidden], #cart-box[hidden] { display: none; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <nav class="main-nav" aria-label="main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="creation.html">Creation</a></li>
+                    <li><a href="album.html">Album</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order.html">Order</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>Your cart</h1>
+        <div class="cart-wrap">
+            <div id="cart-empty" class="cart-empty" hidden>
+                <p>Your cart is empty.</p>
+                <p><a class="btn" href="creation.html">Browse our creations</a></p>
+            </div>
+
+            <div id="cart-box" hidden>
+                <div id="cart-lines"></div>
+                <div class="cart-summary">
+                    <p>Subtotal: <strong id="cart-subtotal"></strong></p>
+                    <p class="cart-meta">The delivery fee is added on the next page.</p>
+                    <div class="cart-actions">
+                        <a class="btn btn-light" href="creation.html">Add another item</a>
+                        <a class="btn" href="order.html">Order now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
+        <p><a href="contact.html">contact us</a></p>
+    </footer>
+    <script src="js/products.js"></script>
+    <script src="js/site.js"></script>
+    <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; };
+
+      // keep only lines that still exist in js/products.js (right item and size)
+      function unitPrice(l) {
+        var p = Object.prototype.hasOwnProperty.call(PRODUCTS, l.item) ? PRODUCTS[l.item] : null;
+        if (!p) return null;
+        if (p.sizes) return Object.prototype.hasOwnProperty.call(p.sizes, l.size) ? p.sizes[l.size] : null;
+        return p.price;
+      }
+      var lines = Cart.read().filter(function (l) { return unitPrice(l) !== null; });
+      Cart.write(lines);
+
+      function save() { Cart.write(lines); }
+
+      function updateTotals() {
+        var sum = lines.reduce(function (s, l) { return s + unitPrice(l) * l.qty; }, 0);
+        $("cart-subtotal").textContent = money(sum);
+      }
+
+      function render() {
+        $("cart-empty").hidden = lines.length > 0;
+        $("cart-box").hidden = lines.length === 0;
+        var box = $("cart-lines");
+        box.innerHTML = "";
+        lines.forEach(function (l, index) {
+          var row = document.createElement("div"); row.className = "cart-line";
+
+          var img = document.createElement("img");
+          img.src = (l.photo || PRODUCTS[l.item].photos[0]) + ".jpeg"; img.alt = l.item; img.loading = "lazy";
+          row.appendChild(img);
+
+          var right = document.createElement("div");
+          var name = document.createElement("p"); name.className = "cart-name"; name.textContent = l.item; right.appendChild(name);
+          var meta = document.createElement("p"); meta.className = "cart-meta";
+          meta.textContent = (l.size ? l.size + " - " : "") + money(unitPrice(l)) + " each"; right.appendChild(meta);
+
+          var ctl = document.createElement("div"); ctl.className = "cart-controls";
+          var qlabel = document.createElement("label"); qlabel.textContent = "Qty"; qlabel.htmlFor = "q" + index;
+          var qty = document.createElement("input"); qty.type = "number"; qty.min = 1; qty.max = 100; qty.value = l.qty; qty.id = "q" + index; qty.className = "cart-qty";
+          var total = document.createElement("span"); total.className = "cart-linetotal"; total.textContent = money(unitPrice(l) * l.qty);
+          qty.addEventListener("input", function () {
+            var v = parseInt(qty.value, 10);
+            if (v >= 1 && v <= 100) { l.qty = v; total.textContent = money(unitPrice(l) * v); save(); updateTotals(); }
+          });
+          ctl.appendChild(qlabel); ctl.appendChild(qty); ctl.appendChild(total);
+          right.appendChild(ctl);
+
+          var ctl2 = document.createElement("div"); ctl2.className = "cart-controls";
+          var colors = document.createElement("input"); colors.type = "text"; colors.maxLength = 200; colors.className = "cart-colors";
+          colors.placeholder = "Colors you want (e.g. red and white)"; colors.value = l.colors || ""; colors.setAttribute("aria-label", "Colors for " + l.item);
+          colors.addEventListener("input", function () { l.colors = colors.value; save(); });
+          var rm = document.createElement("button"); rm.type = "button"; rm.className = "cart-remove"; rm.textContent = "Remove";
+          rm.addEventListener("click", function () { lines.splice(index, 1); save(); render(); });
+          ctl2.appendChild(colors); ctl2.appendChild(rm);
+          right.appendChild(ctl2);
+
+          row.appendChild(right);
+          box.appendChild(row);
+        });
+        updateTotals();
+      }
+      render();
+    })();
+    </script>
+</body>
+</html>

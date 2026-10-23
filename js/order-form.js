@@ -1,143 +1,95 @@
-// Order form: prefills from the catalog link, shows the price by size, sends the order to /api/order.
+// Order page: shows the cart, adds the delivery fee, sends ONE order with all the items to /api/order.
 (function () {
-  var form = document.getElementById("order-form");
+  var params = new URLSearchParams(window.location.search);
+
+  // Old links like order.html?item=Crop+top&photo=4 now open the item page,
+  // where the customer picks size and quantity and adds it to the cart.
+  if (params.get("item")) {
+    var target = "product.html?item=" + encodeURIComponent(params.get("item")).replace(/%20/g, "+");
+    if (params.get("photo")) target += "&photo=" + encodeURIComponent(params.get("photo"));
+    window.location.replace(target);
+    return;
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("order-form");
   if (!form) return;
 
-  var status = document.getElementById("form-status");
+  function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; }
+  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
+  function unitPrice(l) {
+    var p = has(PRODUCTS, l.item) ? PRODUCTS[l.item] : null;
+    if (!p) return null;
+    if (p.sizes) return has(p.sizes, l.size) ? p.sizes[l.size] : null;
+    return p.price;
+  }
+
+  var lines = Cart.read().filter(function (l) { return unitPrice(l) !== null; });
+  var deliverySelect = $("delivery");
+  var status = $("form-status");
   var button = form.querySelector("button[type='submit']");
-  var itemSelect = document.getElementById("item");
-  var photoInput = document.getElementById("photo");
-  var sizeSelect = document.getElementById("size-select");
-  var sizeFree = document.getElementById("size-free");
-  var qtyInput = document.getElementById("quantity");
-  var priceNote = document.getElementById("price-note");
 
-  // Display only: the real price is always decided by the server.
-  // KEEP THESE TWO BLOCKS IDENTICAL TO api/order.js (same names, same spelling).
-  var SIZE_PRICES = {
-    "Crop top": { "Small": 25000, "Medium": 28000, "Large": 32000, "XL": 36000 },
-    "Ruffle crochet hat": { "Child": 15000, "Adult": 20000 },
-    "Sweater": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
-    "Dress": { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
-    "Small bag": { "Small": 15000, "Big": 25000 },
-    "Crochet flower": { "Small": 50000, "Big": 80000 }
-  };
-  var PRICES = { "Scrunchies": 5000, "Hair scrunchie": 5000 };
-  var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Mukono": 5000, "Outside Kampala": 10000 };
-  var deliverySelect = document.getElementById("delivery");
-
-  // Items with fixed sizes but no fixed price (same as api/order.js)
-  var SIZES_ONLY = {
-    "Skirt": ["Small", "Medium", "Large", "XL"]
-  };
-  function sizesFor(item) {
-  if (SIZE_PRICES[item]) return Object.keys(SIZE_PRICES[item]);
-  return SIZES_ONLY[item] || null;
-}
-  function money(n) {
-    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
+  if (lines.length === 0) {
+    $("order-empty").hidden = false;
+    return;
   }
+  $("order-main").hidden = false;
 
-  function unitPrice() {
-    var item = itemSelect.value;
-    if (SIZE_PRICES[item]) return SIZE_PRICES[item][sizeSelect.value] || null;
-    return PRICES[item] || null;
+  // delivery options come from js/products.js
+  Object.keys(DELIVERY_FEES).forEach(function (key) {
+    var fee = DELIVERY_FEES[key];
+    var opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = fee === 0
+      ? "Pick up (free)"
+      : (key === "Outside Kampala" ? "Delivery outside Kampala" : "Delivery in " + key) + " - " + money(fee);
+    deliverySelect.appendChild(opt);
+  });
+
+  // items summary
+  var box = $("os-lines");
+  var subtotal = 0;
+  lines.forEach(function (l) {
+    var price = unitPrice(l) * l.qty;
+    subtotal += price;
+    var row = document.createElement("div"); row.className = "os-line";
+    var img = document.createElement("img");
+    img.src = (l.photo || PRODUCTS[l.item].photos[0]) + ".jpeg"; img.alt = l.item;
+    var mid = document.createElement("div");
+    var n = document.createElement("p"); n.className = "os-name"; n.textContent = l.item; mid.appendChild(n);
+    var s = document.createElement("p"); s.className = "os-sub";
+    s.textContent = (l.size ? l.size + ", " : "") + "qty " + l.qty + (l.colors ? ", " + l.colors : "");
+    mid.appendChild(s);
+    var pr = document.createElement("p"); pr.className = "os-price"; pr.textContent = money(price);
+    row.appendChild(img); row.appendChild(mid); row.appendChild(pr);
+    box.appendChild(row);
+  });
+  $("os-subtotal").textContent = money(subtotal);
+
+  function updateTotal() {
+    var fee = DELIVERY_FEES[deliverySelect.value] || 0;
+    $("os-fee").textContent = money(fee);
+    $("os-total").textContent = money(subtotal + fee);
   }
+  deliverySelect.addEventListener("change", updateTotal);
+  updateTotal();
 
-  // Shows the size list (with prices) for items that have fixed sizes, a free text field otherwise.
-  function updateSize() {
-  var item = itemSelect.value;
-  var names = sizesFor(item);
-  if (names) {
-    var previous = sizeSelect.value;
-    sizeSelect.innerHTML = "";
-    names.forEach(function (name) {
-      var opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = SIZE_PRICES[item] ? name + " - " + money(SIZE_PRICES[item][name]) : name;
-      sizeSelect.appendChild(opt);
-    });
-    if (names.indexOf(previous) !== -1) sizeSelect.value = previous;
-    sizeSelect.hidden = false;
-    sizeSelect.disabled = false;
-    sizeFree.hidden = true;
-    sizeFree.disabled = true;
-  } else {
-    sizeSelect.hidden = true;
-    sizeSelect.disabled = true;
-    sizeFree.hidden = false;
-    sizeFree.disabled = false;
-  }
-}
-
-  function updatePrice() {
-    var price = unitPrice();
-    var qty = parseInt(qtyInput.value, 10);
-    if (price && qty > 0) {
-      var fee = DELIVERY_FEES[deliverySelect.value] || 0;
-      priceNote.textContent = money(price) + " each, delivery " + money(fee) + ", estimated total " + money(price * qty + fee) + " (to be confirmed)";
-    } else {
-      priceNote.textContent = "Price to be confirmed after your order.";
-    }
-    var box = document.getElementById("order-product");
-    if (box) {
-      var label = box.querySelector(".order-product-name");
-      label.textContent = itemSelect.value + (price ? " - " + money(price) + " each" : "");
-    }
-  }
-
-  function refresh() {
-    updateSize();
-    updatePrice();
-  }
-
-  // ---- Prefill from creation.html?item=Crop%20top&photo=4 ----
-  var params = new URLSearchParams(window.location.search);
-  var wantedItem = params.get("item");
-  var wantedPhoto = params.get("photo");
-
-  if (wantedItem && wantedItem.length <= 50) {
-    var known = false;
-    Array.prototype.forEach.call(itemSelect.options, function (opt) {
-      if (opt.value === wantedItem || opt.text === wantedItem) known = true;
-    });
-    // an item that is not in the list yet (new product) is added on the fly
-    if (!known) {
-      var extra = document.createElement("option");
-      extra.textContent = wantedItem;
-      itemSelect.insertBefore(extra, itemSelect.firstChild);
-    }
-    itemSelect.value = wantedItem;
-  }
-
-  var box = document.getElementById("order-product");
-  if (box && wantedPhoto && /^\d{1,3}$/.test(wantedPhoto)) {
-    photoInput.value = wantedPhoto;
-    var img = box.querySelector("img");
-    img.src = wantedPhoto + ".jpeg";
-    img.alt = "Selected " + itemSelect.value;
-    box.hidden = false;
-  }
-
-  itemSelect.addEventListener("change", refresh);
-  sizeSelect.addEventListener("change", updatePrice);
-  qtyInput.addEventListener("input", updatePrice);
-  deliverySelect.addEventListener("change", updatePrice);
-  refresh();
-
-  // ---- Submit ----
-  function show(message, type) {
+  function showError(message) {
     status.textContent = message;
-    status.className = "form-status " + type;
+    status.className = "form-status " + (message ? "error" : "");
   }
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-
     var data = Object.fromEntries(new FormData(form).entries());
+    data.items = lines.map(function (l) {
+      return { item: l.item, size: l.size || "", qty: l.qty, colors: l.colors || "", photo: l.photo || "" };
+    });
+
     button.disabled = true;
     button.textContent = "Sending...";
-    show("", "");
+    showError("");
 
     fetch("/api/order", {
       method: "POST",
@@ -145,24 +97,33 @@
       body: JSON.stringify(data),
     })
       .then(function (res) {
-        return res.json().then(function (json) {
-          return { ok: res.ok, json: json };
-        });
+        return res.json().then(function (json) { return { ok: res.ok, json: json }; });
       })
       .then(function (result) {
-        if (result.ok) {
-          var ref = result.json.reference ? " Your reference is " + result.json.reference + "." : "";
-          show("Thank you! Your order was sent." + ref + " Check your email for the confirmation.", "success");
-          form.reset();
-          if (box) box.hidden = true;
-          photoInput.value = "";
-          refresh();
-        } else {
-          show(result.json.error || "Something went wrong. Please try again.", "error");
+        if (!result.ok) {
+          showError(result.json.error || "Something went wrong. Please try again.");
+          return;
         }
+        var reference = result.json.reference || "";
+        Cart.clear();
+        $("order-main").hidden = true;
+        $("order-done").hidden = false;
+        $("done-text").textContent =
+          "Your reference is " + reference + ". " +
+          (result.json.emailSent === false
+            ? "We could not send the confirmation email, but I will contact you soon."
+            : "Check your email for the confirmation (and your spam folder).");
+        var wa = document.createElement("a");
+        wa.href = "https://wa.me/" + (window.SHOP_WHATSAPP || "") + "?text=" +
+          encodeURIComponent("Hello, I'm writing about my order " + reference);
+        wa.target = "_blank";
+        wa.rel = "noopener";
+        wa.textContent = "Chat with me on WhatsApp";
+        $("done-wa").appendChild(wa);
+        window.scrollTo(0, 0);
       })
       .catch(function () {
-        show("Network problem. Please check your connection and try again.", "error");
+        showError("Network problem. Please check your connection and try again.");
       })
       .finally(function () {
         button.disabled = false;

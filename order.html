@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +6,8 @@
     <title>Order | Crochet Handcrafted Shop</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Styles only for the order form. They use your own colors from style.css */
-        .order-form { max-width: 560px; text-align: left; }
+        .order-wrap { max-width: 560px; margin: 0 auto; padding: 0 14px 30px; }
+        .order-form { text-align: left; }
         .order-form label { display: block; font-weight: bold; margin-bottom: 4px; color: var(--rose-fonce); }
         .order-form .field { display: flex; flex-direction: column; }
         .order-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -20,21 +19,26 @@
         .order-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
         .order-form button:disabled { opacity: 0.6; cursor: wait; }
 
-        .order-product {
-            display: flex; align-items: center; gap: 16px; max-width: 560px; margin: 0 auto 24px;
-            background: #fff; border: 2px solid var(--rose); border-radius: 16px; padding: 12px;
-        }
-        .order-product[hidden] { display: none; }
-        .order-product img { width: 90px; height: 90px; object-fit: cover; margin: 0; border-radius: 12px; box-shadow: none; flex-shrink: 0; }
-        .order-product p { margin: 0; text-align: left; }
-        .order-product-label { font-size: 0.85rem; }
-        .order-product-name { font-weight: bold; color: var(--rose-fonce); font-size: 1.1rem; }
+        .order-summary { background: #fff; border: 2px solid var(--rose); border-radius: 16px; padding: 14px; margin-bottom: 22px; }
+        .order-summary h2 { margin: 0 0 8px; font-size: 1.2rem; }
+        .order-summary h2::after { display: none; }
+        .os-line { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0d5dd; text-align: left; }
+        .os-line img { width: 56px; height: 56px; object-fit: cover; margin: 0; border-radius: 10px; box-shadow: none; }
+        .os-line p { margin: 0; text-align: left; }
+        .os-name { font-weight: bold; }
+        .os-sub { font-size: 0.85rem; color: #7a6a6e; }
+        .os-price { font-weight: bold; white-space: nowrap; }
+        .os-totals p { margin: 6px 0 0; text-align: right; }
+        .os-grand { font-size: 1.2rem; font-weight: bold; color: var(--rose-fonce); }
+        .order-summary .edit { display: inline-block; margin-top: 8px; }
 
-        .form-status { max-width: 560px; margin: 16px auto 0; padding: 12px 16px; border-radius: 10px; font-weight: bold; }
+        .form-status { margin: 16px 0 0; padding: 12px 16px; border-radius: 10px; font-weight: bold; }
         .form-status:empty { display: none; }
-        .form-status.success { background: #e3f4e8; color: #1b5e34; }
         .form-status.error { background: #fde4e4; color: #9b1c1c; }
-
+        .done-box { background: #e3f4e8; color: #1b5e34; border-radius: 16px; padding: 20px; text-align: center; }
+        .done-box p { text-align: center; }
+        .done-box a { color: #1b5e34; font-weight: bold; }
+        [hidden] { display: none !important; }
         @media (max-width: 560px) { .order-form .row { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -56,108 +60,83 @@
 
     <main>
         <h1>Place an order</h1>
-        <p class="intro">Tell me what you would like to order from  our handmade collection today !.</p>
+        <div class="order-wrap">
 
-        <div id="order-product" class="order-product" hidden>
-            <img src="" alt="">
-            <div>
-                <p class="order-product-label">You chose</p>
-                <p class="order-product-name"></p>
-                <p><a href="creation.html">Choose another item</a></p>
+            <div id="order-empty" hidden style="text-align:center">
+                <p>Your cart is empty. Choose your items first, then come back here to send your order.</p>
+                <p><a class="btn" href="creation.html">Browse our creations</a></p>
+            </div>
+
+            <div id="order-done" class="done-box" hidden>
+                <p><strong>Thank you! Your order was sent.</strong></p>
+                <p id="done-text"></p>
+                <p id="done-wa"></p>
+                <p><a href="creation.html">Back to creations</a></p>
+            </div>
+
+            <div id="order-main" hidden>
+                <div class="order-summary">
+                    <h2>Your items</h2>
+                    <div id="os-lines"></div>
+                    <div class="os-totals">
+                        <p>Items: <span id="os-subtotal"></span></p>
+                        <p>Delivery: <span id="os-fee"></span></p>
+                        <p class="os-grand">Estimated total: <span id="os-total"></span></p>
+                        <p class="os-sub">The final price is confirmed by email before you pay.</p>
+                    </div>
+                    <a class="edit" href="cart.html">Change my cart</a>
+                </div>
+
+                <form id="order-form" class="order-form" novalidate>
+                    <div class="row">
+                        <div class="field">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" autocomplete="name" required>
+                        </div>
+                        <div class="field">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" autocomplete="email" required>
+                        <span class="hint">Your confirmation will be sent here.</span>
+                    </div>
+                    <div class="field">
+                        <label for="address">Delivery address</label>
+                        <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="Area, street, landmark near your home..." required></textarea>
+                        <span class="hint">The more exact, the easier the delivery.</span>
+                    </div>
+                    <div class="field">
+                        <label for="delivery">Delivery option</label>
+                        <select id="delivery" name="delivery" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="notes">Anything else?</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Deadline, gift message..."></textarea>
+                    </div>
+
+                    <!-- Anti-spam trap: hidden from real visitors, leave it empty -->
+                    <div class="hp" aria-hidden="true">
+                        <label for="website">Website</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="submit">Send my order</button>
+                </form>
+                <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
             </div>
         </div>
-
-        <form id="order-form" class="order-form" novalidate>
-            <input type="hidden" id="photo" name="photo">
-
-            <div class="row">
-                <div class="field">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" autocomplete="name" required>
-                </div>
-                <div class="field">
-                    <label for="phone">Phone (optional)</label>
-                    <input type="tel" id="phone" name="phone" autocomplete="tel">
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" autocomplete="email" required>
-                <span class="hint">Your confirmation will be sent here.</span>
-            </div>
-            <div class="field">
-                <label for="address">Delivery address</label>
-                <textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="Area, street, landmark near your home..." required></textarea>
-                <span class="hint">The more exact, the easier the delivery.</span>
-            </div>
-            <div class="field">
-                <label for="delivery">Delivery option</label>
-                <select id="delivery" name="delivery" required>
-                <option value="Pickup">Pick up (free)</option>
-                <option value="Kampala">Delivery in Kampala - 5 000 UGX</option>
-                <option value="Mukono">Delivery in Mukono - 5 000 UGX</option>
-                <option value="Outside Kampala">Delivery outside Kampala - 10 000 UGX</option>
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="field">
-                    <label for="item">Item</label>
-                    <select id="item" name="item" required>
-                        <option>Scrunchies</option>
-                        <option>Crop top</option>
-                        <option>Sweater</option>
-                        <option>Dress</option>
-                        <option>Ruffle crochet hat</option>
-                        <option>Crochet flower</option>
-                        <option>Small bag</option>
-                        <option>Baby hat</option>
-                        <option>Skirt</option>
-                        <option>Hair accessory</option>
-                        <option>Home decor</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="quantity">Quantity</label>
-                    <input type="number" id="quantity" name="quantity" min="1" max="100" value="1" required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="field">
-                    <label for="colors">Colors</label>
-                    <input type="text" id="colors" name="colors" placeholder="e.g. yellow and red">
-                </div>
-                <div class="field">
-                    <label for="size-select">Size</label>
-                    <select id="size-select" name="size" hidden></select>
-                    <input type="text" id="size-free" name="size" placeholder="e.g. medium, 120 x 80 cm">
-                </div>
-            </div>
-            <p id="price-note" class="hint" style="font-weight:bold;"></p>
-
-            <div class="field">
-                <label for="notes">Anything else?</label>
-                <textarea id="notes" name="notes" rows="4" placeholder="Style, deadline, gift message..."></textarea>
-            </div>
-
-            <!-- Anti-spam trap: hidden from real visitors, leave it empty -->
-            <div class="hp" aria-hidden="true">
-                <label for="website">Website</label>
-                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-            </div>
-
-            <button type="submit" class="submit">Send my order</button>
-        </form>
-        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
     </main>
 
     <footer class="site-footer">
         <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
         <p><a href="contact.html">contact us</a></p>
     </footer>
+    <script src="js/products.js"></script>
+    <script src="js/site.js"></script>
     <script src="js/order-form.js"></script>
 </body>
 </html>

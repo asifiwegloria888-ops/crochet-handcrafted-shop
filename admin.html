@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .adm { max-width: 900px; margin: 0 auto; padding: 0 14px 40px; text-align: left; }
+        .adm p { text-align: left; margin: 4px 0; }
+        .adm [hidden] { display: none !important; }
+        .login-box { max-width: 380px; margin: 30px auto; background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+        .adm label { display: block; font-weight: bold; margin-bottom: 4px; color: var(--rose-fonce); }
+        .adm input { width: 100%; padding: 12px; border: 1px solid var(--rose); border-radius: 10px; font-size: 1rem; font-family: inherit; background: #fff; box-sizing: border-box; }
+        .adm button, .adm .btn-a { font-family: inherit; font-size: 0.95rem; border: none; border-radius: 20px; padding: 9px 16px; cursor: pointer; background: var(--rose-fonce); color: #fff; }
+        .adm button:disabled { opacity: 0.55; cursor: wait; }
+        .adm button.light { background: #fff; color: var(--rose-fonce); border: 2px solid var(--rose-fonce); }
+        .adm button.danger { background: #fff; color: #9b1c1c; border: 2px solid #9b1c1c; }
+        .err { background: #fde4e4; color: #9b1c1c; padding: 8px 12px; border-radius: 10px; margin-top: 8px; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+        .toolbar .grow { flex: 1 1 180px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .chip { background: #fff !important; color: var(--rose-fonce) !important; border: 2px solid var(--rose) !important; }
+        .chip.on { background: var(--rose-fonce) !important; color: #fff !important; border-color: var(--rose-fonce) !important; }
+        .card { background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+        .card-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .ref { font-weight: bold; font-size: 1.1rem; color: var(--rose-fonce); }
+        .date { font-size: 0.85rem; color: #7a6a6e; }
+        .badge { padding: 2px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+        .st-new { background: #ffe9b8; color: #7a5200; }
+        .st-confirmed { background: #dce8ff; color: #1d3f91; }
+        .st-paid { background: #e3f4e8; color: #1b5e34; }
+        .st-done { background: #eee; color: #444; }
+        .st-cancelled { background: #fde4e4; color: #9b1c1c; }
+        .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .adm table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        .adm td, .adm th { padding: 5px 4px; border-bottom: 1px solid #f0d5dd; text-align: left; vertical-align: top; }
+        .adm td.r, .adm th.r { text-align: right; white-space: nowrap; }
+        .small { font-size: 0.85rem; color: #7a6a6e; }
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--rose); }
+        .actions input { width: 140px; padding: 8px; }
+        .adm a { color: var(--rose-fonce); }
+        @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <p style="color:#fff;margin:0">Admin</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="adm">
+            <div id="login" class="login-box" hidden>
+                <h1 style="font-size:1.4rem;margin-top:0">Admin login</h1>
+                <label for="pw">Password</label>
+                <input type="password" id="pw" autocomplete="current-password">
+                <p><button type="button" id="login-btn" style="margin-top:12px">Log in</button></p>
+                <p id="login-err" class="err" hidden></p>
+            </div>
+
+            <div id="panel" hidden>
+                <h1 style="margin-bottom:10px">Orders</h1>
+                <div class="toolbar">
+                    <input id="search" class="grow" type="search" placeholder="Search name, email, reference...">
+                    <button type="button" id="refresh" class="light">Refresh</button>
+                    <button type="button" id="logout" class="light">Log out</button>
+                </div>
+                <div id="chips" class="chips"></div>
+                <p id="panel-err" class="err" hidden></p>
+                <div id="list"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; };
+
+      // Builds elements with textContent only: nothing a customer typed is ever run as HTML.
+      function el(tag, cls, text) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text != null) e.textContent = text;
+        return e;
+      }
+
+      var orders = [], filter = "all", query = "";
+      var STATUS_LABEL = { new: "New", confirmed: "Confirmed", paid: "Deposit paid", done: "Done", cancelled: "Cancelled" };
+
+      function api(body) {
+        return fetch("/api/admin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify(body),
+        }).then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (res.status === 401 && body.action !== "login") { showLogin(); throw new Error("Please log in."); }
+            if (!res.ok) throw new Error(data.error || "Something went wrong.");
+            return data;
+          });
+        });
+      }
+
+      function showLogin() { $("panel").hidden = true; $("login").hidden = false; $("pw").focus(); }
+      function showPanel() { $("login").hidden = true; $("panel").hidden = false; load(); }
+      function panelError(msg) { var p = $("panel-err"); p.textContent = msg || ""; p.hidden = !msg; }
+
+      $("login-btn").addEventListener("click", login);
+      $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") login(); });
+      function login() {
+        var btn = $("login-btn"); btn.disabled = true; $("login-err").hidden = true;
+        api({ action: "login", password: $("pw").value })
+          .then(function () { $("pw").value = ""; showPanel(); })
+          .catch(function (err) { $("login-err").textContent = err.message; $("login-err").hidden = false; })
+          .then(function () { btn.disabled = false; });
+      }
+      $("logout").addEventListener("click", function () { api({ action: "logout" }).catch(function () {}).then(showLogin); });
+      $("refresh").addEventListener("click", load);
+      $("search").addEventListener("input", function () { query = this.value.trim().toLowerCase(); render(); });
+
+      function load() {
+        panelError("");
+        return api({ action: "list" }).then(function (data) { orders = data.orders; render(); })
+          .catch(function (err) { panelError(err.message); });
+      }
+
+      function waNumber(phone) {
+        var d = String(phone || "").replace(/\D/g, "");
+        if (!d) return "";
+        if (d.indexOf("00") === 0) return d.slice(2);
+        if (d.charAt(0) === "0") return "256" + d.slice(1);   // local Uganda number
+        return d;
+      }
+
+      function renderChips() {
+        var box = $("chips"); box.innerHTML = "";
+        ["all", "new", "confirmed", "paid", "done", "cancelled"].forEach(function (key) {
+          var n = key === "all" ? orders.length : orders.filter(function (o) { return o.status === key; }).length;
+          var b = el("button", "chip" + (filter === key ? " on" : ""), (key === "all" ? "All" : STATUS_LABEL[key]) + " (" + n + ")");
+          b.type = "button";
+          b.addEventListener("click", function () { filter = key; render(); });
+          box.appendChild(b);
+        });
+      }
+
+      function matches(o) {
+        if (filter !== "all" && o.status !== filter) return false;
+        if (!query) return true;
+        return (o.ref + " " + o.name + " " + o.email + " " + o.phone).toLowerCase().indexOf(query) !== -1;
+      }
+
+      function run(btn, body, confirmText) {
+        if (confirmText && !window.confirm(confirmText)) return;
+        panelError("");
+        btn.disabled = true;
+        api(body).then(load).catch(function (err) { panelError(err.message); btn.disabled = false; });
+      }
+
+      function card(o) {
+        var c = el("div", "card");
+
+        var head = el("div", "card-head");
+        var left = el("div");
+        left.appendChild(el("span", "ref", o.ref + "  "));
+        left.appendChild(el("span", "date", new Date(o.created_at).toLocaleString()));
+        head.appendChild(left);
+        head.appendChild(el("span", "badge st-" + o.status, STATUS_LABEL[o.status] || o.status));
+        c.appendChild(head);
+
+        var cols = el("div", "cols");
+
+        var who = el("div");
+        who.appendChild(el("p", "", o.name)).style.fontWeight = "bold";
+        var em = el("p"); var ea = el("a", "", o.email); ea.href = "mailto:" + o.email; em.appendChild(ea); who.appendChild(em);
+        if (o.phone) {
+          var ph = el("p"); var pa = el("a", "", o.phone); pa.href = "tel:" + o.phone.replace(/[^\d+]/g, ""); ph.appendChild(pa);
+          var wn = waNumber(o.phone);
+          if (wn) { ph.appendChild(document.createTextNode("  ")); var wa = el("a", "", "WhatsApp"); wa.href = "https://wa.me/" + wn; wa.target = "_blank"; wa.rel = "noopener"; ph.appendChild(wa); }
+          who.appendChild(ph);
+        }
+        who.appendChild(el("p", "small", "Delivery: " + o.delivery + " (" + money(o.delivery_fee) + ")"));
+        if (o.address) who.appendChild(el("p", "small", "Address: " + o.address));
+        if (o.notes) who.appendChild(el("p", "small", "Notes: " + o.notes));
+        cols.appendChild(who);
+
+        var t = el("table");
+        var hr = el("tr");
+        ["Item", "Qty", "Price"].forEach(function (h, i) { hr.appendChild(el("th", i === 2 ? "r" : "", h)); });
+        t.appendChild(hr);
+        o.items.forEach(function (l) {
+          var tr = el("tr");
+          var td = el("td", "", l.item + (l.size ? " (" + l.size + ")" : ""));
+          if (l.colors) { td.appendChild(el("br")); td.appendChild(el("span", "small", "Colors: " + l.colors)); }
+          if (l.photo) { td.appendChild(el("br")); var pa2 = el("a", "small", "photo " + l.photo); pa2.href = l.photo + ".jpeg"; pa2.target = "_blank"; pa2.rel = "noopener"; td.appendChild(pa2); }
+          tr.appendChild(td);
+          tr.appendChild(el("td", "", String(l.quantity)));
+          tr.appendChild(el("td", "r", l.line_total != null ? money(l.line_total) : "to quote"));
+          t.appendChild(tr);
+        });
+        var tt = el("tr");
+        var lab = el("td", "", o.status === "new" ? "Estimated total" : "Total"); lab.colSpan = 2; lab.style.fontWeight = "bold";
+        tt.appendChild(lab);
+        var val = o.status === "new" ? o.estimate : (o.total != null ? o.total : o.estimate);
+        tt.appendChild(el("td", "r", val != null ? money(val) : "to confirm")).style.fontWeight = "bold";
+        t.appendChild(tt);
+        if (o.deposit != null && o.status !== "new") {
+          var dr = el("tr"); var dl = el("td", "small", "Deposit 50% asked"); dl.colSpan = 2; dr.appendChild(dl);
+          dr.appendChild(el("td", "r small", money(o.deposit))); t.appendChild(dr);
+        }
+        cols.appendChild(t);
+        c.appendChild(cols);
+
+        var act = el("div", "actions");
+        if (o.status === "new") {
+          var inp = el("input"); inp.type = "number"; inp.min = 1; inp.step = 1; inp.value = o.estimate != null ? o.estimate : "";
+          inp.setAttribute("aria-label", "Total price for " + o.ref);
+          var ok = el("button", "", "Confirm + ask 50% deposit");
+          ok.type = "button";
+          ok.addEventListener("click", function () {
+            var total = parseInt(inp.value, 10);
+            if (!(total > 0)) { panelError("Enter the total price first."); return; }
+            run(ok, { action: "confirm", id: o.id, total: total },
+              "Send the confirmation to " + o.email + " asking a deposit of " + money(Math.ceil(total / 2)) + "?");
+          });
+          act.appendChild(el("span", "small", "Total (UGX):")); act.appendChild(inp); act.appendChild(ok);
+        }
+        if (o.status === "confirmed") {
+          var dep = el("button", "", "Deposit received"); dep.type = "button";
+          dep.addEventListener("click", function () { run(dep, { action: "deposit", id: o.id }, "Tell " + o.email + " that you received the deposit?"); });
+          act.appendChild(dep);
+        }
+        if (o.status === "paid" || o.status === "confirmed") {
+          var dn = el("button", "light", "Mark as done"); dn.type = "button";
+          dn.addEventListener("click", function () { run(dn, { action: "status", id: o.id, status: "done" }); });
+          act.appendChild(dn);
+        }
+        if (o.status === "cancelled" || o.status === "done") {
+          var re = el("button", "light", "Reopen"); re.type = "button";
+          re.addEventListener("click", function () { run(re, { action: "status", id: o.id, status: "new" }); });
+          act.appendChild(re);
+        }
+        if (o.status !== "cancelled" && o.status !== "done") {
+          var cx = el("button", "danger", "Cancel order"); cx.type = "button";
+          cx.addEventListener("click", function () { run(cx, { action: "status", id: o.id, status: "cancelled" }, "Cancel order " + o.ref + "? The customer is not notified."); });
+          act.appendChild(cx);
+        }
+        c.appendChild(act);
+        return c;
+      }
+
+      function render() {
+        renderChips();
+        var box = $("list"); box.innerHTML = "";
+        var shown = orders.filter(matches);
+        if (shown.length === 0) box.appendChild(el("p", "small", orders.length ? "No order matches." : "No orders yet."));
+        shown.forEach(function (o) { box.appendChild(card(o)); });
+      }
+
+      // already logged in?
+      api({ action: "check" }).then(showPanel).catch(function (err) {
+        showLogin();
+        if (err.message !== "Please log in.") { $("login-err").textContent = err.message; $("login-err").hidden = false; }
+      });
+    })();
+    </script>
+</body>
+</html>

@@ -140,9 +140,14 @@
         if (found) found.qty = Math.min(100, found.qty + q);
         else cart.push({ item: name, size: size, qty: q, photo: photo });
         try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {}
-        $("pd-msg").textContent = "Added to your cart. You can choose another item or open the cart.";
+        var msg = $("pd-msg");
+        msg.textContent = "Added to your cart. You can choose another item or ";
+        var go = document.createElement("a"); go.href = "cart.html"; go.textContent = "open your cart"; msg.appendChild(go);
+        msg.appendChild(document.createTextNode("."));
+        if (window.updateCartBadge) window.updateCartBadge();
       });
     })();
     </script>
+    <script src="js/site.js"></script>
 </body>
 </html>

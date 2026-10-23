@@ -1,5 +1,5 @@
-// Display data for the shop. The REAL prices are always checked by the server (api/order.js).
-// Keep the prices identical to SIZE_PRICES / PRICES in api/order.js.
+// ONE place for all your articles and prices.
+// The website reads it AND the server reads it (api/_lib.js), so a price is changed here only.
 var PRODUCTS = {
   "Scrunchies": {
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
@@ -37,3 +37,11 @@ var PRODUCTS = {
     photos: ["25","26","29"]
   }
 };
+
+// Delivery options: the key is what the customer picks, the value is the fee in UGX.
+var DELIVERY_FEES = { "Pickup": 0, "Kampala": 5000, "Mukono": 5000, "Outside Kampala": 10000 };
+
+// Lets the server (Node) use this same file. The browser ignores this line.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { PRODUCTS: PRODUCTS, DELIVERY_FEES: DELIVERY_FEES };
+}

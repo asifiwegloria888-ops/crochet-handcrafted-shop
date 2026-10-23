@@ -1,61 +1,46 @@
-// Vercel serverless function: /api/confirm?id=6&t=<token>
-// The shop owner opens this link from the "New order" email, checks the total price,
-// and one click sends the customer: confirmation + 50% deposit amount + payment instructions.
+// GET/POST /api/confirm?id=6&t=<token>
+// Link in the "New order" email. Step 1: confirm + ask the 50% deposit. Step 2: deposit received.
 
-const { neon } = require("@neondatabase/serverless");
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-
-const esc = (s) =>
-  String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const money = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
-
-// Same signature as in order.js: only someone with the email link can confirm an order.
-const sign = (id) =>
-  crypto.createHmac("sha256", process.env.CONFIRM_SECRET || "").update(String(id)).digest("hex").slice(0, 32);
-
-function validToken(id, token) {
-  if (!process.env.CONFIRM_SECRET || typeof token !== "string") return false;
-  const a = Buffer.from(sign(id));
-  const b = Buffer.from(token);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
-}
+const L = require("./_lib");
 
 function send(res, status, title, body) {
   res.status(status);
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   return res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${L.esc(title)}</title>
 <style>
 body{margin:0;background:#fff7f2;color:#4a3b3f;font-family:Georgia,serif;line-height:1.6}
 main{max-width:520px;margin:0 auto;padding:28px 20px}
 h1{color:#c9607f;font-size:1.6rem}
 .box{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
 label{display:block;font-weight:bold;margin:14px 0 4px;color:#c9607f}
-input{width:100%;padding:12px;border:1px solid #e8a0b4;border-radius:10px;font-size:1rem;font-family:inherit}
+input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #e8a0b4;border-radius:10px;font-size:1rem;font-family:inherit}
 button{margin-top:18px;width:100%;background:#c9607f;color:#fff;border:none;padding:14px;border-radius:10px;font-size:1rem;cursor:pointer}
 .err{background:#fde4e4;color:#9b1c1c;padding:10px 14px;border-radius:10px}
 .ok{background:#e3f4e8;color:#1b5e34;padding:10px 14px;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
 </style></head><body><main>${body}</main></body></html>`);
 }
 
+function summary(order) {
+  return `<p><strong>${L.esc(order.name)}</strong><br>${L.esc(order.email)}${order.phone ? "<br>" + L.esc(order.phone) : ""}</p>${L.itemsTable(order)}`;
+}
+
 function formPage(res, order, ref, token, error) {
-  const guess = order.unit_price ? order.unit_price * order.quantity + (order.delivery_fee || 0) : "";
+  const guess = L.estimateOf(order) || "";
   const action = `/api/confirm?id=${order.id}&t=${encodeURIComponent(token)}`;
   return send(
     res,
     error ? 400 : 200,
     `Confirm ${ref}`,
-    `<h1>Confirm order ${esc(ref)}</h1>
+    `<h1>Confirm order ${L.esc(ref)}</h1>
 <div class="box">
-  <p><strong>${esc(order.name)}</strong><br>${esc(order.email)}${order.phone ? "<br>" + esc(order.phone) : ""}</p>
-  <p>${esc(order.item)} x ${esc(order.quantity)}<br>Colors: ${esc(order.colors || "-")}<br>Size: ${esc(order.size || "-")}<br>Notes: ${esc(order.notes || "-")}</p>
-  <p><strong>Delivery:</strong> ${esc(order.delivery || "-")}${order.delivery_fee ? " (" + esc(money(order.delivery_fee)) + ")" : ""}<br>Address: ${esc(order.address || "-")}</p>
-  ${error ? `<p class="err">${esc(error)}</p>` : ""}
-  <form method="POST" action="${esc(action)}">
-    <label for="total">Total price (UGX)</label>
-    <input id="total" name="total" type="number" min="1" step="1" value="${esc(guess)}" required>
+  ${summary(order)}
+  ${error ? `<p class="err">${L.esc(error)}</p>` : ""}
+  <form method="POST" action="${L.esc(action)}">
+    <label for="total">Total price (UGX, delivery included)</label>
+    <input id="total" name="total" type="number" min="1" step="1" value="${L.esc(guess)}" required>
     <p id="dep"></p>
     <button type="submit">Send confirmation and deposit request</button>
   </form>
@@ -68,6 +53,23 @@ function formPage(res, order, ref, token, error) {
   );
 }
 
+function depositPage(res, order, ref, token, error) {
+  const action = `/api/confirm?id=${order.id}&t=${encodeURIComponent(token)}`;
+  return send(
+    res,
+    error ? 500 : 200,
+    `Order ${ref}`,
+    `<h1>Order ${L.esc(ref)}</h1>
+<div class="box">
+  ${summary(order)}
+  <p class="ok">Confirmed. Total ${L.esc(L.money(order.total || 0))}, deposit asked ${L.esc(L.money(order.deposit || 0))}.</p>
+  ${error ? `<p class="err">${L.esc(error)}</p>` : ""}
+  <p>When the customer has paid the deposit, press the button. The customer receives a message saying you are starting the order.</p>
+  <form method="POST" action="${L.esc(action)}"><button type="submit">Deposit received: tell the customer</button></form>
+</div>`
+  );
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "GET" && req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
@@ -76,99 +78,54 @@ module.exports = async (req, res) => {
 
   const id = parseInt(req.query && req.query.id, 10);
   const token = req.query && req.query.t;
-  if (!Number.isInteger(id) || id < 1 || !validToken(id, token)) {
+  if (!Number.isInteger(id) || id < 1 || !L.validToken(id, token)) {
     return send(res, 403, "Link not valid", "<h1>Link not valid</h1><p>This confirmation link is not valid.</p>");
   }
 
-  const sql = neon(process.env.POSTGRES_URL || process.env.DATABASE_URL);
+  const sql = L.db();
   let order;
   try {
-    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS total INT`;
-    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS deposit INT`;
-    await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ`;
-    const rows = await sql`SELECT * FROM orders WHERE id = ${id}`;
-    order = rows[0];
+    await L.ensureSchema(sql);
+    order = (await sql`SELECT * FROM orders WHERE id = ${id}`)[0];
   } catch (err) {
     console.error("Database error:", err);
     return send(res, 500, "Error", "<h1>Error</h1><p>Could not read the order. Please try again.</p>");
   }
   if (!order) return send(res, 404, "Not found", "<h1>Order not found</h1>");
-
-  const ref = "CH-" + String(order.id).padStart(4, "0");
-
-  if (order.status === "confirmed") {
-    return send(
-      res,
-      200,
-      `${ref} already confirmed`,
-      `<h1>Order ${esc(ref)}</h1><p class="ok">This order is already confirmed.<br>Total ${esc(money(order.total || 0))}, deposit asked ${esc(money(order.deposit || 0))}.</p>`
-    );
-  }
-
-  if (req.method === "GET") return formPage(res, order, ref, token);
-
-  // ---- POST: confirm ----
-  const total = parseInt(req.body && req.body.total, 10);
-  if (!Number.isInteger(total) || total < 1 || total > 100000000) {
-    return formPage(res, order, ref, token, "Please enter a valid total price.");
-  }
-  const instructions = (process.env.PAYMENT_INSTRUCTIONS || "").trim();
-  if (!instructions) {
-    return send(
-      res,
-      500,
-      "Missing setting",
-      "<h1>Missing setting</h1><p class=\"err\">Add the variable PAYMENT_INSTRUCTIONS in Vercel (your mobile money number and name), then redeploy.</p>"
-    );
-  }
-
-  const deposit = Math.ceil(total / 2);
-  const balance = total - deposit;
+  const ref = L.refOf(order.id);
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
-    });
-    const owner = process.env.OWNER_EMAIL || process.env.GMAIL_USER;
-    await transporter.sendMail({
-      from: `"Crochet Handcrafted Shop" <${process.env.GMAIL_USER}>`,
-      to: order.email,
-      bcc: owner,
-      replyTo: owner,
-      subject: `Order ${ref} confirmed: please send your 50% deposit`,
-      html: `<div style="font-family:Arial,sans-serif;color:#1B2150;max-width:560px">
-        <h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
-        <p>Hello ${esc(order.name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>
-        <table style="border-collapse:collapse;font-size:15px">
-          <tr><td style="padding:6px 12px 6px 0"><strong>Item</strong></td><td>${esc(order.item)}${order.size ? " (" + esc(order.size) + ")" : ""} x ${esc(order.quantity)}</td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Delivery</strong></td><td>${esc(order.delivery || "-")}${order.delivery_fee ? " (" + esc(money(order.delivery_fee)) + ")" : ""}</td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Total price</strong></td><td>${esc(money(total))}</td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(balance))}</td></tr>
-        </table>
-        <h3>How to pay the deposit</h3>
-        <p style="background:#fff7f2;padding:12px;border-radius:8px">${esc(instructions).replace(/\r?\n/g, "<br>")}</p>
-        <p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, send me the transaction ID or a screenshot on WhatsApp (or reply to this email). I start your order as soon as I receive the deposit.</p>
-        <p style="margin:18px 0"><a href="https://wa.me/256791908861?text=${encodeURIComponent('Hello, I paid the deposit for order ' + ref)}" style="background:#25D366;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Send payment proof on WhatsApp</a></p>
-        <p>Crochet Handcrafted Shop</p>
-      </div>`,
-    });
-  } catch (err) {
-    console.error("Email error:", err);
-    return formPage(res, order, ref, token, "The email could not be sent. Nothing was saved, please try again.");
-  }
+    if (order.status === "new") {
+      if (req.method === "GET") return formPage(res, order, ref, token);
+      const total = parseInt(req.body && req.body.total, 10);
+      if (!Number.isInteger(total) || total < 1 || total > 100000000) return formPage(res, order, ref, token, "Please enter a valid total price.");
+      let result;
+      try {
+        result = await L.doConfirm(sql, order, total);
+      } catch (err) {
+        if (err.user) return formPage(res, order, ref, token, err.message);
+        throw err;
+      }
+      return send(res, 200, `${ref} confirmed`,
+        `<h1>Order ${L.esc(ref)}</h1><p class="ok">Confirmation sent to ${L.esc(order.email)}.<br>Total ${L.esc(L.money(total))}, deposit asked ${L.esc(L.money(result.deposit))}.</p><p>When the deposit arrives, open the same link again and press "Deposit received".</p>`);
+    }
 
-  try {
-    await sql`UPDATE orders SET status = 'confirmed', total = ${total}, deposit = ${deposit}, confirmed_at = now() WHERE id = ${id}`;
-  } catch (err) {
-    console.error("Database update error:", err);
-  }
+    if (order.status === "confirmed") {
+      if (req.method === "GET") return depositPage(res, order, ref, token);
+      try {
+        await L.doDeposit(sql, order);
+      } catch (err) {
+        if (err.user) return depositPage(res, order, ref, token, err.message);
+        throw err;
+      }
+      return send(res, 200, `${ref} deposit received`,
+        `<h1>Order ${L.esc(ref)}</h1><p class="ok">Done. ${L.esc(order.email)} was told that you received the deposit and are starting the order.</p>`);
+    }
 
-  return send(
-    res,
-    200,
-    `${ref} confirmed`,
-    `<h1>Order ${esc(ref)}</h1><p class="ok">Confirmation sent to ${esc(order.email)}.<br>Total ${esc(money(total))}, deposit asked ${esc(money(deposit))}.</p>`
-  );
+    return send(res, 200, `Order ${ref}`,
+      `<h1>Order ${L.esc(ref)}</h1><div class="box">${summary(order)}<p class="ok">Status: ${L.esc(order.status)}. Use your admin page to manage this order.</p></div>`);
+  } catch (err) {
+    console.error("Confirm error:", err);
+    return send(res, 500, "Error", "<h1>Error</h1><p>Something went wrong. Please try again.</p>");
+  }
 };
