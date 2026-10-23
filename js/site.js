@@ -1,7 +1,7 @@
 // Loaded on every customer page: the cart, the "Cart (n)" link in the menu, the WhatsApp button.
 
 // Your WhatsApp number: international format, digits only, no + and no spaces.
-window.SHOP_WHATSAPP = "243978253950";
+window.SHOP_WHATSAPP = "256791908861";
 
 window.Cart = (function () {
   var KEY = "cart";
