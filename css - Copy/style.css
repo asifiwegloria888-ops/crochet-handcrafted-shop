@@ -1,0 +1,219 @@
+:root {
+  --rose: #e8a0b4;
+  --rose-fonce: #c9607f;
+  --creme: #fff7f2;
+  --texte: #4a3b3f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--creme);
+  color: var(--texte);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.7;
+}
+
+/* En-tête et menu */
+header {
+  background: var(--rose);
+  text-align: center;
+  padding: 24px 16px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+header h1, header a:first-child {
+  color: #fff;
+  font-size: 1.8rem;
+  text-decoration: none;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 12px 0 0;
+}
+nav a {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+nav a:hover { background: var(--rose-fonce); }
+
+/* Contenu */
+main, section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+h1, h2 {
+  color: var(--rose-fonce);
+  text-align: center;
+  text-transform: capitalize;
+}
+h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--rose);
+  margin: 8px auto 0;
+  border-radius: 2px;
+}
+p { text-align: center; }
+
+/* Images */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 20px auto;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Liens et boutons */
+main a, section a { color: var(--rose-fonce); font-weight: bold; }
+a:hover { text-decoration: underline; }
+
+/* Formulaire de contact */
+form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+input, textarea {
+  padding: 12px;
+  border: 1px solid var(--rose);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+button, input[type="submit"] {
+  background: var(--rose-fonce);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+button:hover, input[type="submit"]:hover { background: var(--rose); }
+
+/* Pied de page */
+footer {
+  background: var(--rose);
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+footer a { color: #fff; }
+.intro { max-width: 600px; margin: 0 auto 20px; }
+
+/* Boutons de filtre */
+.filtres {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+.filtres button {
+  background: #fff;
+  color: var(--rose-fonce);
+  border: 2px solid var(--rose);
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.filtres button.actif,
+.filtres button:hover {
+  background: var(--rose-fonce);
+  color: #fff;
+}
+
+/* La grille : s'adapte toute seule à la taille de l'écran */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+/* Une carte produit */
+.produit {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s, box-shadow 0.25s;
+  display: flex;
+  flex-direction: column;
+}
+.produit:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+.produit img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.infos {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: center;
+}
+.infos h3 { margin: 0 0 6px; color: var(--rose-fonce); }
+.desc { font-size: 0.9rem; margin: 0 0 10px; }
+.prix { font-weight: bold; font-size: 1.1rem; margin: auto 0 12px; }
+.btn {
+  display: inline-block;
+  background: var(--rose-fonce);
+  color: #fff !important;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn:hover { background: var(--rose); text-decoration: none !important; }
+
+.produit.cache { display: none; }
+
+/* ---- Header: smaller menu, nice on phones ---- */
+header .site-title { margin: 0; }
+header .site-title a { font-size: 1.6rem; }
+header .main-nav li a { font-size: 1rem; }
+
+@media (max-width: 600px) {
+  header { padding: 16px 10px 10px; }
+  header .site-title a { font-size: 1.3rem; }
+  header .main-nav ul { gap: 4px; margin-top: 8px; }
+  header .main-nav li a { font-size: 0.95rem; padding: 6px 12px; }
+}
+.tailles { font-size: 0.85rem; margin: 4px 0 10px; color: #7a6a6e; }
+.main-nav a[aria-current="page"] {
+  font-weight: bold;
+  border-bottom: 2px solid #fff;
+}
+@media (max-width: 700px) {
+  .grille { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; padding: 0 10px; }
+  .produit img { height: 150px !important; width: 100%; object-fit: cover; }
+  .produit h3 { font-size: 1rem; }
+  .produit .desc { display: none; }
+  .produit .btn { padding: 10px 8px; font-size: 0.9rem; }
+}
