@@ -136,7 +136,7 @@ function mailer() {
 const siteUrl = () => (process.env.SITE_URL || "").replace(/\/$/, "");
 
 function waButton(ref) {
-  const number = (process.env.WHATSAPP_NUMBER || "243978253950").replace(/\D/g, "");
+  const number = (process.env.WHATSAPP_NUMBER || "256791908861").replace(/\D/g, "");
   const text = encodeURIComponent("Hello, I'm writing about my order " + ref);
   return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="background:#25D366;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Chat with me on WhatsApp</a></p>`;
 }
