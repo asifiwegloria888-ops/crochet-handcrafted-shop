@@ -3,7 +3,7 @@
 const crypto = require("crypto");
 const L = require("./_lib");
 
-const SESSION_HOURS = 12;
+const SESSION_HOURS = 2;
 const STATUSES = ["new", "confirmed", "paid", "done", "cancelled"];
 
 const secretKey = () => (process.env.ADMIN_PASSWORD || "") + "|" + (process.env.CONFIRM_SECRET || "");
