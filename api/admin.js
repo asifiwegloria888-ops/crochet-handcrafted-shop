@@ -43,7 +43,10 @@ function publicOrder(o) {
     phone: o.phone || "",
     address: o.address || "",
     delivery: o.delivery || "",
-    delivery_fee: o.delivery_fee || 0,
+    delivery_fee: o.delivery_fee,
+    delivery_quote: L.needsQuote(o),
+    ready_date: o.ready_date || "",
+    items_subtotal: L.orderLines(o).every((l) => l.line_total != null) ? L.orderLines(o).reduce((s, l) => s + l.line_total, 0) : null,
     notes: o.notes || "",
     items: L.orderLines(o),
     estimate: L.estimateOf(o),
@@ -90,6 +93,41 @@ module.exports = async (req, res) => {
 
     if (b.action === "check") return res.status(200).json({ ok: true });
 
+    if (b.action === "count") {
+      const rows = await sql`SELECT COUNT(*)::int AS n FROM orders WHERE status = 'new'`;
+      await L.ensureSocialSchema(sql);
+      const pending = await sql`SELECT COUNT(*)::int AS n FROM comments WHERE status = 'pending'`;
+      return res.status(200).json({ ok: true, new: rows[0].n, comments: pending[0].n });
+    }
+
+    if (b.action === "stats") {
+      await L.ensureSocialSchema(sql);
+      await sql`DELETE FROM visits WHERE created_at < now() - interval '90 days'`;
+      const visits = await sql`SELECT vid, path, device, country, ref, created_at FROM visits WHERE created_at > now() - interval '8 days' ORDER BY id DESC LIMIT 30000`;
+      const live = await sql`SELECT path FROM live WHERE last_seen > now() - interval '2 minutes'`;
+      const downloads = await sql`SELECT item, photo, device, country, created_at FROM downloads WHERE created_at > now() - interval '8 days' ORDER BY id DESC LIMIT 5000`;
+      return res.status(200).json({ ok: true, stats: { ...L.buildStats(visits, live, Date.now()), downloads: L.buildDownloads(downloads, Date.now()) } });
+    }
+
+    if (b.action === "comments") {
+      await L.ensureSocialSchema(sql);
+      const rows = await sql`SELECT id, item, name, body, status, created_at FROM comments ORDER BY id DESC LIMIT 200`;
+      return res.status(200).json({ ok: true, comments: rows.map((c) => ({ ...c, label: L.labelOf(c.item) })) });
+    }
+
+    if (b.action === "comment_status" || b.action === "comment_delete") {
+      await L.ensureSocialSchema(sql);
+      const cid = parseInt(b.id, 10);
+      if (!Number.isInteger(cid) || cid < 1) return res.status(400).json({ error: "Invalid comment." });
+      if (b.action === "comment_delete") {
+        await sql`DELETE FROM comments WHERE id = ${cid}`;
+      } else {
+        if (!["approved", "hidden", "pending"].includes(b.status)) return res.status(400).json({ error: "Invalid status." });
+        await sql`UPDATE comments SET status = ${b.status} WHERE id = ${cid}`;
+      }
+      return res.status(200).json({ ok: true });
+    }
+
     if (b.action === "list") {
       const rows = await sql`SELECT * FROM orders ORDER BY id DESC LIMIT 300`;
       return res.status(200).json({ ok: true, orders: rows.map(publicOrder) });
@@ -102,9 +140,8 @@ module.exports = async (req, res) => {
 
     if (b.action === "confirm") {
       if (order.status !== "new") return res.status(400).json({ error: "This order is already confirmed." });
-      const total = parseInt(b.total, 10);
-      if (!Number.isInteger(total) || total < 1 || total > 100000000) return res.status(400).json({ error: "Please enter a valid total price." });
-      await L.doConfirm(sql, order, total);
+      const { fee, total } = L.resolveConfirm(order, b);
+      await L.doConfirm(sql, order, total, fee);
       return res.status(200).json({ ok: true });
     }
 

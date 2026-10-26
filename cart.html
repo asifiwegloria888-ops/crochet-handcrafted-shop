@@ -28,7 +28,11 @@
         .btn-light { background: #fff; color: var(--rose-fonce) !important; border: 2px solid var(--rose-fonce) !important; }
         .btn-light:hover { background: var(--rose-fonce); color: #fff !important; }
         .cart-empty { text-align: center; padding: 30px 10px; }
-        .cart-empty[hidden], #cart-box[hidden] { display: none; }
+        [hidden] { display: none !important; }
+        .cart-color-select { flex: 1 1 160px; min-width: 0; padding: 8px; border: 1px solid var(--rose); border-radius: 10px; font-size: 1rem; font-family: inherit; background: #fff; }
+        .cart-color-select.missing { border-color: #9b1c1c; background: #fff5f5; }
+        .cart-need { color: #9b1c1c; font-size: 0.85rem; margin: 2px 0 0; }
+        .cart-warn { background: #fde4e4; color: #9b1c1c; border-radius: 10px; padding: 10px 14px; font-weight: bold; margin: 10px 0 0; }
     </style>
 </head>
 <body>
@@ -60,9 +64,10 @@
                 <div class="cart-summary">
                     <p>Subtotal: <strong id="cart-subtotal"></strong></p>
                     <p class="cart-meta">The delivery fee is added on the next page.</p>
+                    <p id="cart-warn" class="cart-warn" hidden></p>
                     <div class="cart-actions">
                         <a class="btn btn-light" href="creation.html">Add another item</a>
-                        <a class="btn" href="order.html">Order now</a>
+                        <a class="btn" id="order-now" href="order.html">Order now</a>
                     </div>
                 </div>
             </div>
@@ -74,6 +79,7 @@
         <p><a href="contact.html">contact us</a></p>
     </footer>
     <script src="js/products.js"></script>
+    <script src="js/catalog.js"></script>
     <script src="js/site.js"></script>
     <script>
     (function () {
@@ -92,6 +98,12 @@
 
       function save() { Cart.write(lines); }
 
+      // an item that has a color list must have a color before the order
+      function colorOk(l) {
+        var list = PRODUCTS[l.item].colors;
+        return !(list && list.length) || String(l.colors || "").trim() !== "";
+      }
+
       function updateTotals() {
         var sum = lines.reduce(function (s, l) { return s + unitPrice(l) * l.qty; }, 0);
         $("cart-subtotal").textContent = money(sum);
@@ -106,11 +118,11 @@
           var row = document.createElement("div"); row.className = "cart-line";
 
           var img = document.createElement("img");
-          img.src = (l.photo || PRODUCTS[l.item].photos[0]) + ".jpeg"; img.alt = l.item; img.loading = "lazy";
+          img.src = (l.photo || PRODUCTS[l.item].photos[0]) + ".jpeg"; img.alt = labelOf(l.item); img.loading = "lazy";
           row.appendChild(img);
 
           var right = document.createElement("div");
-          var name = document.createElement("p"); name.className = "cart-name"; name.textContent = l.item; right.appendChild(name);
+          var name = document.createElement("p"); name.className = "cart-name"; name.textContent = labelOf(l.item); right.appendChild(name);
           var meta = document.createElement("p"); meta.className = "cart-meta";
           meta.textContent = (l.size ? l.size + " - " : "") + money(unitPrice(l)) + " each"; right.appendChild(meta);
 
@@ -126,13 +138,44 @@
           right.appendChild(ctl);
 
           var ctl2 = document.createElement("div"); ctl2.className = "cart-controls";
-          var colors = document.createElement("input"); colors.type = "text"; colors.maxLength = 200; colors.className = "cart-colors";
-          colors.placeholder = "Colors you want (e.g. red and white)"; colors.value = l.colors || ""; colors.setAttribute("aria-label", "Colors for " + l.item);
-          colors.addEventListener("input", function () { l.colors = colors.value; save(); });
+          var list = PRODUCTS[l.item].colors;
+          var need = null;
+          if (list && list.length) {
+            // a list of colors to choose from (see COLORS in js/products.js)
+            var sel = document.createElement("select"); sel.className = "cart-color-select";
+            sel.setAttribute("aria-label", "Color for " + labelOf(l.item));
+            var first = document.createElement("option"); first.value = ""; first.textContent = "Choose a color"; sel.appendChild(first);
+            list.forEach(function (c) { var o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o); });
+            var oth = document.createElement("option"); oth.value = "__other"; oth.textContent = "Other color..."; sel.appendChild(oth);
+            var other = document.createElement("input"); other.type = "text"; other.maxLength = 100; other.className = "cart-colors";
+            other.placeholder = "Write the color you want"; other.setAttribute("aria-label", "Other color for " + labelOf(l.item));
+            var cur = String(l.colors || "").trim();
+            if (cur && list.indexOf(cur) !== -1) sel.value = cur;
+            else if (cur) { sel.value = "__other"; other.value = cur; }
+            else sel.value = "";
+            other.hidden = sel.value !== "__other";
+            need = document.createElement("p"); need.className = "cart-need"; need.textContent = "Please choose a color";
+            var apply = function () {
+              l.colors = sel.value === "__other" ? other.value.trim() : sel.value;
+              save();
+              need.hidden = colorOk(l);
+              sel.classList.toggle("missing", !colorOk(l));
+            };
+            sel.classList.toggle("missing", !colorOk(l)); need.hidden = colorOk(l);
+            sel.addEventListener("change", function () { other.hidden = sel.value !== "__other"; apply(); });
+            other.addEventListener("input", apply);
+            ctl2.appendChild(sel); ctl2.appendChild(other);
+          } else {
+            var colors = document.createElement("input"); colors.type = "text"; colors.maxLength = 200; colors.className = "cart-colors";
+            colors.placeholder = "Color (optional)"; colors.value = l.colors || ""; colors.setAttribute("aria-label", "Colors for " + labelOf(l.item));
+            colors.addEventListener("input", function () { l.colors = colors.value; save(); });
+            ctl2.appendChild(colors);
+          }
           var rm = document.createElement("button"); rm.type = "button"; rm.className = "cart-remove"; rm.textContent = "Remove";
           rm.addEventListener("click", function () { lines.splice(index, 1); save(); render(); });
-          ctl2.appendChild(colors); ctl2.appendChild(rm);
+          ctl2.appendChild(rm);
           right.appendChild(ctl2);
+          if (need) right.appendChild(need);
 
           row.appendChild(right);
           box.appendChild(row);
@@ -140,6 +183,16 @@
         updateTotals();
       }
       render();
+
+      $("order-now").addEventListener("click", function (e) {
+        var bad = lines.filter(function (l) { return !colorOk(l); });
+        if (!bad.length) return;
+        e.preventDefault();
+        $("cart-warn").textContent = "Please choose a color for each item before you order.";
+        $("cart-warn").hidden = false;
+        var field = document.querySelector(".cart-color-select.missing");
+        if (field) { field.scrollIntoView({ block: "center" }); field.focus(); }
+      });
     })();
     </script>
 </body>

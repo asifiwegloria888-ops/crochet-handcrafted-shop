@@ -21,6 +21,7 @@ module.exports = async (req, res) => {
     address: L.clean(body.address, 300),
     delivery: L.clean(body.delivery, 50),
     notes: L.clean(body.notes, 1500),
+    ready_date: L.clean(body.ready_date, 10),
   };
   const priced = L.priceItems(body.items);
 
@@ -31,12 +32,16 @@ module.exports = async (req, res) => {
   else if (L.DELIVERY_FEES[customer.delivery] === null && customer.address.length < 10)
     errors.push("Please write your full delivery address (town, area, landmark) so I can quote the delivery price.");
   if (customer.delivery === "Pickup") customer.address = "";
+  if (!priced.errors.length) {
+    const check = L.checkReadyDate(customer.ready_date, priced.items);
+    if (check.error) errors.push(check.error);
+  }
   if (errors.length) return res.status(400).json({ error: errors.join(" ") });
 
   const fee = L.DELIVERY_FEES[customer.delivery]; // null = price quoted by the owner
   const total = fee == null ? null : priced.subtotal + fee;
   const items = priced.items;
-  const summary = items.map((i) => `${i.item}${i.size ? " (" + i.size + ")" : ""} x${i.quantity}`).join(", ").slice(0, 400);
+  const summary = items.map((i) => `${i.label}${i.size ? " (" + i.size + ")" : ""} x${i.quantity}`).join(", ").slice(0, 400);
   const quantity = items.reduce((s, i) => s + i.quantity, 0);
   const firstPhoto = (items.find((i) => i.photo) || {}).photo || "";
 
@@ -46,10 +51,10 @@ module.exports = async (req, res) => {
     const sql = L.db();
     await L.ensureSchema(sql);
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date)
       VALUES (${customer.name}, ${customer.email}, ${customer.phone}, ${summary}, ${""}, ${""}, ${quantity},
               ${customer.notes}, ${firstPhoto}, ${customer.address}, ${customer.delivery}, ${fee},
-              ${JSON.stringify(items)}::jsonb, ${total})
+              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date})
       RETURNING id`;
     order = { id: rows[0].id, ...customer, items, delivery_fee: fee, total, status: "new" };
   } catch (err) {
@@ -87,7 +92,7 @@ module.exports = async (req, res) => {
       const photos = items.filter((i) => i.photo);
       const photoLinks = photos.length
         ? `<p style="margin-top:12px"><strong>Photos chosen:</strong><br>${photos
-            .map((i) => (site ? `<a href="${L.esc(site)}/${i.photo}.jpeg">${L.esc(i.item)}: ${i.photo}.jpeg</a>` : `${L.esc(i.item)}: ${i.photo}.jpeg`))
+            .map((i) => (site ? `<a href="${L.esc(site)}/${i.photo}.jpeg">${L.esc(i.label)}: ${i.photo}.jpeg</a>` : `${L.esc(i.label)}: ${i.photo}.jpeg`))
             .join("<br>")}</p>`
         : "";
       const btn = "display:inline-block;background:#c9607f;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px";

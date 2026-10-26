@@ -41,6 +41,25 @@
         .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--rose); }
         .actions input { width: 140px; padding: 8px; }
         .adm a { color: var(--rose-fonce); }
+        .tabs { display: flex; gap: 6px; margin: 4px 0 14px; border-bottom: 2px solid var(--rose); }
+        .adm .tab { background: #fff; color: var(--rose-fonce); border: 2px solid var(--rose); border-bottom: none; border-radius: 12px 12px 0 0; padding: 9px 16px; margin-bottom: -2px; }
+        .adm .tab.on { background: var(--rose-fonce); color: #fff; border-color: var(--rose-fonce); }
+        .tabbadge { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 9px; background: #ffe9b8; color: #7a5200; font-size: 0.8rem; font-weight: bold; text-align: center; }
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .kpi { background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+        .kpi .n { font-size: 1.8rem; font-weight: bold; color: var(--rose-fonce); line-height: 1.1; }
+        .kpi .l { font-size: 0.85rem; color: #7a6a6e; }
+        .live-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #1fa855; margin-right: 6px; }
+        .bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 8px; }
+        .bars .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+        .bars .bar { width: 100%; background: var(--rose); border-radius: 6px 6px 0 0; min-height: 2px; }
+        .bars .v { font-size: 0.8rem; font-weight: bold; }
+        .bars .d { font-size: 0.75rem; color: #7a6a6e; }
+        .list2 { margin: 6px 0 0; padding: 0; list-style: none; }
+        .list2 li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid #f0d5dd; font-size: 0.92rem; overflow-wrap: anywhere; }
+        .st-pending { background: #ffe9b8; color: #7a5200; }
+        .st-approved { background: #e3f4e8; color: #1b5e34; }
+        .st-hidden { background: #eee; color: #444; }
         @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -63,15 +82,34 @@
             </div>
 
             <div id="panel" hidden>
-                <h1 style="margin-bottom:10px">Orders</h1>
+                <div class="tabs" id="tabs">
+                    <button type="button" class="tab on" data-tab="orders">Orders</button>
+                    <button type="button" class="tab" data-tab="visitors">Visitors</button>
+                    <button type="button" class="tab" data-tab="comments">Comments <span id="comments-badge" class="tabbadge" hidden></span></button>
+                </div>
+                <p id="panel-err" class="err" hidden></p>
+
+                <div id="tab-orders">
                 <div class="toolbar">
                     <input id="search" class="grow" type="search" placeholder="Search name, email, reference...">
                     <button type="button" id="refresh" class="light">Refresh</button>
                     <button type="button" id="logout" class="light">Log out</button>
                 </div>
                 <div id="chips" class="chips"></div>
-                <p id="panel-err" class="err" hidden></p>
                 <div id="list"></div>
+                </div>
+
+                <div id="tab-visitors" hidden>
+                    <div class="toolbar"><button type="button" id="refresh-stats" class="light">Refresh</button>
+                        <span class="small">Anonymous: no names, no IP address. Your own visits from a device where you are logged in are not counted.</span></div>
+                    <div id="stats"></div>
+                </div>
+
+                <div id="tab-comments" hidden>
+                    <div class="toolbar"><button type="button" id="refresh-comments" class="light">Refresh</button>
+                        <span class="small">A comment is shown on the article page only after you approve it.</span></div>
+                    <div id="comment-list"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -108,7 +146,10 @@
       }
 
       function showLogin() { $("panel").hidden = true; $("login").hidden = false; $("pw").focus(); }
-      function showPanel() { $("login").hidden = true; $("panel").hidden = false; load(); }
+      // Remembers on this device only that you are the owner, so the "Admin" link shows in the menu.
+      // It is just a convenience: the real protection is the password checked by the server.
+      function rememberAdmin(on) { try { if (on) localStorage.setItem("shopAdmin", "1"); else localStorage.removeItem("shopAdmin"); } catch (e) {} }
+      function showPanel() { rememberAdmin(true); $("login").hidden = true; $("panel").hidden = false; load(); loadCommentBadge(); }
       function panelError(msg) { var p = $("panel-err"); p.textContent = msg || ""; p.hidden = !msg; }
 
       $("login-btn").addEventListener("click", login);
@@ -120,7 +161,7 @@
           .catch(function (err) { $("login-err").textContent = err.message; $("login-err").hidden = false; })
           .then(function () { btn.disabled = false; });
       }
-      $("logout").addEventListener("click", function () { api({ action: "logout" }).catch(function () {}).then(showLogin); });
+      $("logout").addEventListener("click", function () { rememberAdmin(false); api({ action: "logout" }).catch(function () {}).then(showLogin); });
       $("refresh").addEventListener("click", load);
       $("search").addEventListener("input", function () { query = this.value.trim().toLowerCase(); render(); });
 
@@ -186,6 +227,10 @@
         }
         who.appendChild(el("p", "small", (o.delivery === "Pickup" ? "Pick up (free)" : o.delivery === "Delivery" ? "Delivery to his address" : "Delivery: " + o.delivery) + (o.delivery_quote ? " (price to quote)" : o.delivery === "Pickup" ? "" : " (" + money(o.delivery_fee || 0) + ")")));
         if (o.address) who.appendChild(el("p", "small", "Address: " + o.address));
+        if (o.ready_date) {
+          var rd2 = el("p", "", "Ready by: " + new Date(o.ready_date + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }));
+          rd2.style.fontWeight = "bold"; who.appendChild(rd2);
+        }
         if (o.notes) who.appendChild(el("p", "small", "Notes: " + o.notes));
         cols.appendChild(who);
 
@@ -195,7 +240,7 @@
         t.appendChild(hr);
         o.items.forEach(function (l) {
           var tr = el("tr");
-          var td = el("td", "", l.item + (l.size ? " (" + l.size + ")" : ""));
+          var td = el("td", "", (l.label || l.item) + (l.size ? " (" + l.size + ")" : ""));
           if (l.colors) { td.appendChild(el("br")); td.appendChild(el("span", "small", "Colors: " + l.colors)); }
           if (l.photo) { td.appendChild(el("br")); var pa2 = el("a", "small", "photo " + l.photo); pa2.href = l.photo + ".jpeg"; pa2.target = "_blank"; pa2.rel = "noopener"; td.appendChild(pa2); }
           tr.appendChild(td);
@@ -218,18 +263,29 @@
 
         var act = el("div", "actions");
         if (o.status === "new") {
-          var inp = el("input"); inp.type = "number"; inp.min = 1; inp.step = 1; inp.value = o.estimate != null ? o.estimate : "";
-          inp.setAttribute("aria-label", "Total price for " + o.ref);
+          var feeMode = o.delivery_quote && o.items_subtotal != null;
+          var inp = el("input"); inp.type = "number"; inp.min = feeMode ? 0 : 1; inp.step = 1;
+          inp.value = feeMode ? "" : (o.estimate != null ? o.estimate : "");
+          inp.setAttribute("aria-label", (feeMode ? "Delivery fee for " : "Total price for ") + o.ref);
+          var sum = el("span", "small", "");
+          var totalOf = function () {
+            var v = parseInt(inp.value, 10);
+            if (!(v >= (feeMode ? 0 : 1))) return null;
+            return feeMode ? o.items_subtotal + v : v;
+          };
+          var showSum = function () { var t = totalOf(); sum.textContent = t == null ? "" : "Total " + money(t) + " - deposit " + money(Math.ceil(t / 2)); };
+          inp.addEventListener("input", showSum); showSum();
           var ok = el("button", "", "Confirm + ask 50% deposit");
           ok.type = "button";
           ok.addEventListener("click", function () {
-            var total = parseInt(inp.value, 10);
-            if (!(total > 0)) { panelError("Enter the total price first."); return; }
-            run(ok, { action: "confirm", id: o.id, total: total },
-              "Send the confirmation to " + o.email + " asking a deposit of " + money(Math.ceil(total / 2)) + "?");
+            var t = totalOf();
+            if (t == null) { panelError(feeMode ? "Enter the delivery fee first (0 if free)." : "Enter the total price first."); return; }
+            var body = feeMode ? { action: "confirm", id: o.id, delivery_fee: parseInt(inp.value, 10) } : { action: "confirm", id: o.id, total: t };
+            run(ok, body, "Send the confirmation to " + o.email + (feeMode ? " with delivery " + money(parseInt(inp.value, 10)) + "," : "") + " total " + money(t) + ", deposit asked " + money(Math.ceil(t / 2)) + "?");
           });
-          if (o.delivery_quote) act.appendChild(el("p", "err", "Add the delivery price to the items total, then confirm."));
-          act.appendChild(el("span", "small", "Total (UGX):")); act.appendChild(inp); act.appendChild(ok);
+          if (o.delivery_quote && !feeMode) act.appendChild(el("p", "err", "Add the delivery price to the total, then confirm."));
+          act.appendChild(el("span", "small", feeMode ? "Delivery fee (UGX):" : "Total (UGX):"));
+          act.appendChild(inp); act.appendChild(ok); act.appendChild(sum);
         }
         if (o.status === "confirmed") {
           var dep = el("button", "", "Deposit received"); dep.type = "button";
@@ -261,6 +317,110 @@
         var shown = orders.filter(matches);
         if (shown.length === 0) box.appendChild(el("p", "small", orders.length ? "No order matches." : "No orders yet."));
         shown.forEach(function (o) { box.appendChild(card(o)); });
+      }
+
+      // ---------- tabs ----------
+      var currentTab = "orders", statsTimer = null;
+      function showTab(name) {
+        currentTab = name;
+        ["orders", "visitors", "comments"].forEach(function (t) { $("tab-" + t).hidden = t !== name; });
+        Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (b) { b.classList.toggle("on", b.dataset.tab === name); });
+        panelError("");
+        clearInterval(statsTimer);
+        if (name === "visitors") { loadStats(); statsTimer = setInterval(loadStats, 30000); }
+        if (name === "comments") loadComments();
+        if (name === "orders") load();
+      }
+      Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (b) { b.addEventListener("click", function () { showTab(b.dataset.tab); }); });
+      $("refresh-stats").addEventListener("click", loadStats);
+      $("refresh-comments").addEventListener("click", loadComments);
+
+      // ---------- visitors ----------
+      function prettyPath(p) {
+        var m = /^\/product\.html\?item=(.+)$/.exec(p);
+        if (m) { try { return "Article: " + decodeURIComponent(m[1]); } catch (e) { return p; } }
+        return p.replace(/^\//, "") || "index.html";
+      }
+      function kpi(n, label, live) {
+        var k = el("div", "kpi"); var num = el("div", "n");
+        if (live) num.appendChild(el("span", "live-dot"));
+        num.appendChild(document.createTextNode(String(n))); k.appendChild(num); k.appendChild(el("div", "l", label)); return k;
+      }
+      function listCard(title, rows, fmt) {
+        var c = el("div", "card"); c.appendChild(el("p", "ref", title));
+        if (!rows.length) { c.appendChild(el("p", "small", "Nothing yet.")); return c; }
+        var ul = el("ul", "list2");
+        rows.forEach(function (r) { var li = el("li"); li.appendChild(el("span", "", fmt[0](r))); li.appendChild(el("strong", "", String(fmt[1](r)))); ul.appendChild(li); });
+        c.appendChild(ul); return c;
+      }
+      function loadStats() {
+        panelError("");
+        return api({ action: "stats" }).then(function (data) {
+          var s = data.stats, box = $("stats"); box.innerHTML = "";
+          var k = el("div", "kpis");
+          k.appendChild(kpi(s.online.count, "online now", true));
+          k.appendChild(kpi(s.today.visitors, "visitors today"));
+          k.appendChild(kpi(s.today.views, "pages viewed today"));
+          k.appendChild(kpi(s.week.visitors, "visitors, last 7 days"));
+          var dl = s.downloads || { today: 0, week: 0, items: [], recent: [] };
+          k.appendChild(kpi(dl.today, "photos downloaded today"));
+          box.appendChild(k);
+
+          var chart = el("div", "card"); chart.appendChild(el("p", "ref", "Visitors, last 7 days"));
+          var bars = el("div", "bars"), max = Math.max.apply(null, s.days.map(function (d) { return d.visitors; }).concat([1]));
+          s.days.forEach(function (d) {
+            var col = el("div", "col"); col.appendChild(el("span", "v", String(d.visitors)));
+            var bar = el("div", "bar"); bar.style.height = Math.round((d.visitors / max) * 80) + "%"; col.appendChild(bar);
+            col.appendChild(el("span", "d", d.day.slice(8) + "/" + d.day.slice(5, 7))); bars.appendChild(col);
+          });
+          chart.appendChild(bars); box.appendChild(chart);
+
+          box.appendChild(listCard("On the site right now", s.online.pages, [function (r) { return r.label || prettyPath(r.path); }, function (r) { return r.n; }]));
+          box.appendChild(listCard("Most viewed articles (7 days)", s.items, [function (r) { return r.item; }, function (r) { return r.views; }]));
+          box.appendChild(listCard("Most viewed pages (7 days)", s.pages, [function (r) { return prettyPath(r.path); }, function (r) { return r.views; }]));
+          box.appendChild(listCard("Downloaded photos (7 days): " + dl.week + " in total", dl.items, [function (r) { return r.item; }, function (r) { return r.n; }]));
+          box.appendChild(listCard("Last downloads (only the Download button is counted)", dl.recent, [function (r) {
+            return new Date(r.at).toLocaleString() + " - " + r.item + (r.photo ? " (photo " + r.photo + ")" : "") + (r.country ? " - " + r.country : "") + (r.device ? " - " + r.device : "");
+          }, function () { return ""; }]));
+          box.appendChild(listCard("Phone or computer (7 days)", [{ k: "Phone", n: s.devices.phone }, { k: "Computer", n: s.devices.computer }], [function (r) { return r.k; }, function (r) { return r.n; }]));
+          box.appendChild(listCard("Countries (7 days)", s.countries, [function (r) { return r.country; }, function (r) { return r.n; }]));
+          box.appendChild(listCard("Where they come from (7 days)", s.sources, [function (r) { return r.ref; }, function (r) { return r.n; }]));
+        }).catch(function (err) { panelError(err.message); });
+      }
+
+      // ---------- comments ----------
+      function setBadge(n) { var b = $("comments-badge"); b.textContent = n; b.hidden = !(n > 0); }
+      function loadCommentBadge() {
+        api({ action: "count" }).then(function (d) { setBadge(d.comments || 0); }).catch(function () {});
+      }
+      function loadComments() {
+        panelError("");
+        return api({ action: "comments" }).then(function (data) {
+          var box = $("comment-list"); box.innerHTML = "";
+          setBadge(data.comments.filter(function (c) { return c.status === "pending"; }).length);
+          if (!data.comments.length) box.appendChild(el("p", "small", "No comments yet."));
+          data.comments.forEach(function (c) {
+            var card = el("div", "card");
+            var head = el("div", "card-head");
+            var left = el("div"); left.appendChild(el("span", "ref", c.name + "  ")); left.appendChild(el("span", "date", "on " + (c.label || c.item) + " - " + new Date(c.created_at).toLocaleString()));
+            head.appendChild(left); head.appendChild(el("span", "badge st-" + c.status, c.status)); card.appendChild(head);
+            card.appendChild(el("p", "", c.body));
+            var act = el("div", "actions");
+            function btn(label, cls, body, ask) {
+              var b = el("button", cls, label); b.type = "button";
+              b.addEventListener("click", function () {
+                if (ask && !window.confirm(ask)) return;
+                b.disabled = true;
+                api(body).then(loadComments).catch(function (err) { panelError(err.message); b.disabled = false; });
+              });
+              act.appendChild(b);
+            }
+            if (c.status !== "approved") btn("Approve (show it)", "", { action: "comment_status", id: c.id, status: "approved" });
+            if (c.status === "approved") btn("Hide", "light", { action: "comment_status", id: c.id, status: "hidden" });
+            btn("Delete", "danger", { action: "comment_delete", id: c.id }, "Delete this comment for good?");
+            card.appendChild(act); box.appendChild(card);
+          });
+        }).catch(function (err) { panelError(err.message); });
       }
 
       // already logged in?

@@ -21,6 +21,26 @@
         .pd-total { font-weight: bold; font-size: 1.15rem; margin: 12px 0; }
         .pd-msg { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: #e3f4e8; color: #1b5e34; }
         .pd-msg:empty { display: none; }
+        .pd-msg.err { background: #fde4e4; color: #9b1c1c; }
+        .pd-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+        .pd-act { font-family: inherit; font-size: 0.95rem; background: #fff; color: var(--rose-fonce); border: 2px solid var(--rose); border-radius: 20px; padding: 7px 14px; cursor: pointer; }
+        .pd-act.on { background: var(--rose-fonce); color: #fff; border-color: var(--rose-fonce); }
+        .pd-act:disabled { opacity: 0.6; }
+        .pd-dl { display: inline-block; margin-top: 10px; text-decoration: none; }
+        .pd-act .cnt { font-weight: bold; }
+        .pd-social { max-width: 640px; margin: 34px auto 0; text-align: left; }
+        .pd-social h2 { text-align: center; }
+        .pd-comment { background: #fff; border-radius: 14px; padding: 10px 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .pd-comment p { margin: 0; text-align: left; }
+        .pd-cwho { font-size: 0.85rem; color: #7a6a6e; }
+        .pd-ctext { margin-top: 4px !important; overflow-wrap: anywhere; }
+        .pd-none { text-align: center !important; color: #7a6a6e; }
+        .pd-cform { margin-top: 18px; }
+        .pd-cform label { display: block; font-weight: bold; color: var(--rose-fonce); margin: 10px 0 4px; }
+        .pd-cform input[type=text], .pd-cform textarea { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--rose); border-radius: 10px; font-family: inherit; font-size: 1rem; background: #fff; }
+        .pd-cform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .pd-note { font-size: 0.85rem; color: #7a6a6e; text-align: center; }
+        [hidden] { display: none !important; }
         @media (max-width: 700px) { .pd { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -46,22 +66,45 @@
             <div>
                 <img id="pd-main" class="pd-main" src="" alt="">
                 <div id="pd-thumbs" class="pd-thumbs"></div>
+                <a id="pd-download" class="pd-act pd-dl" href="#" download hidden>&#8681; Download this photo</a>
             </div>
             <div>
                 <p id="pd-desc"></p>
+                <div class="pd-actions" id="pd-actions" hidden>
+                    <button type="button" id="pd-like" class="pd-act" aria-pressed="false"><span class="ic">&#9825;</span> <span class="lbl">Like</span> <span id="pd-likes" class="cnt"></span></button>
+                    <button type="button" id="pd-fav" class="pd-act" aria-pressed="false"><span class="ic">&#9734;</span> <span class="lbl">Add to favorites</span></button>
+                </div>
                 <table id="pd-table"></table>
                 <label for="pd-size">Size</label>
                 <select id="pd-size"></select>
+                <div id="pd-color-box">
+                    <label for="pd-color">Color</label>
+                    <select id="pd-color"></select>
+                    <input type="text" id="pd-color-other" maxlength="100" placeholder="Write the color you want" hidden style="margin-top:8px">
+                </div>
                 <label for="pd-qty">Quantity</label>
                 <input type="number" id="pd-qty" min="1" max="100" value="1">
-                <label for="pd-colors">Colours (optional)</label>
-                <input type="text" id="pd-colors" maxlength="200" placeholder="Ex: red and white">
                 <p class="pd-total" id="pd-total"></p>
                 <button type="button" class="submit" id="pd-add">Add to cart</button>
                 <p id="pd-msg" class="pd-msg" role="status"></p>
                 <p><a href="creation.html">&larr; Back to creations</a></p>
             </div>
         </div>
+
+        <section id="pd-comments-box" class="pd-social" hidden>
+            <h2>Comments</h2>
+            <div id="pd-comments"></div>
+            <form id="pd-cform" class="pd-cform">
+                <label for="pd-cname">Your name</label>
+                <input type="text" id="pd-cname" maxlength="40" required>
+                <label for="pd-ctext">Your comment</label>
+                <textarea id="pd-ctext" rows="3" maxlength="500" required></textarea>
+                <div class="hp" aria-hidden="true"><label for="pd-chp">Website</label><input type="text" id="pd-chp" tabindex="-1" autocomplete="off"></div>
+                <button type="submit" class="submit">Send my comment</button>
+                <p id="pd-cmsg" class="pd-msg" role="status"></p>
+                <p class="pd-note"></p>
+            </form>
+        </section>
     </main>
 
     <footer class="site-footer">
@@ -70,10 +113,11 @@
     </footer>
 
     <script src="js/products.js"></script>
+    <script src="js/catalog.js"></script>
     <script>
     (function () {
       var params = new URLSearchParams(location.search);
-      var name = params.get("item");
+      var name = resolveProduct(params.get("item"), params.get("photo")); // also understands old links (item=Dress&photo=31)
       var p = Object.prototype.hasOwnProperty.call(PRODUCTS, name) ? PRODUCTS[name] : null;
       var $ = function (id) { return document.getElementById(id); };
       if (!p) {
@@ -84,9 +128,11 @@
       var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; };
       var photo = params.get("photo");
       if (p.photos.indexOf(photo) === -1) photo = p.photos[0];
+      try { history.replaceState(null, "", "product.html?item=" + encodeURIComponent(name).replace(/%20/g, "+") + "&photo=" + photo); } catch (e) {}
 
-      document.title = name + " | Crochet Handcrafted Shop";
-      $("pd-title").textContent = name;
+      var label = labelOf(name);
+      document.title = label + " | Crochet Handcrafted Shop";
+      $("pd-title").textContent = label;
       $("pd-desc").textContent = p.desc;
 
       // price table + size list
@@ -108,15 +154,29 @@
         sizeSel.parentNode.removeChild(sizeSel);
       }
 
+      // colors: a list to choose from (see COLORS in js/products.js)
+      var colorBox = $("pd-color-box"), colorSel = $("pd-color"), colorOther = $("pd-color-other");
+      var hasColors = !!(p.colors && p.colors.length);
+      if (hasColors) {
+        var first = document.createElement("option"); first.value = ""; first.textContent = "Choose a color"; colorSel.appendChild(first);
+        p.colors.forEach(function (c) {
+          var o = document.createElement("option"); o.value = c; o.textContent = c; colorSel.appendChild(o);
+        });
+        var other = document.createElement("option"); other.value = "__other"; other.textContent = "Other color..."; colorSel.appendChild(other);
+        colorSel.addEventListener("change", function () { colorOther.hidden = colorSel.value !== "__other"; });
+      } else {
+        colorBox.hidden = true;
+      }
+
       // gallery
       var main = $("pd-main"), thumbs = $("pd-thumbs");
       function setPhoto(id) {
-        photo = id; main.src = id + ".jpeg"; main.alt = name;
+        photo = id; main.src = id + ".jpeg"; main.alt = label;
         Array.prototype.forEach.call(thumbs.children, function (t) { t.classList.toggle("on", t.dataset.id === id); });
       }
       p.photos.forEach(function (id) {
         var t = document.createElement("img");
-        t.src = id + ".jpeg"; t.alt = name; t.dataset.id = id; t.loading = "lazy";
+        t.src = id + ".jpeg"; t.alt = label; t.dataset.id = id; t.loading = "lazy";
         t.addEventListener("click", function () { setPhoto(id); });
         thumbs.appendChild(t);
       });
@@ -136,14 +196,23 @@
         var q = parseInt($("pd-qty").value, 10);
         if (!(q >= 1 && q <= 100)) return;
         var size = p.sizes ? sizeSel.value : "";
+        var colors = "";
+        var msg = $("pd-msg");
+        if (hasColors) {
+          colors = colorSel.value === "__other" ? colorOther.value.trim() : colorSel.value;
+          if (!colors) {
+            msg.className = "pd-msg err";
+            msg.textContent = colorSel.value === "__other" ? "Please write the color you want." : "Please choose a color.";
+            return;
+          }
+        }
         var cart = [];
         try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); } catch (e) {}
-        var colors = $("pd-colors").value.trim();
         var found = cart.filter(function (l) { return l.item === name && l.size === size && l.photo === photo && (l.colors || "") === colors; })[0];
         if (found) found.qty = Math.min(100, found.qty + q);
         else cart.push({ item: name, size: size, qty: q, photo: photo, colors: colors });
         try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {}
-        var msg = $("pd-msg");
+        msg.className = "pd-msg";
         msg.textContent = "Added to your cart. You can choose another item or ";
         var go = document.createElement("a"); go.href = "cart.html"; go.textContent = "open your cart"; msg.appendChild(go);
         msg.appendChild(document.createTextNode("."));
@@ -152,5 +221,6 @@
     })();
     </script>
     <script src="js/site.js"></script>
+    <script src="js/social.js"></script>
 </body>
 </html>

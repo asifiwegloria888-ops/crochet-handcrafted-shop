@@ -24,12 +24,22 @@ table{width:100%;border-collapse:collapse;font-size:.95rem}
 }
 
 function summary(order) {
-  return `<p><strong>${L.esc(order.name)}</strong><br>${L.esc(order.email)}${order.phone ? "<br>" + L.esc(order.phone) : ""}</p>${L.itemsTable(order)}`;
+  const confirmed = order.status !== "new" && order.total != null ? order.total : undefined;
+  return `<p><strong>${L.esc(order.name)}</strong><br>${L.esc(order.email)}${order.phone ? "<br>" + L.esc(order.phone) : ""}</p>${L.itemsTable(order, confirmed)}`;
 }
 
 function formPage(res, order, ref, token, error) {
+  const lines = L.orderLines(order);
+  const itemsSum = lines.every((l) => l.line_total != null) ? lines.reduce((s, l) => s + l.line_total, 0) : null;
+  const feeMode = L.needsQuote(order) && itemsSum != null;
   const guess = L.estimateOf(order) || "";
   const action = `/api/confirm?id=${order.id}&t=${encodeURIComponent(token)}`;
+  const field = feeMode
+    ? `<p>Items total: <strong>${L.esc(L.money(itemsSum))}</strong></p>
+    <label for="delivery_fee">Delivery fee (UGX). The customer sees this exact amount.</label>
+    <input id="delivery_fee" name="delivery_fee" type="number" min="0" step="1" required>`
+    : `<label for="total">Total price (UGX, delivery included)</label>
+    <input id="total" name="total" type="number" min="1" step="1" value="${L.esc(guess)}" required>`;
   return send(
     res,
     error ? 400 : 200,
@@ -39,15 +49,16 @@ function formPage(res, order, ref, token, error) {
   ${summary(order)}
   ${error ? `<p class="err">${L.esc(error)}</p>` : ""}
   <form method="POST" action="${L.esc(action)}">
-    <label for="total">Total price (UGX, delivery included)</label>
-    <input id="total" name="total" type="number" min="1" step="1" value="${L.esc(guess)}" required>
+    ${field}
     <p id="dep"></p>
     <button type="submit">Send confirmation and deposit request</button>
   </form>
 </div>
 <script>
- var t=document.getElementById("total"),d=document.getElementById("dep");
- function u(){var v=parseInt(t.value,10);d.textContent=v>0?"Deposit asked (50%): "+Math.ceil(v/2).toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g," ")+" UGX":"";}
+ var base=${feeMode ? itemsSum : 0},isFee=${feeMode ? "true" : "false"};
+ var t=document.getElementById(isFee?"delivery_fee":"total"),d=document.getElementById("dep");
+ function fmt(n){return n.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g," ")+" UGX";}
+ function u(){var v=parseInt(t.value,10);if(!(v>=0)||(!isFee&&v<1)){d.textContent="";return;}var total=isFee?base+v:v;d.textContent="Total "+fmt(total)+" - deposit asked (50%): "+fmt(Math.ceil(total/2));}
  t.addEventListener("input",u);u();
 </script>`
   );
@@ -97,17 +108,17 @@ module.exports = async (req, res) => {
   try {
     if (order.status === "new") {
       if (req.method === "GET") return formPage(res, order, ref, token);
-      const total = parseInt(req.body && req.body.total, 10);
-      if (!Number.isInteger(total) || total < 1 || total > 100000000) return formPage(res, order, ref, token, "Please enter a valid total price.");
       let result;
       try {
-        result = await L.doConfirm(sql, order, total);
+        const { fee, total } = L.resolveConfirm(order, req.body || {});
+        result = await L.doConfirm(sql, order, total, fee);
+        result.total = total;
       } catch (err) {
         if (err.user) return formPage(res, order, ref, token, err.message);
         throw err;
       }
       return send(res, 200, `${ref} confirmed`,
-        `<h1>Order ${L.esc(ref)}</h1><p class="ok">Confirmation sent to ${L.esc(order.email)}.<br>Total ${L.esc(L.money(total))}, deposit asked ${L.esc(L.money(result.deposit))}.</p><p>When the deposit arrives, open the same link again and press "Deposit received".</p>`);
+        `<h1>Order ${L.esc(ref)}</h1><p class="ok">Confirmation sent to ${L.esc(order.email)}.<br>Total ${L.esc(L.money(result.total))}, deposit asked ${L.esc(L.money(result.deposit))}.</p><p>When the deposit arrives, open the same link again and press "Deposit received".</p>`);
     }
 
     if (order.status === "confirmed") {

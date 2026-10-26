@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My favorites | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .fav-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; padding: 0 14px 30px; }
+        @media (min-width: 700px) { .fav-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .fav-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); text-align: center; padding-bottom: 14px; }
+        .fav-card img { width: 100%; height: 170px; object-fit: cover; margin: 0; border-radius: 0; box-shadow: none; }
+        .fav-card h3 { margin: 10px 8px 8px; color: var(--rose-fonce); font-size: 1.05rem; }
+        .fav-card .btn { font-size: 0.9rem; padding: 7px 14px; }
+        .fav-remove { display: block; margin: 8px auto 0; background: none; border: none; color: #9b1c1c; text-decoration: underline; cursor: pointer; font-family: inherit; font-size: 0.85rem; }
+        .fav-empty { text-align: center; padding: 20px; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <nav class="main-nav" aria-label="main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="creation.html">Creation</a></li>
+                    <li><a href="album.html">Album</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order.html">Order</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>My favorites</h1>
+        <p class="fav-empty" id="fav-empty" hidden>You have no favorite yet. Open an article and press "Add to favorites".<br><br><a class="btn" href="creation.html">Browse our creations</a></p>
+        <div class="fav-grid" id="fav-grid"></div>
+        <p class="fav-empty" style="font-size:0.85rem">Your favorites are saved on this phone or computer only.</p>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
+        <p><a href="contact.html">contact us</a></p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/catalog.js"></script>
+    <script src="js/site.js"></script>
+    <script>
+    (function () {
+      var grid = document.getElementById("fav-grid");
+      function render() {
+        var names = Fav.read().filter(function (n) { return Object.prototype.hasOwnProperty.call(PRODUCTS, n); });
+        grid.innerHTML = "";
+        document.getElementById("fav-empty").hidden = names.length > 0;
+        names.forEach(function (n) {
+          var card = document.createElement("div"); card.className = "fav-card";
+          var link = document.createElement("a"); link.href = "product.html?item=" + encodeURIComponent(n).replace(/%20/g, "+");
+          var img = document.createElement("img"); img.src = PRODUCTS[n].photos[0] + ".jpeg"; img.alt = labelOf(n); img.loading = "lazy"; link.appendChild(img);
+          var h = document.createElement("h3"); h.textContent = labelOf(n);
+          var more = document.createElement("a"); more.className = "btn"; more.href = link.href; more.textContent = "View details";
+          var rm = document.createElement("button"); rm.type = "button"; rm.className = "fav-remove"; rm.textContent = "Remove";
+          rm.addEventListener("click", function () { Fav.toggle(n); render(); });
+          card.appendChild(link); card.appendChild(h); card.appendChild(more); card.appendChild(rm); grid.appendChild(card);
+        });
+      }
+      render();
+    })();
+    </script>
+</body>
+</html>

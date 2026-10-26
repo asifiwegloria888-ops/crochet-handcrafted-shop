@@ -4,7 +4,10 @@
 const { neon } = require("@neondatabase/serverless");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const { PRODUCTS, DELIVERY_FEES } = require("../js/products.js");
+const base = require("../js/products.js");
+const catalog = require("../js/catalog.js")(base); // fills in titles, colors, preparation days (see js/catalog.js)
+const { PRODUCTS, DELIVERY_FEES } = base;
+const { leadDaysFor, labelOf } = catalog;
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const esc = (s) =>
@@ -44,7 +47,156 @@ async function ensureSchema(sql) {
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS deposit INT`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_date TEXT`;
   schemaReady = true;
+}
+
+// Tables for visits, likes and comments (created automatically the first time they are needed)
+let socialReady = false;
+async function ensureSocialSchema(sql) {
+  if (socialReady) return;
+  await sql`CREATE TABLE IF NOT EXISTS visits (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    vid TEXT NOT NULL,
+    path TEXT NOT NULL,
+    device TEXT,
+    country TEXT,
+    ref TEXT
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS visits_created_idx ON visits (created_at)`;
+  await sql`CREATE TABLE IF NOT EXISTS live (
+    vid TEXT PRIMARY KEY,
+    path TEXT,
+    last_seen TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await sql`CREATE TABLE IF NOT EXISTS likes (
+    item TEXT NOT NULL,
+    vid TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (item, vid)
+  )`;
+  await sql`CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    item TEXT NOT NULL,
+    vid TEXT,
+    name TEXT NOT NULL,
+    body TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await sql`CREATE TABLE IF NOT EXISTS downloads (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    vid TEXT NOT NULL,
+    item TEXT NOT NULL,
+    photo TEXT,
+    device TEXT,
+    country TEXT
+  )`;
+  socialReady = true;
+}
+
+const validVid = (v) => (typeof v === "string" && /^[A-Za-z0-9-]{8,64}$/.test(v) ? v : null);
+
+// Visitor statistics, computed here from simple rows (days are Kampala days).
+function buildStats(visits, live, nowMs) {
+  const eat = (d) => new Date(new Date(d).getTime() + 3 * 3600 * 1000).toISOString().slice(0, 10);
+  const today = eat(nowMs);
+  const days = [];
+  for (let i = 6; i >= 0; i--) days.push(addDays(today, -i));
+  const perDay = {};
+  days.forEach((d) => (perDay[d] = { views: 0, vids: new Set() }));
+  const count = (map, key) => (map[key] = (map[key] || 0) + 1);
+  const top = (map, n) => Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, n);
+  const pages = {}, items = {}, countries = {}, sources = {};
+  const devices = { phone: 0, computer: 0 };
+  const week = new Set();
+  let weekViews = 0;
+
+  visits.forEach((v) => {
+    const slot = perDay[eat(v.created_at)];
+    if (!slot) return;
+    slot.views++;
+    slot.vids.add(v.vid);
+    week.add(v.vid);
+    weekViews++;
+    count(pages, String(v.path).split("?")[0]);
+    const m = /[?]item=([^&]+)/.exec(v.path);
+    if (m) {
+      try { count(items, decodeURIComponent(m[1])); } catch (e) {}
+    }
+    devices[v.device === "phone" ? "phone" : "computer"]++;
+    if (v.country) count(countries, v.country);
+    if (v.ref) count(sources, v.ref);
+  });
+
+  const liveByPath = {};
+  live.forEach((r) => count(liveByPath, r.path || "/"));
+
+  return {
+    online: {
+      count: live.length,
+      pages: top(liveByPath, 6).map(([path, n]) => {
+        const m = /[?]item=([^&]+)/.exec(path);
+        let label = "";
+        try { if (m) label = "Article: " + labelOf(decodeURIComponent(m[1])); } catch (e) {}
+        return { path, n, label };
+      }),
+    },
+    today: { visitors: perDay[today].vids.size, views: perDay[today].views },
+    week: { visitors: week.size, views: weekViews },
+    days: days.map((d) => ({ day: d, visitors: perDay[d].vids.size, views: perDay[d].views })),
+    pages: top(pages, 8).map(([path, views]) => ({ path, views })),
+    items: top(items, 8).map(([item, views]) => ({ item: labelOf(item), views })),
+    devices,
+    countries: top(countries, 5).map(([country, n]) => ({ country, n })),
+    sources: top(sources, 5).map(([ref, n]) => ({ ref, n })),
+  };
+}
+
+// Photo downloads (only the "Download" button can be counted; a long-press "save image" cannot be detected)
+function buildDownloads(rows, nowMs) {
+  const eat = (d) => new Date(new Date(d).getTime() + 3 * 3600 * 1000).toISOString().slice(0, 10);
+  const today = eat(nowMs);
+  const weekStart = addDays(today, -6);
+  const byItem = {};
+  let todayCount = 0, weekCount = 0;
+  rows.forEach((r) => {
+    const day = eat(r.created_at);
+    if (day === today) todayCount++;
+    if (day >= weekStart) {
+      weekCount++;
+      byItem[r.item] = (byItem[r.item] || 0) + 1;
+    }
+  });
+  return {
+    today: todayCount,
+    week: weekCount,
+    items: Object.entries(byItem).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([item, n]) => ({ item: labelOf(item), n })),
+    recent: rows.slice(0, 10).map((r) => ({ at: r.created_at, item: labelOf(r.item), photo: r.photo || "", country: r.country || "", device: r.device || "" })),
+  };
+}
+
+// ---------- Ready date ----------
+// Dates are "YYYY-MM-DD" text. "Today" is Kampala time (UTC+3).
+const todayEAT = () => new Date(Date.now() + 3 * 3600 * 1000).toISOString().slice(0, 10);
+const addDays = (iso, n) => {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s) && new Date(s + "T00:00:00Z").toISOString().slice(0, 10) === s;
+const formatDate = (iso) =>
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+
+function checkReadyDate(value, items) {
+  const lead = leadDaysFor(items.map((i) => i.item));
+  const min = addDays(todayEAT(), lead);
+  if (!isDate(value)) return { error: "Please choose the date you want your order to be ready.", lead, min };
+  if (value < min) return { error: `Your items need ${lead} days to be made. Please choose ${formatDate(min)} or a later date.`, lead, min };
+  if (value > addDays(todayEAT(), 365)) return { error: "Please choose a date within the next year.", lead, min };
+  return { ok: true, lead, min };
 }
 
 // ---------- Prices (decided here, never by the browser) ----------
@@ -79,8 +231,13 @@ function priceItems(raw) {
       errors.push(`Quantity for ${name} must be between 1 and 100.`);
       return;
     }
+    const colors = clean(r.colors, 200);
+    if (product.colors && product.colors.length && !colors) {
+      errors.push(`Please choose a color for ${name}.`);
+      return;
+    }
     const photo = typeof r.photo === "string" && product.photos.includes(r.photo) ? r.photo : "";
-    items.push({ item: name, size, quantity, colors: clean(r.colors, 200), photo, unit_price: unit, line_total: unit * quantity });
+    items.push({ item: name, label: labelOf(name), size, quantity, colors, photo, unit_price: unit, line_total: unit * quantity });
   });
 
   return { items, errors, subtotal: items.reduce((s, i) => s + i.line_total, 0) };
@@ -92,6 +249,7 @@ function orderLines(o) {
   return [
     {
       item: o.item,
+      label: labelOf(o.item),
       size: o.size || "",
       quantity: o.quantity,
       colors: o.colors || "",
@@ -111,6 +269,24 @@ function estimateOf(o) {
   const lines = orderLines(o);
   if (lines.some((l) => l.line_total == null)) return null;
   return lines.reduce((s, l) => s + l.line_total, 0) + (o.delivery_fee || 0);
+}
+
+// What the owner types when confirming: the exact delivery fee (delivery orders) or the total (other orders).
+function resolveConfirm(order, body) {
+  const lines = orderLines(order);
+  const itemsSum = lines.every((l) => l.line_total != null) ? lines.reduce((s, l) => s + l.line_total, 0) : null;
+  const intIn = (v, min, max) => {
+    const n = parseInt(v, 10);
+    return Number.isInteger(n) && n >= min && n <= max ? n : null;
+  };
+  if (needsQuote(order) && itemsSum != null) {
+    const fee = intIn(body.delivery_fee, 0, 10000000);
+    if (fee === null) throw userError("Please enter the delivery fee (0 if it is free).");
+    return { fee, total: itemsSum + fee };
+  }
+  const total = intIn(body.total, 1, 100000000);
+  if (total === null) throw userError("Please enter a valid total price.");
+  return { fee: order.delivery_fee != null ? order.delivery_fee : 0, total };
 }
 
 // ---------- Security: link in the owner email ----------
@@ -155,7 +331,7 @@ function itemsTable(order, confirmedTotal) {
   const rows = lines
     .map(
       (l) => `<tr>
-      <td ${TD}>${esc(l.item)}${l.size ? " (" + esc(l.size) + ")" : ""}${l.colors ? `<br><span style="color:#7a6a6e;font-size:13px">Colors: ${esc(l.colors)}</span>` : ""}</td>
+      <td ${TD}>${esc(l.label || l.item)}${l.size ? " (" + esc(l.size) + ")" : ""}${l.colors ? `<br><span style="color:#7a6a6e;font-size:13px">Colors: ${esc(l.colors)}</span>` : ""}</td>
       <td ${TD}>${esc(l.quantity)}</td>
       <td ${TD} align="right">${l.line_total != null ? esc(money(l.line_total)) : "to be quoted"}</td></tr>`
     )
@@ -187,13 +363,14 @@ function itemsTable(order, confirmedTotal) {
     <tr><td ${TD} colspan="2"><strong>${totalLabel}</strong></td><td ${TD} align="right"><strong>${totalCell}</strong></td></tr>
   </table>
   ${order.address ? `<p style="margin:10px 0"><strong>Delivery address:</strong> ${esc(order.address)}</p>` : ""}
+  ${order.ready_date ? `<p style="margin:10px 0"><strong>Wanted ready by:</strong> ${esc(formatDate(order.ready_date))}</p>` : ""}
   ${order.notes ? `<p style="margin:10px 0"><strong>Notes:</strong> ${esc(order.notes)}</p>` : ""}`;
 }
 
 const WRAP = (inner) => `<div style="font-family:Arial,sans-serif;color:#3a2f33;max-width:560px">${inner}</div>`;
 
 // Owner confirms the order and asks for the 50% deposit
-async function doConfirm(sql, order, total) {
+async function doConfirm(sql, order, total, fee) {
   const instructions = (process.env.PAYMENT_INSTRUCTIONS || "").trim();
   if (!instructions) throw userError("Add the variable PAYMENT_INSTRUCTIONS in Vercel (your mobile money number and name), then redeploy.");
   const deposit = Math.ceil(total / 2);
@@ -209,7 +386,7 @@ async function doConfirm(sql, order, total) {
       html: WRAP(`
         <h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
         <p>Hello ${esc(order.name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>
-        ${itemsTable(order, total)}
+        ${itemsTable({ ...order, delivery_fee: fee }, total)}
         <table style="border-collapse:collapse;font-size:15px;margin-top:12px">
           <tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
           <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(total - deposit))}</td></tr>
@@ -225,7 +402,7 @@ async function doConfirm(sql, order, total) {
     console.error("Email error:", err);
     throw userError("The email could not be sent. Nothing was changed, please try again.");
   }
-  await sql`UPDATE orders SET status = 'confirmed', total = ${total}, deposit = ${deposit}, confirmed_at = now() WHERE id = ${order.id}`;
+  await sql`UPDATE orders SET status = 'confirmed', total = ${total}, deposit = ${deposit}, delivery_fee = ${fee}, confirmed_at = now() WHERE id = ${order.id}`;
   return { deposit, balance: total - deposit };
 }
 
@@ -257,6 +434,6 @@ async function doDeposit(sql, order) {
 
 module.exports = {
   PRODUCTS, DELIVERY_FEES, has, esc, clean, money, refOf, userError, db, ensureSchema,
-  priceItems, orderLines, estimateOf, needsQuote, deliveryLabel, sign, validToken, mailer, siteUrl, waButton,
+  ensureSocialSchema, validVid, buildStats, buildDownloads, labelOf, resolveProduct: catalog.resolveProduct, priceItems, orderLines, estimateOf, needsQuote, deliveryLabel, resolveConfirm, checkReadyDate, formatDate, todayEAT, addDays, sign, validToken, mailer, siteUrl, waButton,
   itemsTable, WRAP, doConfirm, doDeposit,
 };

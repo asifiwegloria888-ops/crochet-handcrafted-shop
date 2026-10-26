@@ -67,6 +67,11 @@
                 <p><a class="btn" href="creation.html">Browse our creations</a></p>
             </div>
 
+            <div id="order-colors" hidden style="text-align:center">
+                <p>Please choose a color for each item in your cart before you order.</p>
+                <p><a class="btn" href="cart.html">Go to my cart</a></p>
+            </div>
+
             <div id="order-done" class="done-box" hidden>
                 <p><strong>Thank you! Your order was sent.</strong></p>
                 <p id="done-text"></p>
@@ -115,6 +120,11 @@
                         <span class="hint">The more exact, the easier the delivery.</span>
                     </div>
                     <div class="field">
+                        <label for="ready-date">Date you want your order ready</label>
+                        <input type="date" id="ready-date" name="ready_date" required>
+                        <span class="hint" id="ready-hint"></span>
+                    </div>
+                    <div class="field">
                         <label for="notes">Anything else?</label>
                         <textarea id="notes" name="notes" rows="3" placeholder="Deadline, gift message..."></textarea>
                     </div>
@@ -123,11 +133,6 @@
                     <div class="hp" aria-hidden="true">
                         <label for="website">Website</label>
                         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-                    </div>
-                    <div class="field" id="ready-date-field">
-                        <label for="ready_date">Date you want your order to be ready *</label>
-                        <input type="date" id="ready_date" name="ready_date" required>
-                        <small id="ready-date-help"></small>
                     </div>
 
                     <button type="submit" class="submit">Send my order</button>
@@ -142,6 +147,7 @@
         <p><a href="contact.html">contact us</a></p>
     </footer>
     <script src="js/products.js"></script>
+    <script src="js/catalog.js"></script>
     <script src="js/site.js"></script>
     <script src="js/order-form.js"></script>
 </body>
