@@ -4,7 +4,7 @@ var PRODUCTS = {
   "Scrunchies": {
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
     price: 5000,
-    photos: ["1", "2", "6", "7", "10"]
+    photos: ["2", "7", "10","55"]
   },
   "Ruffle crochet hat": {
     desc: "A handmade ruffle hat in the colors you like.",
@@ -15,6 +15,11 @@ var PRODUCTS = {
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["4"]
+  },
+  "Crop top-48": {
+    desc: "Handmade to measure. Choose your size and your colors.",
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 30000 },
+    photos: ["48"]
   },
   "Crop top-5": {
     desc: "Handmade to measure. Choose your size and your colors.",
@@ -71,18 +76,47 @@ var PRODUCTS = {
     sizes: {"Small": 10000,"Medium": 10000,"Large": 15000,"XL": 20000},
     photos: ["37"]
   },
+  
   "Sweater": {
     desc: "A warm handmade crochet sweater, made to measure.",
     sizes: { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
     photos: ["21","28"]
   },
   
-  "Dress": {
+  "Dress-30": {
     title: "Dress",
     desc: "Handmade to measure, choose your colors.",
     sizes: { "Small": 45000, "Medium": 45000, "Large": 50000, "XL": 60000 },
     photos: ["30"]
   },
+  "Dress-64": {
+    title: "Dress",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 40000 },
+    photos: ["64"]
+  },
+
+  "Dress-51": {
+    title: "Dress",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 60000, "Medium": 65000, "Large": 70000, "XL": 70000 },
+    photos: ["51"]
+  },
+  "Dress-53": {
+    title: "Dress",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 40000 },
+    photos: ["53"]
+  },
+
+  "Dress-54": {
+    title: "Dress",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 40000 },
+    photos: ["54"]
+  },
+
+
   "dress-31": {
     title: "Dress",
     desc: "Handmade to measure. Choose your size and your colors",
@@ -113,11 +147,26 @@ var PRODUCTS = {
     sizes: { "Small": 60000, "Medium": 60000, "Large": 70000, "XL": 75000 },
     photos: ["34"]
   },
+
+  "Dress-66": {
+    title: "Dress",
+    desc: "A beautiful dress made with love. Choose your size and color",
+    sizes: { "Small": 40000, "Medium": 40000, "Large": 45000, "XL": 45000 },
+    photos: ["66"]
+  },
+  
+  "Dress-59": {
+    title: "Dress",
+    desc: "A beautiful dress made with love. Choose your size and color",
+    sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 40000 },
+    photos: ["59"]
+  },
+  
   "Dress-36": {
     title: "Dress",
     desc: "A beautiful dress made with love. choose your size and color",
     sizes: {"Small": 40000, "Medium": 40000, "Large": 50000, "XL": 60000},
-    photos: ["36"]
+    photos: ["36","63"]
 
   },
   "Dress-38": {
@@ -146,7 +195,7 @@ var PRODUCTS = {
   "Crochet flower": {
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
-    photos: ["25","26","29"]
+    photos: ["25","26","29","52"]
   },
   "Two-pieces": {
     title: "Two-piece",
@@ -155,20 +204,113 @@ var PRODUCTS = {
     photos: ["46","43"]
 
   },
+
+  "Two-piece-56": {
+    title: "Two-piece",
+    desc: "cute and confy. choose your color",
+    sizes: {"Small": 30000,"Medium": 30000,"Large":35000,"XL":35000},
+    photos: ["56"]
+  },
   "Two-piece 42": {
+    title: "Two piece",
     desc: "two-piece items are available. choose your color",
     sizes: {"small": 40000,"large": 45000,"XL": 50000},
     photos: ["42"]
   },
+
+  "Two-piece-57": {
+    title: "Two piece",
+    desc: "two-piece items are available. choose your color",
+    sizes: {"small": 30000,"large": 30000,"XL": 35000},
+    photos: ["57"]
+  },
+  "Two-pieces-60": {
+    title: "Two piece",
+    desc: "two-piece items are available. choose your color",
+    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    photos: ["60"]
+  },
+
+  "Two-pieces-61": {
+    title: "Two piece",
+    desc: "two-piece items are available. choose your color",
+    sizes: {"small": 20000,"large": 20000,"XL": 25000},
+    photos: ["61"]
+  },
+
+  "Two-piece-62": { 
+    title: "Two piece",
+    desc: "two-piece items are available. choose your color",
+    sizes: {"small": 35000,"large": 35000,"XL": 40000},
+    photos: ["62"]
+  },
+
+
+  "Two-piece 49": {
+    title: "Two piece",
+    desc: "two-pieces items are available. choose your color",
+    sizes: {"small": 50000,"large": 55000,"XL":60000},
+    photos: ["49"]
+  },
   "Two-piece 39": {
+    title: "Two piece",
     desc: "two-pieces items are available. choose your color",
     sizes: {"small": 35000,"large": 40000,"XL":45000},
     photos: ["39"]
   },
+  "Two-piece 47": {
+    title: "Two piece",
+    title: "Two piece",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    photos: ["47"]
+  },
+
+  "Two-piece-40": {
+    title: "Two piece",
+    title: "Two piece",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 40000,"large": 40000,"XL": 50000},
+    photos: ["40"]
+  },
+
+  "Skirt-45": {
+    title: "Skirt",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 20000,"large": 20000,"XL": 25000},
+    photos: ["45"]
+  },
+
+  "Skirt-41": {
+    title: "Skirt",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    photos: ["41"]
+  },
+  
+  "Two-piece 44": {
+    title: "Two piece",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 30000,"large": 30000,"XL": 40000},
+    photos: ["44"]
+  },
+  "Two-piece 60": {
+    title: "Two piece",
+    desc: "Two-pieces items are available, choose your color",
+    sizes: {"small": 35000,"large": 40000,"XL": 45000},
+    photos: ["60"]
+  },
   "Two-piece 46": {
+    title: "Two piece",
     desc: "Two-pieces items are available, choose your color",
     sizes: {"small": 50000,"large": 60000,"XL": 70000},
     photos: ["46"]
+  },
+  "Couple outfits-50": {
+    title: "Couple outfits",
+    desc: "Couple outfits are available, get yours",
+    sizes: {"small": 110000,"large": 120000,"XL": 140000},
+    photos: ["50"]
   }
 
   
