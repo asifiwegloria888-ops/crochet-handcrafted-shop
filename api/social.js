@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
     }
 
     if (src.action === "comment") {
-      if (src.website) return res.status(200).json({ ok: true, message: "Thank you! Your comment will appear after I approve it." }); // honeypot
+      if (src.website) return res.status(200).json({ ok: true, message: "Thank you!" }); // honeypot
       const name = L.clean(src.name, 40);
       const body = L.clean(src.body, 500);
       if (name.length < 2) return res.status(400).json({ error: "Please write your name (at least 2 letters)." });
@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
       const recent = (await sql`SELECT COUNT(*)::int AS n FROM comments WHERE vid = ${vid} AND created_at > now() - interval '1 hour'`)[0].n;
       if (recent >= 3) return res.status(429).json({ error: "You wrote several comments already. Please try again later." });
       await sql`INSERT INTO comments (item, vid, name, body) VALUES (${item}, ${vid}, ${name}, ${body})`;
-      return res.status(200).json({ ok: true, message: "Thank you! Your comment will appear after I approve it." });
+      return res.status(200).json({ ok: true, message: "Thank you!" });
     }
 
     return res.status(400).json({ error: "Unknown action." });

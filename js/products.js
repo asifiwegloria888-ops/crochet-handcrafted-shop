@@ -181,7 +181,7 @@ var PRODUCTS = {
     sizes: { "Small": 15000},
     photos: ["22"]
   },
-  "Small bag -32":{
+  "Small bag-32":{
     desc: " A handmade crochet bag.",
     sizes: { "Small": 15000,},
     photos: ["32"]
