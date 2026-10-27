@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
         subject: `We received your order ${reference}`,
         html: L.WRAP(`
           <h2 style="color:#c9607f">Thank you, ${L.esc(order.name)}!</h2>
-          <p>We have received your order <strong>${reference}</strong>. I will contact you soon to confirm the details and the price. To start your order, a 50% deposit is requested once the price is confirmed.</p>
+          <p>We have received your order <strong>${reference}</strong>. To start your order, a 50% deposit is requested.</p>
           ${L.itemsTable(order)}
           <p style="margin-top:20px">You can reply directly to this email, or write to me on WhatsApp:</p>
           ${L.waButton(reference)}
