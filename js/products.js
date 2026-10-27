@@ -138,7 +138,7 @@ var PRODUCTS = {
   "dress-35": {
     title: "Dress",
     desc: "A beautiful dress made with love. Choose your size and color",
-    sizes: { "Small": 50000, "Medium": 60000, "Large": 60000, "XL": 70000 },
+    sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 45000 },
     photos: ["35"]
   },
   "dress-34": {
