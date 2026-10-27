@@ -5,7 +5,7 @@ var PRODUCTS = {
     title: "Scrunchie",
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
     price: 5000,
-    photos: ["2", "7", "10","55"]
+    photos: ["7", "10","55"]
   },
   "Ruffle crochet hat": {
     title: "Ruffle crochet hat",
@@ -330,6 +330,32 @@ var PRODUCTS = {
     sizes: {"small": 45000,"large": 45000,"XL": 50000},
     photos: ["46"]
   },
+
+  "Shirt-1": {
+    title: "Shirt",
+    desc: "Shirt for man are available, choose your color",
+    sizes: {"small": 45000,"large": 45000,"XL": 50000},
+    photos: ["1"]
+  },
+  "Shirt-2": {
+    title: "Shirt",
+    desc: "Shirt for man are available, choose your color",
+    sizes: {"small": 45000,"large": 45000,"XL": 50000},
+    photos: ["2"]
+  },
+  "Shirt-6": {
+    title: "Shirt",
+    desc: "Shirt for man are available, choose your color",
+    sizes: {"small": 45000,"large": 45000,"XL": 50000},
+    photos: ["6"]
+  },
+
+  "Shirt-17": {
+    title: "Shirt",
+    desc: "Shirt for man are available, choose your color",
+    sizes: {"small": 45000,"large": 45000,"XL": 50000},
+    photos: ["17"]
+  }
   "Couple outfits-50": {
     title: "Couple outfits",
     desc: "Couple outfits are available, get yours",
