@@ -59,8 +59,18 @@
         .ig-post:disabled { opacity: 0.5; }
         .ig .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
         .pd-note { font-size: 0.8rem; color: #7a6a6e; }
+        /* layout: photo, then the price block, then the comments (on a phone); on a computer the comments stay under the photo */
+        .pd { grid-template-areas: "photo info" "cm info"; grid-template-rows: auto 1fr; }
+        .pd-photo { grid-area: photo; } .pd-info { grid-area: info; } .pd-cwrap { grid-area: cm; margin-top: 0; }
+        .pd-ctitle { font-weight: bold; color: var(--rose-fonce); margin: 0 0 6px !important; }
+        .ig-comments { max-height: 320px; }
+        #pd-cform { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+        #pd-cname { flex: none; width: 100%; box-sizing: border-box; height: 38px; padding: 6px 14px; font-size: 0.95rem; border-radius: 19px; }
+        .ig-row { display: flex; align-items: flex-end; gap: 8px; }
+        #pd-ctext { flex: 1; min-width: 0; box-sizing: border-box; min-height: 38px; max-height: 200px; padding: 8px 14px; font: inherit; font-size: 0.95rem; line-height: 1.35; border: 1px solid var(--rose); border-radius: 19px; background: #fff; resize: none; overflow-y: auto; }
+        .ig-row .ig-post { padding: 8px 6px; }
         [hidden] { display: none !important; }
-        @media (max-width: 700px) { .pd { grid-template-columns: 1fr; } }
+        @media (max-width: 700px) { .pd { grid-template-columns: 1fr; grid-template-areas: "photo" "info" "cm"; grid-template-rows: none; } }
     </style>
 </head>
 <body>
@@ -82,7 +92,7 @@
     <main>
         <h1 id="pd-title">Item</h1>
         <div id="pd-box" class="pd">
-            <div>
+            <div class="pd-photo">
                 <img id="pd-main" class="pd-main" src="" alt="">
                 <div id="pd-thumbs" class="pd-thumbs"></div>
                 <div id="pd-post" class="ig" hidden>
@@ -93,18 +103,9 @@
                         <button type="button" id="pd-fav" class="ig-btn ig-right ig-fav" aria-pressed="false" aria-label="Save to favorites"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
                     </div>
                     <p class="ig-likes" id="pd-likes"></p>
-                    <div id="pd-comments" class="ig-comments"></div>
-                    <form id="pd-cform" class="ig-form">
-                        <input type="text" id="pd-cname" maxlength="40" placeholder="Your name (optional)" aria-label="Your name (optional)" autocomplete="name">
-                        <input type="text" id="pd-ctext" maxlength="500" placeholder="Add a comment..." aria-label="Add a comment" required>
-                        <button type="submit" class="ig-post">Post</button>
-                        <div class="hp" aria-hidden="true"><input type="text" id="pd-chp" tabindex="-1" autocomplete="off"></div>
-                    </form>
-                    <p id="pd-cmsg" class="pd-msg" role="status"></p>
-                    <p class="pd-note"></p>
                 </div>
             </div>
-            <div>
+            <div class="pd-info">
                 <p id="pd-desc"></p>
                 <table id="pd-table"></table>
                 <label for="pd-size">Size</label>
@@ -119,6 +120,20 @@
                 <button type="button" class="submit" id="pd-add">Add to cart</button>
                 <p id="pd-msg" class="pd-msg" role="status"></p>
                 <p><a href="creation.html">&larr; Back to creations</a></p>
+            </div>
+            <div id="pd-cwrap" class="pd-cwrap ig" hidden>
+                <p class="pd-ctitle">Comments</p>
+                    <div id="pd-comments" class="ig-comments"></div>
+                    <form id="pd-cform" class="ig-form">
+                        <input type="text" id="pd-cname" maxlength="40" placeholder="Your name (optional)" aria-label="Your name (optional)" autocomplete="name">
+                        <div class="ig-row">
+                            <textarea id="pd-ctext" rows="1" maxlength="500" placeholder="Add a comment..." aria-label="Add a comment" required></textarea>
+                            <button type="submit" class="ig-post">Post</button>
+                        </div>
+                        <div class="hp" aria-hidden="true"><input type="text" id="pd-chp" tabindex="-1" autocomplete="off"></div>
+                    </form>
+                    <p id="pd-cmsg" class="pd-msg" role="status"></p>
+                    <p class="pd-note">Comments appear after I have read and approved them.</p>
             </div>
         </div>
 
