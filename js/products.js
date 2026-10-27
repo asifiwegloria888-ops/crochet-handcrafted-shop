@@ -284,7 +284,7 @@ var PRODUCTS = {
   "Skirt-41": {
     title: "Skirt",
     desc: "Two-pieces items are available, choose your color",
-    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    sizes: {"small": 30000,"large": 30000,"XL": 35000},
     photos: ["41"]
   },
   
