@@ -178,6 +178,21 @@
       // site.js is loaded after this script, so the visitor id is asked at the moment it is needed
       function getVid() { return window.visitorId ? window.visitorId() : ""; }
 
+      // Phones: a normal download goes to the Downloads / Files folder, often not to the gallery (Photos).
+      // So on a phone (iPhone, iPad, Android) the photo is handed to the share sheet ("Save Image" puts it in the gallery).
+      // The photo is prepared in advance, because the share must start right at the tap.
+      var isPhone = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      var shareFile = null, shareFor = "";
+      function prepareShare(src) {
+        shareFile = null; shareFor = src;
+        if (!isPhone || !navigator.canShare || !window.File || !src) return;
+        fetch(src).then(function (r) { return r.blob(); }).then(function (blob) {
+          if (shareFor !== src) return;
+          var f = new File([blob], "crochet-handcrafted-shop-" + src.replace(/\.jpe?g.*$/i, "").replace(/^.*\//, "") + ".jpeg", { type: blob.type || "image/jpeg" });
+          if (navigator.canShare({ files: [f] })) shareFile = f;
+        }).catch(function () {});
+      }
+
       // The article (js/products.js) that owns this photo, or null if the photo is not in an article yet.
       function articleOf(item, ph) {
         if (typeof resolveProduct !== "function" || typeof PRODUCTS === "undefined") return null;
@@ -235,6 +250,7 @@
         } else { order.hidden = true; }
 
         dl.href = b.dataset.src;
+        prepareShare(b.dataset.src);
         dl.setAttribute("download", "crochet-handcrafted-shop-" + photo + ".jpeg");
 
         // like / comments / favorite exist only for photos that belong to an article
@@ -261,7 +277,8 @@
       });
 
       // ---- download (counted in the admin page, your own downloads are not) ----
-      dl.addEventListener("click", function () {
+      dl.addEventListener("click", function (e) {
+        if (shareFile) { e.preventDefault(); navigator.share({ files: [shareFile] }).catch(function () {}); }
         if (!art) return;
         var owner = false;
         try { owner = localStorage.getItem("shopAdmin") === "1"; } catch (e) {}

@@ -1,220 +1,115 @@
-// Order page: shows the cart, adds the delivery fee, sends ONE order with all the items to /api/order.
+// Like / comment / favorite / download, Instagram style. Needs js/products.js, js/catalog.js and js/site.js.
+// Used by product.html. (The album page can use the same API: /api/social and /api/track.)
 (function () {
-  var params = new URLSearchParams(window.location.search);
-
-  // Old links like order.html?item=Crop+top&photo=4 now open the item page,
-  // where the customer picks size and quantity and adds it to the cart.
-  if (params.get("item")) {
-    var target = "product.html?item=" + encodeURIComponent(params.get("item")).replace(/%20/g, "+");
-    if (params.get("photo")) target += "&photo=" + encodeURIComponent(params.get("photo"));
-    window.location.replace(target);
-    return;
-  }
-
   var $ = function (id) { return document.getElementById(id); };
-  var form = $("order-form");
-  if (!form) return;
+  var q = new URLSearchParams(location.search);
+  var item = resolveProduct(q.get("item"), q.get("photo"));
+  if (!item || !Object.prototype.hasOwnProperty.call(PRODUCTS, item) || !$("pd-post")) return;
 
-  function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; }
-  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+  $("pd-post").hidden = false;
+  var vid = window.visitorId();
+  var likeBtn = $("pd-like"), favBtn = $("pd-fav"), cCount = $("pd-ccount"), likesTxt = $("pd-likes");
 
-  // ---- Ready date rules (same as in api/order.js, which checks again on the server) ----
-  // Days to wait after the order date. Anything not listed waits 7 days.
-  // If the cart mixes products, the LONGEST delay applies.
-  var DEFAULT_LEAD_DAYS = 7;
-  var LEAD_DAYS = { "sweater": 14, "dress": 14, "scrunchies": 3 };
-  var KAMPALA_OFFSET_MS = 3 * 60 * 60 * 1000; // Uganda is UTC+3
-
-  function leadDays(cartLines) {
-    var days = 0;
-    cartLines.forEach(function (l) {
-      var key = String(l.item || "").trim().toLowerCase();
-      var d = has(LEAD_DAYS, key) ? LEAD_DAYS[key] : DEFAULT_LEAD_DAYS;
-      if (d > days) days = d;
-    });
-    return days || DEFAULT_LEAD_DAYS;
+  // ---------- download (counted in the admin page, your own downloads are not) ----------
+  var dl = $("pd-download");
+  // Phones: a normal download goes to the Downloads / Files folder, often not to the gallery (Photos).
+  // So on a phone (iPhone, iPad, Android) the photo is handed to the share sheet ("Save Image" puts it in the gallery).
+  // The photo is prepared in advance, because the share must start right at the tap.
+  var isPhone = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var shareFile = null, shareFor = "";
+  function prepareShare(src) {
+    shareFile = null; shareFor = src;
+    if (!isPhone || !navigator.canShare || !window.File || !src) return;
+    fetch(src).then(function (r) { return r.blob(); }).then(function (blob) {
+      if (shareFor !== src) return;
+      var f = new File([blob], "crochet-handcrafted-shop-" + src.replace(/\.jpe?g.*$/i, "").replace(/^.*\//, "") + ".jpeg", { type: blob.type || "image/jpeg" });
+      if (navigator.canShare({ files: [f] })) shareFile = f;
+    }).catch(function () {});
   }
-  function isoPlusDays(n) {
-    var d = new Date(Date.now() + KAMPALA_OFFSET_MS);
-    d.setUTCDate(d.getUTCDate() + n);
-    return d.toISOString().slice(0, 10);
-  }
-  function prettyDate(iso) {
-    return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
-      weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
-    });
-  }
-
-  function unitPrice(l) {
-    var p = has(PRODUCTS, l.item) ? PRODUCTS[l.item] : null;
-    if (!p) return null;
-    if (p.sizes) return has(p.sizes, l.size) ? p.sizes[l.size] : null;
-    return p.price;
-  }
-
-  var lines = Cart.read().filter(function (l) { return unitPrice(l) !== null; });
-  var deliverySelect = $("delivery");
-  var status = $("form-status");
-  var button = form.querySelector("button[type='submit']");
-
-  if (lines.length === 0) {
-    $("order-empty").hidden = false;
-    return;
-  }
-  $("order-main").hidden = false;
-
-  // ---- Ready date field (created here, placed just before the submit button) ----
-  var minLead = leadDays(lines);
-  var minReady = isoPlusDays(minLead);
-  var dateField = $("ready-date-field");
-  if (!dateField) {
-    dateField = document.createElement("div");
-    dateField.id = "ready-date-field";
-    dateField.className = "field";
-    var dateLabel = document.createElement("label");
-    dateLabel.setAttribute("for", "ready_date");
-    dateLabel.textContent = "Date you want your order to be ready *";
-    var dateInput = document.createElement("input");
-    dateInput.type = "date";
-    dateInput.id = "ready_date";
-    dateInput.name = "ready_date";
-    dateInput.required = true;
-    var dateHelp = document.createElement("small");
-    dateHelp.id = "ready-date-help";
-    dateField.appendChild(dateLabel);
-    dateField.appendChild(dateInput);
-    dateField.appendChild(dateHelp);
-    button.parentNode.insertBefore(dateField, button);
-  }
-  var readyInput = $("ready_date");
-  readyInput.min = minReady;
-  $("ready-date-help").textContent =
-    "Required. Earliest date: " + prettyDate(minReady) + " (" + minLead + " days after today).";
-
-  // delivery options come from js/products.js
-  Object.keys(DELIVERY_FEES).forEach(function (key) {
-    var fee = DELIVERY_FEES[key];
-    var opt = document.createElement("option");
-    opt.value = key;
-    if (fee === null) opt.textContent = "Delivery to my address (price confirmed by me)";
-    else if (fee === 0) opt.textContent = "Pick up (free)";
-    else opt.textContent = key + " - " + money(fee);
-    deliverySelect.appendChild(opt);
+  // prepare the photo each time the big photo changes (thumbnails)
+  var mainImg = $("pd-main");
+  mainImg.addEventListener("load", function () { prepareShare(mainImg.getAttribute("src") || ""); });
+  if (mainImg.complete && mainImg.getAttribute("src")) prepareShare(mainImg.getAttribute("src"));
+  dl.addEventListener("click", function (e) {
+    var src = $("pd-main").getAttribute("src") || "";
+    var m = /^(\d+)\.jpeg/.exec(src);
+    if (!m) return;
+    dl.href = src;
+    if (shareFile && shareFor === src) { e.preventDefault(); navigator.share({ files: [shareFile] }).catch(function () {}); }
+    dl.setAttribute("download", "crochet-handcrafted-shop-" + m[1] + ".jpeg");
+    var owner = false;
+    try { owner = localStorage.getItem("shopAdmin") === "1"; } catch (e) {}
+    if (owner) return;
+    fetch("/api/track", {
+      method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+      body: JSON.stringify({ kind: "download", vid: vid, item: item, photo: m[1], device: window.innerWidth < 700 ? "phone" : "computer" }),
+    }).catch(function () {});
   });
 
-  // items summary
-  var box = $("os-lines");
-  var subtotal = 0;
-  lines.forEach(function (l) {
-    var price = unitPrice(l) * l.qty;
-    subtotal += price;
-    var row = document.createElement("div"); row.className = "os-line";
-    var img = document.createElement("img");
-    img.src = (l.photo || PRODUCTS[l.item].photos[0]) + ".jpeg"; img.alt = l.item;
-    var mid = document.createElement("div");
-    var n = document.createElement("p"); n.className = "os-name"; n.textContent = l.item; mid.appendChild(n);
-    var s = document.createElement("p"); s.className = "os-sub";
-    s.textContent = (l.size ? l.size + ", " : "") + "qty " + l.qty + (l.colors ? ", " + l.colors : "");
-    mid.appendChild(s);
-    var pr = document.createElement("p"); pr.className = "os-price"; pr.textContent = money(price);
-    row.appendChild(img); row.appendChild(mid); row.appendChild(pr);
-    box.appendChild(row);
+  // ---------- favorite (saved on this device) ----------
+  function drawFav() {
+    var on = window.Fav.has(item);
+    favBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    favBtn.classList.toggle("on", on);
+    favBtn.setAttribute("aria-label", on ? "Remove from favorites" : "Save to favorites");
+  }
+  favBtn.addEventListener("click", function () { window.Fav.toggle(item); drawFav(); });
+  drawFav();
+
+  // ---------- likes ----------
+  function drawLike(d) {
+    likeBtn.setAttribute("aria-pressed", d.liked ? "true" : "false");
+    likeBtn.classList.toggle("on", !!d.liked);
+    likesTxt.textContent = d.likes > 0 ? d.likes + (d.likes === 1 ? " like" : " likes") : "Be the first to like this";
+  }
+  likeBtn.addEventListener("click", function () {
+    likeBtn.disabled = true;
+    fetch("/api/social", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "like", item: item, vid: vid }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d.ok) drawLike(d); })
+      .catch(function () {})
+      .then(function () { likeBtn.disabled = false; });
   });
-  $("os-subtotal").textContent = money(subtotal);
 
-  var addressField = $("address-field");
-  var addressInput = $("address");
-
-  function updateTotal() {
-    // no address needed to pick up the order yourself
-    var pickup = DELIVERY_FEES[deliverySelect.value] === 0;
-    addressField.hidden = pickup;
-    addressInput.disabled = pickup;
-    addressInput.required = !pickup;
-    var fee = DELIVERY_FEES[deliverySelect.value];
-    // exact delivery charge on its own line, then the total
-    if (fee === null) {
-      $("os-fee").textContent = "price confirmed by me";
-      $("os-total").textContent = money(subtotal) + " + delivery";
-    } else if (fee === 0) {
-      $("os-fee").textContent = "Free (pick up)";
-      $("os-total").textContent = money(subtotal);
-    } else {
-      $("os-fee").textContent = money(fee || 0);
-      $("os-total").textContent = money(subtotal + (fee || 0));
-    }
-  }
-  deliverySelect.addEventListener("change", updateTotal);
-  updateTotal();
-
-  function showError(message) {
-    status.textContent = message;
-    status.className = "form-status " + (message ? "error" : "");
-  }
-
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // ready date: required, and not before today + lead days
-    var chosen = readyInput.value;
-    if (!chosen) {
-      showError("Please choose the date you want your order to be ready.");
-      readyInput.focus();
-      return;
-    }
-    if (chosen < minReady) {
-      showError("The ready date must be " + minLead + " days or more after today. Earliest: " + prettyDate(minReady) + ".");
-      readyInput.focus();
-      return;
-    }
-
-    var data = Object.fromEntries(new FormData(form).entries());
-    data.ready_date = chosen;
-    data.items = lines.map(function (l) {
-      return { item: l.item, size: l.size || "", qty: l.qty, colors: l.colors || "", photo: l.photo || "" };
+  // ---------- comments ----------
+  var list = $("pd-comments");
+  function drawComments(comments) {
+    list.innerHTML = "";
+    cCount.textContent = comments.length ? String(comments.length) : "";
+    comments.forEach(function (c) {
+      var row = document.createElement("p"); row.className = "ig-comment";
+      var nm = document.createElement("strong"); nm.textContent = c.name;
+      row.appendChild(nm); row.appendChild(document.createTextNode(" " + c.body));
+      list.appendChild(row);
     });
+  }
+  fetch("/api/social?item=" + encodeURIComponent(item) + "&vid=" + encodeURIComponent(vid))
+    .then(function (r) { return r.json(); })
+    .then(function (d) { if (d.ok) { drawLike(d); drawComments(d.comments || []); } else { drawLike({ likes: 0 }); } })
+    .catch(function () { drawLike({ likes: 0 }); });
 
-    button.disabled = true;
-    button.textContent = "Sending...";
-    showError("");
+  $("pd-cbtn").addEventListener("click", function () { $("pd-ctext").focus(); });
 
-    fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+  var form = $("pd-cform"), msg = $("pd-cmsg");
+  // the name is optional; if he writes it once, it is remembered on this device
+  try { $("pd-cname").value = localStorage.getItem("commentName") || ""; } catch (e) {}
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var btn = form.querySelector("button");
+    btn.disabled = true; msg.className = "pd-msg"; msg.textContent = "";
+    fetch("/api/social", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "comment", item: item, vid: vid, name: $("pd-cname").value.trim(), body: $("pd-ctext").value, website: $("pd-chp").value }),
     })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
-        return res.json().then(function (json) { return { ok: res.ok, json: json }; });
-      })
-      .then(function (result) {
-        if (!result.ok) {
-          showError(result.json.error || "Something went wrong. Please try again.");
-          return;
+        if (res.ok) {
+          msg.textContent = res.j.message || "Thank you!"; $("pd-ctext").value = "";
+          try { localStorage.setItem("commentName", $("pd-cname").value.trim()); } catch (e) {}
         }
-        var reference = result.json.reference || "";
-        Cart.clear();
-        $("order-main").hidden = true;
-        $("order-done").hidden = false;
-        $("done-text").textContent =
-          "Your reference is " + reference + ". " +
-          (result.json.emailSent === false
-            ? "We could not send the confirmation email, but I will contact you soon."
-            : "Check your email for the confirmation (and your spam folder).");
-        var wa = document.createElement("a");
-        wa.href = "https://wa.me/" + (window.SHOP_WHATSAPP || "") + "?text=" +
-          encodeURIComponent("Hello, I'm writing about my order " + reference);
-        wa.target = "_blank";
-        wa.rel = "noopener";
-        wa.textContent = "Chat with me on WhatsApp";
-        $("done-wa").appendChild(wa);
-        window.scrollTo(0, 0);
+        else { msg.className = "pd-msg err"; msg.textContent = res.j.error || "Something went wrong."; }
       })
-      .catch(function () {
-        showError("Network problem. Please check your connection and try again.");
-      })
-      .finally(function () {
-        button.disabled = false;
-        button.textContent = "Send my order";
-      });
+      .catch(function () { msg.className = "pd-msg err"; msg.textContent = "Network problem. Please try again."; })
+      .then(function () { btn.disabled = false; });
   });
 })();
