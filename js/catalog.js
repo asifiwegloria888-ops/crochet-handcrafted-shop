@@ -13,6 +13,8 @@
     "Skirt":              { leadDays: 7,  cat: "vetements" },
     "Ruffle crochet hat": { leadDays: 7,  cat: "accessoires" },
     "Small bag":          { leadDays: 7,  cat: "accessoires" },
+    "Two-piece":          { leadDays: 14,  cat: "vetements"},
+    "Couple outfits":     { leadDays: 20, cat: "vetements"},
     "Crochet flower":     { leadDays: 7,  cat: "accessoires" }
   };
 
@@ -38,14 +40,15 @@
       p.photos = (p.photos || []).map(String);
     });
 
-    // when several articles have the same title (3 dresses), a small number tells them apart: "Dress #31"
+    // The customer sees the title only ("Dress"). With labelOf(id, true) (admin page and your own emails)
+    // a small number tells identical titles apart: "Dress #31"
     var sameTitle = {};
     ids.forEach(function (id) { sameTitle[PRODUCTS[id].title] = (sameTitle[PRODUCTS[id].title] || 0) + 1; });
 
-    function labelOf(id) {
+    function labelOf(id, forOwner) {
       var p = PRODUCTS[id];
       if (!p) return String(id);
-      return sameTitle[p.title] > 1 ? p.title + " #" + p.photos[0] : p.title;
+      return forOwner && sameTitle[p.title] > 1 ? p.title + " #" + p.photos[0] : p.title;
     }
 
     // days needed for a list of articles: the longest one

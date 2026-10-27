@@ -154,7 +154,7 @@ var PRODUCTS = {
     sizes: { "Small": 40000, "Medium": 40000, "Large": 45000, "XL": 45000 },
     photos: ["66"]
   },
-  
+
   "Dress-59": {
     title: "Dress",
     desc: "A beautiful dress made with love. Choose your size and color",
@@ -269,14 +269,14 @@ var PRODUCTS = {
   "Two-piece-40": {
     title: "Two piece",
     title: "Two piece",
-    desc: "Two-pieces items are available, choose your color",
+    desc: "Skirt are available, choose your color",
     sizes: {"small": 40000,"large": 40000,"XL": 50000},
     photos: ["40"]
   },
 
   "Skirt-45": {
     title: "Skirt",
-    desc: "Two-pieces items are available, choose your color",
+    desc: "Skirt are available, choose your color",
     sizes: {"small": 20000,"large": 20000,"XL": 25000},
     photos: ["45"]
   },

@@ -140,37 +140,26 @@
           var ctl2 = document.createElement("div"); ctl2.className = "cart-controls";
           var list = PRODUCTS[l.item].colors;
           var need = null;
+          // the customer writes the color he wants (nothing is proposed)
+          var colors = document.createElement("input"); colors.type = "text"; colors.maxLength = 100; colors.className = "cart-color-select";
+          colors.setAttribute("aria-label", "Color for " + labelOf(l.item));
+          colors.value = l.colors || "";
           if (list && list.length) {
-            // a list of colors to choose from (see COLORS in js/products.js)
-            var sel = document.createElement("select"); sel.className = "cart-color-select";
-            sel.setAttribute("aria-label", "Color for " + labelOf(l.item));
-            var first = document.createElement("option"); first.value = ""; first.textContent = "Choose a color"; sel.appendChild(first);
-            list.forEach(function (c) { var o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o); });
-            var oth = document.createElement("option"); oth.value = "__other"; oth.textContent = "Other color..."; sel.appendChild(oth);
-            var other = document.createElement("input"); other.type = "text"; other.maxLength = 100; other.className = "cart-colors";
-            other.placeholder = "Write the color you want"; other.setAttribute("aria-label", "Other color for " + labelOf(l.item));
-            var cur = String(l.colors || "").trim();
-            if (cur && list.indexOf(cur) !== -1) sel.value = cur;
-            else if (cur) { sel.value = "__other"; other.value = cur; }
-            else sel.value = "";
-            other.hidden = sel.value !== "__other";
-            need = document.createElement("p"); need.className = "cart-need"; need.textContent = "Please choose a color";
+            colors.placeholder = "Write the color you want";
+            need = document.createElement("p"); need.className = "cart-need"; need.textContent = "Please write the color you want";
             var apply = function () {
-              l.colors = sel.value === "__other" ? other.value.trim() : sel.value;
+              l.colors = colors.value.trim();
               save();
               need.hidden = colorOk(l);
-              sel.classList.toggle("missing", !colorOk(l));
+              colors.classList.toggle("missing", !colorOk(l));
             };
-            sel.classList.toggle("missing", !colorOk(l)); need.hidden = colorOk(l);
-            sel.addEventListener("change", function () { other.hidden = sel.value !== "__other"; apply(); });
-            other.addEventListener("input", apply);
-            ctl2.appendChild(sel); ctl2.appendChild(other);
+            colors.classList.toggle("missing", !colorOk(l)); need.hidden = colorOk(l);
+            colors.addEventListener("input", apply);
           } else {
-            var colors = document.createElement("input"); colors.type = "text"; colors.maxLength = 200; colors.className = "cart-colors";
-            colors.placeholder = "Color (optional)"; colors.value = l.colors || ""; colors.setAttribute("aria-label", "Colors for " + labelOf(l.item));
+            colors.placeholder = "Color (optional)";
             colors.addEventListener("input", function () { l.colors = colors.value; save(); });
-            ctl2.appendChild(colors);
           }
+          ctl2.appendChild(colors);
           var rm = document.createElement("button"); rm.type = "button"; rm.className = "cart-remove"; rm.textContent = "Remove";
           rm.addEventListener("click", function () { lines.splice(index, 1); save(); render(); });
           ctl2.appendChild(rm);
@@ -188,7 +177,7 @@
         var bad = lines.filter(function (l) { return !colorOk(l); });
         if (!bad.length) return;
         e.preventDefault();
-        $("cart-warn").textContent = "Please choose a color for each item before you order.";
+        $("cart-warn").textContent = "Please write the color you want for each item before you order.";
         $("cart-warn").hidden = false;
         var field = document.querySelector(".cart-color-select.missing");
         if (field) { field.scrollIntoView({ block: "center" }); field.focus(); }

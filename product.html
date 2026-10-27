@@ -40,6 +40,25 @@
         .pd-cform input[type=text], .pd-cform textarea { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--rose); border-radius: 10px; font-family: inherit; font-size: 1rem; background: #fff; }
         .pd-cform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
         .pd-note { font-size: 0.85rem; color: #7a6a6e; text-align: center; }
+        .ig { margin-top: 14px; }
+        .ig-bar { display: flex; align-items: center; gap: 16px; }
+        .ig-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; padding: 4px; cursor: pointer; color: #2b2b2b; text-decoration: none; font: inherit; }
+        .ig-btn:hover { color: var(--rose-fonce); }
+        .ig-right { margin-left: auto; }
+        .ig-like.on { color: #e0245e; }
+        .ig-like.on svg { fill: #e0245e; }
+        .ig-fav.on svg { fill: currentColor; }
+        .ig-btn:disabled { opacity: 0.6; }
+        .ig-n { font-size: 0.95rem; font-weight: bold; }
+        .ig-likes { margin: 6px 0 8px !important; font-weight: bold; }
+        .ig-comments { max-height: 220px; overflow-y: auto; }
+        .ig-comment { margin: 0 0 6px !important; overflow-wrap: anywhere; font-size: 0.95rem; }
+        .ig-form { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; border-top: 1px solid #f0d5dd; padding-top: 10px; }
+        .ig-form input[type=text] { flex: 1 1 120px; min-width: 0; padding: 9px 10px; border: 1px solid var(--rose); border-radius: 18px; font: inherit; font-size: 0.95rem; background: #fff; }
+        .ig-post { background: none; border: none; color: var(--rose-fonce); font: inherit; font-weight: bold; cursor: pointer; padding: 0 6px; }
+        .ig-post:disabled { opacity: 0.5; }
+        .ig .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .pd-note { font-size: 0.8rem; color: #7a6a6e; }
         [hidden] { display: none !important; }
         @media (max-width: 700px) { .pd { grid-template-columns: 1fr; } }
     </style>
@@ -66,21 +85,33 @@
             <div>
                 <img id="pd-main" class="pd-main" src="" alt="">
                 <div id="pd-thumbs" class="pd-thumbs"></div>
-                <a id="pd-download" class="pd-act pd-dl" href="#" download hidden>&#8681; Download this photo</a>
+                <div id="pd-post" class="ig" hidden>
+                    <div class="ig-bar">
+                        <button type="button" id="pd-like" class="ig-btn ig-like" aria-pressed="false" aria-label="Like"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                        <button type="button" id="pd-cbtn" class="ig-btn" aria-label="Comment"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg><span id="pd-ccount" class="ig-n"></span></button>
+                        <a id="pd-download" class="ig-btn" href="#" download aria-label="Download this photo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>
+                        <button type="button" id="pd-fav" class="ig-btn ig-right ig-fav" aria-pressed="false" aria-label="Save to favorites"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+                    </div>
+                    <p class="ig-likes" id="pd-likes"></p>
+                    <div id="pd-comments" class="ig-comments"></div>
+                    <form id="pd-cform" class="ig-form">
+                        <input type="text" id="pd-cname" maxlength="40" placeholder="Your name (optional)" aria-label="Your name (optional)" autocomplete="name">
+                        <input type="text" id="pd-ctext" maxlength="500" placeholder="Add a comment..." aria-label="Add a comment" required>
+                        <button type="submit" class="ig-post">Post</button>
+                        <div class="hp" aria-hidden="true"><input type="text" id="pd-chp" tabindex="-1" autocomplete="off"></div>
+                    </form>
+                    <p id="pd-cmsg" class="pd-msg" role="status"></p>
+                    <p class="pd-note"></p>
+                </div>
             </div>
             <div>
                 <p id="pd-desc"></p>
-                <div class="pd-actions" id="pd-actions" hidden>
-                    <button type="button" id="pd-like" class="pd-act" aria-pressed="false"><span class="ic">&#9825;</span> <span class="lbl">Like</span> <span id="pd-likes" class="cnt"></span></button>
-                    <button type="button" id="pd-fav" class="pd-act" aria-pressed="false"><span class="ic">&#9734;</span> <span class="lbl">Add to favorites</span></button>
-                </div>
                 <table id="pd-table"></table>
                 <label for="pd-size">Size</label>
                 <select id="pd-size"></select>
                 <div id="pd-color-box">
                     <label for="pd-color">Color</label>
-                    <select id="pd-color"></select>
-                    <input type="text" id="pd-color-other" maxlength="100" placeholder="Write the color you want" hidden style="margin-top:8px">
+                    <input type="text" id="pd-color" maxlength="100" placeholder="Write the color you want (ex: red and white)">
                 </div>
                 <label for="pd-qty">Quantity</label>
                 <input type="number" id="pd-qty" min="1" max="100" value="1">
@@ -91,20 +122,6 @@
             </div>
         </div>
 
-        <section id="pd-comments-box" class="pd-social" hidden>
-            <h2>Comments</h2>
-            <div id="pd-comments"></div>
-            <form id="pd-cform" class="pd-cform">
-                <label for="pd-cname">Your name</label>
-                <input type="text" id="pd-cname" maxlength="40" required>
-                <label for="pd-ctext">Your comment</label>
-                <textarea id="pd-ctext" rows="3" maxlength="500" required></textarea>
-                <div class="hp" aria-hidden="true"><label for="pd-chp">Website</label><input type="text" id="pd-chp" tabindex="-1" autocomplete="off"></div>
-                <button type="submit" class="submit">Send my comment</button>
-                <p id="pd-cmsg" class="pd-msg" role="status"></p>
-                <p class="pd-note"></p>
-            </form>
-        </section>
     </main>
 
     <footer class="site-footer">
@@ -154,19 +171,10 @@
         sizeSel.parentNode.removeChild(sizeSel);
       }
 
-      // colors: a list to choose from (see COLORS in js/products.js)
-      var colorBox = $("pd-color-box"), colorSel = $("pd-color"), colorOther = $("pd-color-other");
-      var hasColors = !!(p.colors && p.colors.length);
-      if (hasColors) {
-        var first = document.createElement("option"); first.value = ""; first.textContent = "Choose a color"; colorSel.appendChild(first);
-        p.colors.forEach(function (c) {
-          var o = document.createElement("option"); o.value = c; o.textContent = c; colorSel.appendChild(o);
-        });
-        var other = document.createElement("option"); other.value = "__other"; other.textContent = "Other color..."; colorSel.appendChild(other);
-        colorSel.addEventListener("change", function () { colorOther.hidden = colorSel.value !== "__other"; });
-      } else {
-        colorBox.hidden = true;
-      }
+      // color: nothing is proposed, each customer writes the color he wants
+      var colorBox = $("pd-color-box"), colorInput = $("pd-color");
+      var hasColors = !!(p.colors && p.colors.length); // true = this article needs a color (colors: [] in products.js = no color asked)
+      if (!hasColors) colorBox.hidden = true;
 
       // gallery
       var main = $("pd-main"), thumbs = $("pd-thumbs");
@@ -199,10 +207,11 @@
         var colors = "";
         var msg = $("pd-msg");
         if (hasColors) {
-          colors = colorSel.value === "__other" ? colorOther.value.trim() : colorSel.value;
+          colors = colorInput.value.trim();
           if (!colors) {
             msg.className = "pd-msg err";
-            msg.textContent = colorSel.value === "__other" ? "Please write the color you want." : "Please choose a color.";
+            msg.textContent = "Please write the color you want.";
+            colorInput.focus();
             return;
           }
         }

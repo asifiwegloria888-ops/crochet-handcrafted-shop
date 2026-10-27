@@ -240,7 +240,7 @@
         t.appendChild(hr);
         o.items.forEach(function (l) {
           var tr = el("tr");
-          var td = el("td", "", (l.label || l.item) + (l.size ? " (" + l.size + ")" : ""));
+          var td = el("td", "", (l.owner_label || l.label || l.item) + (l.size ? " (" + l.size + ")" : ""));
           if (l.colors) { td.appendChild(el("br")); td.appendChild(el("span", "small", "Colors: " + l.colors)); }
           if (l.photo) { td.appendChild(el("br")); var pa2 = el("a", "small", "photo " + l.photo); pa2.href = l.photo + ".jpeg"; pa2.target = "_blank"; pa2.rel = "noopener"; td.appendChild(pa2); }
           tr.appendChild(td);
