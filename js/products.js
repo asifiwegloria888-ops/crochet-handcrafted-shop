@@ -355,7 +355,7 @@ var PRODUCTS = {
     desc: "Shirt for man are available, choose your color",
     sizes: {"small": 45000,"large": 45000,"XL": 50000},
     photos: ["17"]
-  }
+  },
   "Couple outfits-50": {
     title: "Couple outfits",
     desc: "Couple outfits are available, get yours",
