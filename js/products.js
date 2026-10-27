@@ -11,7 +11,7 @@ var PRODUCTS = {
     title: "Ruffle crochet hat",
     desc: "A handmade ruffle hat in the colors you like.",
     sizes: { "Child": 15000, "Adult": 20000 },
-    photos: ["3","27"]
+    photos: ["3","27","29"]
   },
   "Crop top": {
     title: "Crop top",
@@ -37,11 +37,11 @@ var PRODUCTS = {
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 25000 },
     photos: ["8"]
   },
-  "Crop top-9":{
+  "Crop top":{
     title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
-    photos: ["9"]
+    photos: ["9","19"]
   },
   "Crop top-11": {
     title: "Crop top",
@@ -89,6 +89,13 @@ var PRODUCTS = {
     desc: "choose your favotite color",
     sizes: {"Small": 10000,"Medium": 10000,"Large": 15000,"XL": 20000},
     photos: ["37"]
+  },
+
+  "Sweater-18": {
+    title: "Sweater",
+    desc: "A warm handmade crochet sweater, made to measure.",
+    sizes: { "Small": 200000, "Medium": 200000, "Large": 200000, "XL": 210000 },
+    photos: ["18"]
   },
   
   "Sweater": {
@@ -362,9 +369,6 @@ var PRODUCTS = {
     sizes: {"small": 110000,"large": 120000,"XL": 140000},
     photos: ["50"]
   }
-
-  
-  
 
 };
 
