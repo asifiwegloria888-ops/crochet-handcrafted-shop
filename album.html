@@ -140,7 +140,7 @@
             <div id="lb-cbox" class="ig-only" hidden>
                 <div id="lb-comments" class="ig-comments"></div>
                 <form id="lb-cform" class="ig-form">
-                    <input type="text" id="lb-cname" maxlength="40" placeholder="Your name" aria-label="Your name" required>
+                    <input type="text" id="lb-cname" maxlength="40" placeholder="Your name (optional)" aria-label="Your name (optional)" autocomplete="name">
                     <input type="text" id="lb-ctext" maxlength="500" placeholder="Add a comment..." aria-label="Add a comment" required>
                     <button type="submit" class="ig-post">Post</button>
                     <div class="hp" aria-hidden="true"><input type="text" id="lb-chp" tabindex="-1" autocomplete="off"></div>
@@ -171,9 +171,12 @@
       var likeBtn = $("lb-like"), cBtn = $("lb-cbtn"), favBtn = $("lb-fav"), dl = $("lb-dl");
       var likesTxt = $("lb-likes"), cCount = $("lb-ccount"), cBox = $("lb-cbox"), list = $("lb-comments");
       var form = $("lb-cform"), msg = $("lb-cmsg");
+      // the name is optional; if he writes it once, it is remembered on this device
+      try { $("lb-cname").value = localStorage.getItem("commentName") || ""; } catch (e) {}
       var onlyArticle = lb.querySelectorAll(".ig-only");
       var current = 0, art = null, photo = "";
-      var vid = window.visitorId ? window.visitorId() : "";
+      // site.js is loaded after this script, so the visitor id is asked at the moment it is needed
+      function getVid() { return window.visitorId ? window.visitorId() : ""; }
 
       // The article (js/products.js) that owns this photo, or null if the photo is not in an article yet.
       function articleOf(item, ph) {
@@ -207,7 +210,7 @@
         });
       }
       function loadSocial(id) {
-        fetch("/api/social?item=" + encodeURIComponent(id) + "&vid=" + encodeURIComponent(vid))
+        fetch("/api/social?item=" + encodeURIComponent(id) + "&vid=" + encodeURIComponent(getVid()))
           .then(function (r) { return r.json(); })
           .then(function (d) { if (art !== id) return; if (d.ok) { drawLike(d); drawComments(d.comments || []); } else drawLike({ likes: 0 }); })
           .catch(function () { if (art === id) drawLike({ likes: 0 }); });
@@ -265,7 +268,7 @@
         if (owner) return;
         fetch("/api/track", {
           method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
-          body: JSON.stringify({ kind: "download", vid: vid, item: art, photo: photo, device: window.innerWidth < 700 ? "phone" : "computer" })
+          body: JSON.stringify({ kind: "download", vid: getVid(), item: art, photo: photo, device: window.innerWidth < 700 ? "phone" : "computer" })
         }).catch(function () {});
       });
 
@@ -277,7 +280,7 @@
         if (!art) return;
         var id = art;
         likeBtn.disabled = true;
-        post({ action: "like", item: id, vid: vid })
+        post({ action: "like", item: id, vid: getVid() })
           .then(function (r) { return r.json(); })
           .then(function (d) { if (d.ok && art === id) drawLike(d); })
           .catch(function () {})
@@ -294,10 +297,13 @@
         if (!art) return;
         var btn = form.querySelector("button");
         btn.disabled = true; msg.className = "lb-msg"; msg.textContent = "";
-        post({ action: "comment", item: art, vid: vid, name: $("lb-cname").value, body: $("lb-ctext").value, website: $("lb-chp").value })
+        post({ action: "comment", item: art, vid: getVid(), name: $("lb-cname").value.trim(), body: $("lb-ctext").value, website: $("lb-chp").value })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (res) {
-            if (res.ok) { msg.textContent = res.j.message || "Thank you!"; $("lb-ctext").value = ""; }
+            if (res.ok) {
+              msg.textContent = res.j.message || "Thank you!"; $("lb-ctext").value = "";
+              try { localStorage.setItem("commentName", $("lb-cname").value.trim()); } catch (e) {}
+            }
             else { msg.className = "lb-msg err"; msg.textContent = res.j.error || "Something went wrong."; }
           })
           .catch(function () { msg.className = "lb-msg err"; msg.textContent = "Network problem. Please try again."; })

@@ -2,82 +2,97 @@
 // The website reads it AND the server reads it (api/_lib.js), so a price is changed here only.
 var PRODUCTS = {
   "Scrunchies": {
+    title: "Scrunchie",
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
     price: 5000,
     photos: ["2", "7", "10","55"]
   },
   "Ruffle crochet hat": {
+    title: "Ruffle crochet hat",
     desc: "A handmade ruffle hat in the colors you like.",
     sizes: { "Child": 15000, "Adult": 20000 },
     photos: ["3","27"]
   },
   "Crop top": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["4"]
   },
   "Crop top-48": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 30000 },
     photos: ["48"]
   },
   "Crop top-5": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 25000, "Medium": 25000, "Large": 30000, "XL": 35000 },
     photos: ["5"]
   },
   "Crop top-8": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 25000 },
     photos: ["8"]
   },
   "Crop top-9":{
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["9"]
   },
   "Crop top-11": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["11"]
   },
 
   "Crop top-12":{
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["12"]
   },
 
   "Crop top-13": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["13"]
   },
 
   "Crop top-14": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["14"]
   },
   "Crop top-15": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["15"]
   },
    
   "Crop top-16": {
+    title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Medium": 15000, "Large": 20000, "XL": 20000 },
     photos: ["16"]
   },
   
   "Crop-top-37": {
+    title: "Crop top",
     desc: "choose your favotite color",
     sizes: {"Small": 10000,"Medium": 10000,"Large": 15000,"XL": 20000},
     photos: ["37"]
   },
   
   "Sweater": {
+    title: "Sweater",
     desc: "A warm handmade crochet sweater, made to measure.",
     sizes: { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 90000 },
     photos: ["21","28"]
@@ -177,22 +192,26 @@ var PRODUCTS = {
   },
 
   "Small bag-22": {
+    title: "Small bag",
     desc: "A small handmade crochet bag.",
     sizes: { "Small": 15000},
     photos: ["22"]
   },
   "Small bag-32":{
+    title: "Small bag",
     desc: " A handmade crochet bag.",
     sizes: { "Small": 15000,},
     photos: ["32"]
   },
   "Small bag-33": {
+    title: "Small bag",
     desc: "choose your color",
     sizes: {"Small": 15000},
     photos: ["33"]
   },
 
   "Crochet flower": {
+    title: "Crochet flowerg",
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["25","26","29","52"]
@@ -247,7 +266,6 @@ var PRODUCTS = {
 
   "Two-piece-65": {
     title: "Two piece",
-    title: "Two piece",
     desc: "Skirt are available, choose your color",
     sizes: {"small": 55000,"large": 55000,"XL": 60000},
     photos: ["65"]
@@ -268,14 +286,12 @@ var PRODUCTS = {
   },
   "Two-piece 47": {
     title: "Two piece",
-    title: "Two piece",
     desc: "Two-pieces items are available, choose your color",
     sizes: {"small": 25000,"large": 25000,"XL": 30000},
     photos: ["47"]
   },
 
   "Two-piece-40": {
-    title: "Two piece",
     title: "Two piece",
     desc: "Skirt are available, choose your color",
     sizes: {"small": 50000,"large": 50000,"XL": 55000},
