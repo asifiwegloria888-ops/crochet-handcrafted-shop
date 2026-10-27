@@ -197,7 +197,7 @@ var PRODUCTS = {
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["25","26","29","52"]
   },
-  "Two-pieces": {
+  "Two-piece": {
     title: "Two-piece",
     desc: "cute and confy. choose your color",
     sizes: {"Small": 50000,"Medium": 60000,"Large":70000,"XL":90000},
@@ -234,7 +234,7 @@ var PRODUCTS = {
   "Two-pieces-61": {
     title: "Two piece",
     desc: "two-piece items are available. choose your color",
-    sizes: {"small": 20000,"large": 20000,"XL": 25000},
+    sizes: {"small": 25000,"large": 25000,"XL": 30000},
     photos: ["61"]
   },
 
@@ -243,6 +243,14 @@ var PRODUCTS = {
     desc: "two-piece items are available. choose your color",
     sizes: {"small": 35000,"large": 35000,"XL": 40000},
     photos: ["62"]
+  },
+
+  "Two-piece-65": {
+    title: "Two piece",
+    title: "Two piece",
+    desc: "Skirt are available, choose your color",
+    sizes: {"small": 55000,"large": 55000,"XL": 60000},
+    photos: ["65"]
   },
 
 
@@ -270,7 +278,7 @@ var PRODUCTS = {
     title: "Two piece",
     title: "Two piece",
     desc: "Skirt are available, choose your color",
-    sizes: {"small": 40000,"large": 40000,"XL": 50000},
+    sizes: {"small": 50000,"large": 50000,"XL": 55000},
     photos: ["40"]
   },
 
@@ -303,7 +311,7 @@ var PRODUCTS = {
   "Two-piece 46": {
     title: "Two piece",
     desc: "Two-pieces items are available, choose your color",
-    sizes: {"small": 50000,"large": 60000,"XL": 70000},
+    sizes: {"small": 45000,"large": 45000,"XL": 50000},
     photos: ["46"]
   },
   "Couple outfits-50": {
