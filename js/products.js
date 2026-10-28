@@ -255,6 +255,20 @@ var PRODUCTS = {
     sizes: { "Small": 15000},
     photos: ["22"]
   },
+
+  "Small bag-67": {
+    title: "Small bag",
+    desc: "A small handmade crochet bag.",
+    sizes: { "Small": 20000},
+    photos: ["67"]
+  },
+
+  "Small bag-68": {
+    title: "Small bag",
+    desc: "A small handmade crochet bag.",
+    sizes: { "Small": 20000},
+    photos: ["68"]
+  },
   "Small bag-32":{
     title: "Small bag",
     desc: " A handmade crochet bag.",
