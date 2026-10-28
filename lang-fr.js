@@ -147,6 +147,26 @@
     "small": "Petit (S)", "medium": "Moyen (M)", "large": "Grand (L)",
 
     // texts of the cards of the Creation page
+    "Skirt are available, choose your color": "Des jupes sont disponibles, choisissez votre couleur",
+    "Shirt for man are available, choose your color": "Des chemises pour hommes sont disponibles, choisissez votre couleur",
+    "Beautiful shirt with beautiful colors are available": "De belles chemises aux belles couleurs sont disponibles",
+    "Beautiful crop top with beautiful colors are available": "De beaux crop tops aux belles couleurs sont disponibles",
+    "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
+    "Get for you one": "Procurez-vous-en une",
+    "Get for you one today": "Procurez-vous-en une aujourd'hui",
+    "get yours today": "Prenez la vôtre aujourd'hui",
+    "Beautiful outfit for couples with beautiful colors are available": "De belles tenues pour couples aux belles couleurs sont disponibles",
+    "Beautiful dress with beautiful colors are available": "De belles robes aux belles couleurs sont disponibles",
+    "Beautiful dress with beautiful colors": "Belle robe aux belles couleurs",
+    "Beautiful dress": "Belle robe",
+    "Beautiful crochet flower are available": "De belles fleurs au crochet sont disponibles",
+    "Beautiful scrunchies": "De beaux chouchous",
+    "Beautiful two piece": "Bel ensemble deux pièces",
+    "Beautiful item!": "Bel article !",
+    "confy! Handmade to measure, choose your colors!": "Confortable ! Fait main sur mesure, choisissez vos couleurs !",
+    "cute, beautiful, comfy. choose your favorite color!": "Mignon, beau et confortable. Choisissez votre couleur préférée !",
+    "Couple outfit": "Tenue de couple",
+    "Scrunchie": "Chouchou",
     "Handmade two-piece set. soft, cute & comfy. custom size & color available": "Ensemble deux pièces fait main. Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
     "soft, cute & comfy. custom size & color available": "Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
     "Handmade to measure, choose your colors": "Fait main sur mesure, choisissez vos couleurs",
@@ -174,9 +194,9 @@
     return d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   }
 
-  // Lookup that ignores capital letters and a final "." or "!": a card written a little differently is still found
+  // Lookup that ignores capital letters, hyphens and a final "." or "!": a text written a little differently is still found
   var NORM = {};
-  var norm = function (t) { return String(t).toLowerCase().replace(/\s+/g, " ").replace(/[\s.!]+$/, ""); };
+  var norm = function (t) { return String(t).toLowerCase().replace(/-/g, " ").replace(/\s+/g, " ").replace(/[\s.!]+$/, ""); };
   Object.keys(EXACT).forEach(function (k) { var n = norm(k); if (!has(NORM, n)) NORM[n] = EXACT[k]; });
 
   // Texts with a number or a name inside. Each rule: [regular expression, function(match, translate) -> French text]

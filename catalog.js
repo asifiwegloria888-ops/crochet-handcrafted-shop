@@ -11,8 +11,11 @@
     "Sweater":            { leadDays: 14, cat: "vetements" },
     "Crop top":           { leadDays: 7,  cat: "vetements" },
     "Skirt":              { leadDays: 7,  cat: "vetements" },
+    "Shirt":              { leadDays: 7,  cat: "vetements" },
     "Ruffle crochet hat": { leadDays: 7,  cat: "accessoires" },
     "Small bag":          { leadDays: 7,  cat: "accessoires" },
+    "Two-piece":          { leadDays: 14,  cat: "vetements"},
+    "Couple outfits":     { leadDays: 20, cat: "vetements"},
     "Crochet flower":     { leadDays: 7,  cat: "accessoires" }
   };
 
