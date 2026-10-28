@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     delivery: L.clean(body.delivery, 50),
     notes: L.clean(body.notes, 1500),
     ready_date: L.clean(body.ready_date, 10),
+    lang: body.lang === "fr" ? "fr" : "en",
   };
   const priced = L.priceItems(body.items);
 
@@ -41,7 +42,7 @@ module.exports = async (req, res) => {
   const fee = L.DELIVERY_FEES[customer.delivery]; // null = price quoted by the owner
   const total = fee == null ? null : priced.subtotal + fee;
   const items = priced.items;
-  const summary = items.map((i) => `${i.owner_label || i.label}${i.size ? " (" + i.size + ")" : ""} x${i.quantity}`).join(", ").slice(0, 400);
+  const summary = items.map((i) => `${i.label}${i.size ? " (" + i.size + ")" : ""} x${i.quantity}`).join(", ").slice(0, 400);
   const quantity = items.reduce((s, i) => s + i.quantity, 0);
   const firstPhoto = (items.find((i) => i.photo) || {}).photo || "";
 
@@ -51,10 +52,10 @@ module.exports = async (req, res) => {
     const sql = L.db();
     await L.ensureSchema(sql);
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date, lang)
       VALUES (${customer.name}, ${customer.email}, ${customer.phone}, ${summary}, ${""}, ${""}, ${quantity},
               ${customer.notes}, ${firstPhoto}, ${customer.address}, ${customer.delivery}, ${fee},
-              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date})
+              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date}, ${customer.lang})
       RETURNING id`;
     order = { id: rows[0].id, ...customer, items, delivery_fee: fee, total, status: "new" };
   } catch (err) {
@@ -69,18 +70,20 @@ module.exports = async (req, res) => {
     const { transporter, from, owner } = L.mailer();
     const site = L.siteUrl();
 
+    // to the customer, in the language he used on the site
     try {
+      const lang = L.langOf(order);
+      const mail = L.MAIL[lang].received(order.name, reference);
       await transporter.sendMail({
         from,
         to: order.email,
         replyTo: owner,
-        subject: `We received your order ${reference}`,
+        subject: mail.subject,
         html: L.WRAP(`
-          <h2 style="color:#c9607f">Thank you, ${L.esc(order.name)}!</h2>
-          <p>We have received your order <strong>${reference}</strong>. I will contact you soon to confirm the details and the price. To start your order, a 50% deposit is requested once the price is confirmed.</p>
-          ${L.itemsTable(order)}
-          <p style="margin-top:20px">You can reply directly to this email, or write to me on WhatsApp:</p>
-          ${L.waButton(reference)}
+          ${mail.intro}
+          ${L.itemsTable(order, undefined, true, lang)}
+          ${mail.outro}
+          ${L.waButton(reference, lang)}
           <p>Crochet Handcrafted Shop</p>`),
       });
       customerEmailSent = true;
@@ -90,10 +93,17 @@ module.exports = async (req, res) => {
 
     try {
       const photos = items.filter((i) => i.photo);
+      // the picture the customer chose is shown inside the email, with a clickable link under it (needs SITE_URL in Vercel)
       const photoLinks = photos.length
-        ? `<p style="margin-top:12px"><strong>Photos chosen:</strong><br>${photos
-            .map((i) => (site ? `<a href="${L.esc(site)}/${i.photo}.jpeg">${L.esc(i.owner_label || i.label)}: ${i.photo}.jpeg</a>` : `${L.esc(i.owner_label || i.label)}: ${i.photo}.jpeg`))
-            .join("<br>")}</p>`
+        ? `<p style="margin:14px 0 4px"><strong>Photos chosen:</strong></p>` +
+          photos
+            .map((i) => {
+              const caption = `${L.esc(i.label)}${i.size ? " (" + L.esc(i.size) + ")" : ""}: ${L.esc(i.photo)}.jpeg`;
+              return site
+                ? `<p style="margin:8px 0"><a href="${L.esc(site)}/${L.esc(i.photo)}.jpeg"><img src="${L.esc(site)}/${L.esc(i.photo)}.jpeg" alt="${L.esc(i.label)}" width="160" style="display:block;border:0;border-radius:10px;margin-bottom:4px"></a><a href="${L.esc(site)}/${L.esc(i.photo)}.jpeg" style="font-size:13px">${caption}</a></p>`
+                : `<p style="margin:4px 0">${caption}</p>`;
+            })
+            .join("")
         : "";
       const btn = "display:inline-block;background:#c9607f;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px";
       const buttons =
@@ -111,7 +121,7 @@ module.exports = async (req, res) => {
           <h2 style="color:#9e1b2e">New order ${reference}</h2>
           ${customerEmailSent ? "" : '<p style="background:#fde4e4;color:#9b1c1c;padding:10px;border-radius:8px"><strong>The confirmation email to the customer could not be sent.</strong> Please contact them yourself.</p>'}
           <p><strong>${L.esc(order.name)}</strong><br>${L.esc(order.email)}${order.phone ? "<br>" + L.esc(order.phone) : ""}</p>
-          ${L.itemsTable(order, undefined, true)}
+          ${L.itemsTable(order)}
           ${photoLinks}
           ${buttons}
           <p style="margin-top:20px">Or reply to this email to answer the customer directly.</p>`),

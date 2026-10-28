@@ -132,6 +132,8 @@
     "Network problem. Please try again.": "Problème de réseau. Veuillez réessayer.", "Something went wrong.": "Un problème est survenu.",
 
     // ---------- YOUR OWN TRANSLATIONS (add new lines here) ----------
+        "A very soft crochet scarf": "Une écharpe au crochet très douce",
+    
     "": ""
   };
   delete EXACT[""];
