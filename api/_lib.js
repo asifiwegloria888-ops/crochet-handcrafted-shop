@@ -320,7 +320,7 @@ const siteUrl = () => (process.env.SITE_URL || "").replace(/\/$/, "");
 
 function waButton(ref, lang) {
   const fr = lang === "fr";
-  const number = (process.env.WHATSAPP_NUMBER || "243978253950").replace(/\D/g, "");
+  const number = (process.env.WHATSAPP_NUMBER || "256791908861").replace(/\D/g, "");
   const text = encodeURIComponent((fr ? "Bonjour, je vous écris au sujet de ma commande " : "Hello, I'm writing about my order ") + ref);
   return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px">${fr ? "Écrivez-moi sur WhatsApp" : "WhatsApp me"}</a></p>`;
 }
