@@ -112,6 +112,56 @@
     }
   }
 
+  // ---------- prices in dollars (every language except English) ----------
+  // Every "15 000 UGX" written on the page becomes "≈ $4.05". Only the display changes:
+  // the real prices stay in UGX on the server, and you confirm the final price in UGX.
+  var UGX_PER_USD = 3700;   // <-- CHANGE THIS NUMBER when the exchange rate changes (1 dollar = ... UGX)
+
+  function startDollars() {
+    var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1 };
+    var PRICE = /(\d[\d   ]*)\s*UGX/g;
+
+    function usd(ugx) {
+      var d = ugx / UGX_PER_USD;
+      return "≈ $" + (d >= 100 ? Math.round(d).toLocaleString("en-US") : d.toFixed(2));
+    }
+    function skipped(el) {
+      for (var e = el; e && e !== document.documentElement; e = e.parentElement) {
+        if (SKIP[e.tagName] || (e.hasAttribute && (e.hasAttribute("data-no-i18n") || e.getAttribute("translate") === "no")) ||
+            (e.classList && e.classList.contains("notranslate"))) return true;
+      }
+      return false;
+    }
+    function convertText(node) {
+      var v = node.nodeValue;
+      if (!v || v.indexOf("UGX") === -1) return;
+      var p = node.parentElement;
+      if (!p || skipped(p)) return;
+      var out = v.replace(PRICE, function (m, num) {
+        var n = parseInt(num.replace(/\D/g, ""), 10);
+        return isNaN(n) ? m : usd(n);
+      });
+      if (out !== v) node.nodeValue = out;
+    }
+    function convertTree(root) {
+      if (root.nodeType === 3) { convertText(root); return; }
+      if (root.nodeType !== 1) return;
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var n, list = [];
+      while ((n = walker.nextNode())) list.push(n);
+      list.forEach(convertText);
+    }
+
+    convertTree(document.body);
+    // prices written later by the page (cart, order total, delivery list...) are converted too
+    new MutationObserver(function (changes) {
+      changes.forEach(function (c) {
+        if (c.type === "childList") for (var i = 0; i < c.addedNodes.length; i++) convertTree(c.addedNodes[i]);
+        else if (c.type === "characterData") convertText(c.target);
+      });
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+
   // ---------- other languages: Google Translate (only for these visitors) ----------
   function startGoogle(code) {
     try {
@@ -178,6 +228,7 @@
   }
 
   addSelector();
+  if (lang !== "en") startDollars();
   if (french) startFrench();
   else if (lang !== "en") startGoogle(lang);
   else clearGoogle();

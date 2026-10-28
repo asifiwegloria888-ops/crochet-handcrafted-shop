@@ -367,13 +367,13 @@ var PRODUCTS = {
   "Two piece 39": {
     title: "Two piece",
     desc: "two pieces items are available. choose your color",
-    sizes: {"small": 35000,"large": 40000,"XL":45000},
+    sizes: {"small": 45000,"large": 50000,"XL":55000},
     photos: ["39"]
   },
   "Two piece 47": {
     title: "Two piece",
     desc: "Two pieces items are available, choose your color",
-    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    sizes: {"small": 35000,"large": 35000,"XL": 40000},
     photos: ["47"]
   },
 
