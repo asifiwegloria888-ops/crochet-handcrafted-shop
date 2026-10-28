@@ -84,7 +84,7 @@
     "← Back to creations": "← Retour aux créations", "Item not found": "Article introuvable", "⇩ Download this photo": "⇩ Télécharger cette photo",
     "Added to your cart. You can choose another item or": "Ajouté au panier. Vous pouvez choisir un autre article ou", "open your cart": "ouvrir votre panier",
     "Your name": "Votre nom", "Your comment": "Votre commentaire", "Send my comment": "Envoyer mon commentaire",
-    "Comments appear after I have read and approved them.": "Les commentaires apparaissent après que je les ai lus et approuvés.",
+    "Comments appear after I have read and approved them.":"",
     "No comment yet. Be the first!": "Pas encore de commentaire. Soyez le premier !",
     "Thank you! Your comment will appear after I approve it.": "Merci ! Votre commentaire apparaîtra après mon approbation.",
     "Thank you!": "Merci !",
