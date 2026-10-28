@@ -132,8 +132,56 @@
     "Network problem. Please try again.": "Problème de réseau. Veuillez réessayer.", "Something went wrong.": "Un problème est survenu.",
 
     // ---------- YOUR OWN TRANSLATIONS (add new lines here) ----------
-        "A very soft crochet scarf": "Une écharpe au crochet très douce",
-    
+    // article descriptions and names (js/products.js)
+    "choose your favorite color": "choisissez votre couleur préférée",
+    "choose your color": "choisissez votre couleur",
+    "A beautiful dress made with love. choose your size and color": "Une belle robe faite avec amour. Choisissez votre taille et votre couleur",
+    "A cute dress. choose your favorite color": "Une jolie robe. Choisissez votre couleur préférée",
+    "A handmade crochet bag.": "Un sac au crochet fait main.",
+    "cute and comfy. choose your color": "Mignon et confortable. Choisissez votre couleur",
+    "two-piece items are available. choose your color": "Des ensembles deux pièces sont disponibles. Choisissez votre couleur",
+    "two-pieces items are available. choose your color": "Des ensembles deux pièces sont disponibles. Choisissez votre couleur",
+    "Two-pieces items are available, choose your color": "Des ensembles deux pièces sont disponibles. Choisissez votre couleur",
+    "Couple outfits are available, get yours": "Des tenues assorties pour couples sont disponibles, prenez la vôtre",
+    "Two-piece": "Deux-pièces", "Couple outfits": "Tenues de couple", "Shirt": "Chemise", "T-shirt": "T-shirt",
+    "small": "Petit (S)", "medium": "Moyen (M)", "large": "Grand (L)",
+
+    // texts of the cards of the Creation page
+    "Skirt are available, choose your color": "Des jupes sont disponibles, choisissez votre couleur",
+    "Shirt for man are available, choose your color": "Des chemises pour hommes sont disponibles, choisissez votre couleur",
+    "Beautiful shirt with beautiful colors are available": "De belles chemises aux belles couleurs sont disponibles",
+    "Beautiful crop top with beautiful colors are available": "De beaux crop tops aux belles couleurs sont disponibles",
+    "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
+    "Get for you one": "Procurez-vous-en une",
+    "Get for you one today": "Procurez-vous-en une aujourd'hui",
+    "get yours today": "Prenez la vôtre aujourd'hui",
+    "Beautiful outfit for couples with beautiful colors are available": "De belles tenues pour couples aux belles couleurs sont disponibles",
+    "Beautiful dress with beautiful colors are available": "De belles robes aux belles couleurs sont disponibles",
+    "Beautiful dress with beautiful colors": "Belle robe aux belles couleurs",
+    "Beautiful dress": "Belle robe",
+    "Beautiful crochet flower are available": "De belles fleurs au crochet sont disponibles",
+    "Beautiful scrunchies": "De beaux chouchous",
+    "Beautiful two piece": "Bel ensemble deux pièces",
+    "Beautiful item!": "Bel article !",
+    "confy! Handmade to measure, choose your colors!": "Confortable ! Fait main sur mesure, choisissez vos couleurs !",
+    "cute, beautiful, comfy. choose your favorite color!": "Mignon, beau et confortable. Choisissez votre couleur préférée !",
+    "Couple outfit": "Tenue de couple",
+    "Scrunchie": "Chouchou",
+    "Handmade two-piece set. soft, cute & comfy. custom size & color available": "Ensemble deux pièces fait main. Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
+    "soft, cute & comfy. custom size & color available": "Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
+    "Handmade to measure, choose your colors": "Fait main sur mesure, choisissez vos couleurs",
+    "Choose your color": "Choisissez votre couleur",
+
+    // comments, favorites, download, color
+    "Comment": "Commenter", "Add a comment": "Ajouter un commentaire", "Your name (optional)": "Votre nom (facultatif)",
+    "Download this photo": "Télécharger cette photo", "Save to favorites": "Ajouter aux favoris", "Remove from favorites": "Retirer des favoris",
+    "Write the color you want": "Écrivez la couleur souhaitée",
+    "Write the color you want (ex: red and white)": "Écrivez la couleur souhaitée (ex : rouge et blanc)",
+    "Please write the color you want": "Veuillez écrire la couleur souhaitée",
+    "Please write the color you want.": "Veuillez écrire la couleur souhaitée.",
+    "Please write the color you want for each item before you order.": "Veuillez écrire la couleur souhaitée pour chaque article avant de commander.",
+    "Please write the color you want for each item in your cart before you order.": "Veuillez écrire la couleur souhaitée pour chaque article de votre panier avant de commander.",
+    "Please reload the page and try again.": "Veuillez recharger la page et réessayer.",
     "": ""
   };
   delete EXACT[""];
@@ -145,6 +193,11 @@
     if (isNaN(d)) return text;
     return d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   }
+
+  // Lookup that ignores capital letters, hyphens and a final "." or "!": a text written a little differently is still found
+  var NORM = {};
+  var norm = function (t) { return String(t).toLowerCase().replace(/-/g, " ").replace(/\s+/g, " ").replace(/[\s.!]+$/, ""); };
+  Object.keys(EXACT).forEach(function (k) { var n = norm(k); if (!has(NORM, n)) NORM[n] = EXACT[k]; });
 
   // Texts with a number or a name inside. Each rule: [regular expression, function(match, translate) -> French text]
   var RULES = [
@@ -169,6 +222,8 @@
     [/^Your items need (\d+) days\.$/, function (m) { return "Vos articles demandent " + m[1] + " jours."; }],
     [/^Please choose (.+) or a later date\.$/, function (m) { return "Veuillez choisir le " + frDate(m[1]) + " ou une date ultérieure."; }],
     [/^Your reference is (\S+)\. (.+)$/, function (m, tr) { return "Votre référence est " + m[1] + ". " + tr(m[2]); }],
+    [/^Please write the color you want for (.+)\.$/, function (m, tr) { return "Veuillez écrire la couleur souhaitée pour " + tr(m[1]) + "."; }],
+    [/^Guest (\d+)$/, function (m) { return "Invité " + m[1]; }],
     [/^Please choose a size for (.+)\.$/, function (m, tr) { return "Veuillez choisir une taille pour " + tr(m[1]) + "."; }],
     [/^Please choose a color for (.+)\.$/, function (m, tr) { return "Veuillez choisir une couleur pour " + tr(m[1]) + "."; }],
     [/^Quantity for (.+) must be between 1 and 100\.$/, function (m, tr) { return "La quantité pour " + tr(m[1]) + " doit être comprise entre 1 et 100."; }],
@@ -182,6 +237,8 @@
     var core = String(s).replace(/\s+/g, " ").trim();
     if (!core) return s;
     if (has(EXACT, core)) return EXACT[core];
+    var nk = norm(core);
+    if (has(NORM, nk)) return NORM[nk];
     for (var i = 0; i < RULES.length; i++) {
       var m = RULES[i][0].exec(core);
       if (m) { var r = RULES[i][1](m, translate); if (r != null) return r; }
