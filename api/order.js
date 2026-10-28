@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     delivery: L.clean(body.delivery, 50),
     notes: L.clean(body.notes, 1500),
     ready_date: L.clean(body.ready_date, 10),
+    lang: body.lang === "fr" ? "fr" : "en",
   };
   const priced = L.priceItems(body.items);
 
@@ -51,10 +52,10 @@ module.exports = async (req, res) => {
     const sql = L.db();
     await L.ensureSchema(sql);
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date, lang)
       VALUES (${customer.name}, ${customer.email}, ${customer.phone}, ${summary}, ${""}, ${""}, ${quantity},
               ${customer.notes}, ${firstPhoto}, ${customer.address}, ${customer.delivery}, ${fee},
-              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date})
+              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date}, ${customer.lang})
       RETURNING id`;
     order = { id: rows[0].id, ...customer, items, delivery_fee: fee, total, status: "new" };
   } catch (err) {
@@ -69,18 +70,20 @@ module.exports = async (req, res) => {
     const { transporter, from, owner } = L.mailer();
     const site = L.siteUrl();
 
+    // to the customer, in the language he used on the site
     try {
+      const lang = L.langOf(order);
+      const mail = L.MAIL[lang].received(order.name, reference);
       await transporter.sendMail({
         from,
         to: order.email,
         replyTo: owner,
-        subject: `We received your order ${reference}`,
+        subject: mail.subject,
         html: L.WRAP(`
-          <h2 style="color:#c9607f">Thank you, ${L.esc(order.name)}!</h2>
-          <p>We have received your order <strong>${reference}</strong>. To start your order, a 50% deposit is requested.</p>
-          ${L.itemsTable(order)}
-          <p style="margin-top:20px">You can reply directly to this email, or write to me on WhatsApp:</p>
-          ${L.waButton(reference)}
+          ${mail.intro}
+          ${L.itemsTable(order, undefined, true, lang)}
+          ${mail.outro}
+          ${L.waButton(reference, lang)}
           <p>Crochet Handcrafted Shop</p>`),
       });
       customerEmailSent = true;

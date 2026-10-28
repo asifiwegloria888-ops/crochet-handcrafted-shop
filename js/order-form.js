@@ -58,7 +58,7 @@
   readyInput.min = minDate;
   readyInput.max = addDays(today, 365);
   function prettyDate(iso) {
-    return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    return new Date(iso + "T00:00:00Z").toLocaleDateString(window.shopLocale || "en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   }
   var times = {};
   lines.forEach(function (l) { times[labelOf(l.item)] = leadDaysFor([l.item]); });
@@ -125,6 +125,7 @@
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     var data = Object.fromEntries(new FormData(form).entries());
+    data.lang = window.SHOP_LANG || "en";
     if (!data.ready_date) { showError("Please choose the date you want your order ready."); readyInput.focus(); return; }
     if (data.ready_date < minDate) { showError("Your items need " + lead + " days. Please choose " + prettyDate(minDate) + " or a later date."); readyInput.focus(); return; }
     data.items = lines.map(function (l) {

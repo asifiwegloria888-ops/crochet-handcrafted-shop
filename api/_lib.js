@@ -4,6 +4,8 @@
 const { neon } = require("@neondatabase/serverless");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const LANG_FR = require("../js/lang-fr.js");
+const tr = (lang, s) => (lang === "fr" ? LANG_FR.translate(s) : s);   // translate a text for a French customer
 const base = require("../js/products.js");
 const catalog = require("../js/catalog.js")(base); // fills in titles, colors, preparation days (see js/catalog.js)
 const { PRODUCTS, DELIVERY_FEES } = base;
@@ -48,6 +50,7 @@ async function ensureSchema(sql) {
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_date TEXT`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS lang TEXT`;
   schemaReady = true;
 }
 
@@ -187,8 +190,8 @@ const addDays = (iso, n) => {
   return d.toISOString().slice(0, 10);
 };
 const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s) && new Date(s + "T00:00:00Z").toISOString().slice(0, 10) === s;
-const formatDate = (iso) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const formatDate = (iso, lang) =>
+  new Date(iso + "T00:00:00Z").toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 function checkReadyDate(value, items) {
   const lead = leadDaysFor(items.map((i) => i.item));
@@ -315,26 +318,44 @@ function mailer() {
 
 const siteUrl = () => (process.env.SITE_URL || "").replace(/\/$/, "");
 
-function waButton(ref) {
+function waButton(ref, lang) {
+  const fr = lang === "fr";
   const number = (process.env.WHATSAPP_NUMBER || "243978253950").replace(/\D/g, "");
-  const text = encodeURIComponent("Hello, I'm writing about my order " + ref);
-  return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px">WhatsApp me</a></p>`;
+  const text = encodeURIComponent((fr ? "Bonjour, je vous écris au sujet de ma commande " : "Hello, I'm writing about my order ") + ref);
+  return `<p style="margin:18px 0"><a href="https://wa.me/${number}?text=${text}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;line-height:20px">${fr ? "Écrivez-moi sur WhatsApp" : "WhatsApp me"}</a></p>`;
 }
 
 const TD = 'style="padding:6px 8px;border-bottom:1px solid #f0d5dd;vertical-align:top"';
 
-const deliveryLabel = (d) =>
-  d === "Pickup" ? "Pick up" : d === "Delivery" ? "Delivery to the address below" : d ? "Delivery (" + d + ")" : "-";
+// Words used in the order table, in English and in French (for the customer)
+const LBL = {
+  en: { item: "Item", qty: "Qty", price: "Price", colors: "Colors:", toQuote: "to be quoted", included: "included in the total", itemsQuote: "Items (delivery price to be quoted)",
+        plusDelivery: " + delivery", toConfirm: "to be confirmed", totalPrice: "Total price", estTotal: "Estimated total", address: "Delivery address:",
+        ready: "Wanted ready by:", notes: "Notes:", pickup: "Pick up", deliveryTo: "Delivery to the address below" },
+  fr: { item: "Article", qty: "Qté", price: "Prix", colors: "Couleurs :", toQuote: "à confirmer", included: "incluse dans le total", itemsQuote: "Articles (prix de livraison à confirmer)",
+        plusDelivery: " + livraison", toConfirm: "à confirmer", totalPrice: "Prix total", estTotal: "Total estimé", address: "Adresse de livraison :",
+        ready: "Date souhaitée :", notes: "Notes :", pickup: "Retrait sur place", deliveryTo: "Livraison à l'adresse ci-dessous" },
+};
 
-function itemsTable(order, confirmedTotal) {
+const deliveryLabel = (d, lang) => {
+  const w = LBL[lang === "fr" ? "fr" : "en"];
+  return d === "Pickup" ? w.pickup : d === "Delivery" ? w.deliveryTo : d ? "Delivery (" + d + ")" : "-";
+};
+
+// publicNames = true for emails to the CUSTOMER ("Dress"); false for you and the admin ("Dress #34")
+// lang = "fr" writes the table in French
+function itemsTable(order, confirmedTotal, publicNames, lang) {
+  const fr = lang === "fr";
+  const w = LBL[fr ? "fr" : "en"];
   const lines = orderLines(order);
   const rows = lines
-    .map(
-      (l) => `<tr>
-      <td ${TD}>${esc(l.label || l.item)}${l.size ? " (" + esc(l.size) + ")" : ""}${l.colors ? `<br><span style="color:#7a6a6e;font-size:13px">Colors: ${esc(l.colors)}</span>` : ""}</td>
+    .map((l) => {
+      const name = publicNames ? String(l.label || l.item).replace(/ #\d+$/, "") : l.label || l.item;
+      return `<tr>
+      <td ${TD}>${esc(tr(lang, name))}${l.size ? " (" + esc(tr(lang, l.size)) + ")" : ""}${l.colors ? `<br><span style="color:#7a6a6e;font-size:13px">${w.colors} ${esc(tr(lang, l.colors))}</span>` : ""}</td>
       <td ${TD}>${esc(l.quantity)}</td>
-      <td ${TD} align="right">${l.line_total != null ? esc(money(l.line_total)) : "to be quoted"}</td></tr>`
-    )
+      <td ${TD} align="right">${l.line_total != null ? esc(money(l.line_total)) : w.toQuote}</td></tr>`;
+    })
     .join("");
   const quote = needsQuote(order);
   const priced = lines.every((l) => l.line_total != null);
@@ -343,31 +364,86 @@ function itemsTable(order, confirmedTotal) {
 
   let deliveryCell, totalLabel, totalCell;
   if (confirmedTotal != null) {
-    deliveryCell = quote ? "included in the total" : esc(money(order.delivery_fee || 0));
-    totalLabel = "Total price";
+    deliveryCell = quote ? w.included : esc(money(order.delivery_fee || 0));
+    totalLabel = w.totalPrice;
     totalCell = esc(money(confirmedTotal));
   } else if (quote) {
-    deliveryCell = "to be quoted";
-    totalLabel = "Items (delivery price to be quoted)";
-    totalCell = itemsSum != null ? esc(money(itemsSum)) + " + delivery" : "to be confirmed";
+    deliveryCell = w.toQuote;
+    totalLabel = w.itemsQuote;
+    totalCell = itemsSum != null ? esc(money(itemsSum)) + w.plusDelivery : w.toConfirm;
   } else {
     deliveryCell = esc(money(order.delivery_fee || 0));
-    totalLabel = "Estimated total";
-    totalCell = estimate != null ? esc(money(estimate)) : "to be confirmed";
+    totalLabel = w.estTotal;
+    totalCell = estimate != null ? esc(money(estimate)) : w.toConfirm;
   }
 
   return `<table style="border-collapse:collapse;font-size:15px;width:100%;max-width:520px">
-    <tr><th align="left" ${TD}>Item</th><th align="left" ${TD}>Qty</th><th align="right" ${TD}>Price</th></tr>
+    <tr><th align="left" ${TD}>${w.item}</th><th align="left" ${TD}>${w.qty}</th><th align="right" ${TD}>${w.price}</th></tr>
     ${rows}
-    <tr><td ${TD} colspan="2">${esc(deliveryLabel(order.delivery))}</td><td ${TD} align="right">${deliveryCell}</td></tr>
+    <tr><td ${TD} colspan="2">${esc(deliveryLabel(order.delivery, lang))}</td><td ${TD} align="right">${deliveryCell}</td></tr>
     <tr><td ${TD} colspan="2"><strong>${totalLabel}</strong></td><td ${TD} align="right"><strong>${totalCell}</strong></td></tr>
   </table>
-  ${order.address ? `<p style="margin:10px 0"><strong>Delivery address:</strong> ${esc(order.address)}</p>` : ""}
-  ${order.ready_date ? `<p style="margin:10px 0"><strong>Wanted ready by:</strong> ${esc(formatDate(order.ready_date))}</p>` : ""}
-  ${order.notes ? `<p style="margin:10px 0"><strong>Notes:</strong> ${esc(order.notes)}</p>` : ""}`;
+  ${order.address ? `<p style="margin:10px 0"><strong>${w.address}</strong> ${esc(order.address)}</p>` : ""}
+  ${order.ready_date ? `<p style="margin:10px 0"><strong>${w.ready}</strong> ${esc(formatDate(order.ready_date, lang))}</p>` : ""}
+  ${order.notes ? `<p style="margin:10px 0"><strong>${w.notes}</strong> ${esc(order.notes)}</p>` : ""}`;
 }
 
 const WRAP = (inner) => `<div style="font-family:Arial,sans-serif;color:#3a2f33;max-width:560px">${inner}</div>`;
+
+// The emails the CUSTOMER receives, in English or French (the language the customer used on the site)
+const MAIL = {
+  en: {
+    received: (name, ref) => ({
+      subject: `We received your order ${ref}`,
+      intro: `<h2 style="color:#c9607f">Thank you, ${esc(name)}!</h2>
+          <p>We have received your order <strong>${ref}</strong>. I will contact you soon to confirm the details and the price. To start your order, a 50% deposit is requested once the price is confirmed.</p>`,
+      outro: `<p style="margin-top:20px">You can reply directly to this email, or write to me on WhatsApp:</p>`,
+    }),
+    confirmed: (name, ref, deposit, balance, instructions) => ({
+      subject: `Order ${ref} confirmed: please send your 50% deposit`,
+      head: `<h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
+        <p>Hello ${esc(name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>`,
+      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(balance))}</td></tr>`,
+      how: `<h3>How to pay the deposit</h3>`,
+      after: `<p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, reply to this email with the transaction ID or a screenshot. I start your order as soon as I receive the deposit.</p>
+        <p>A question? Write to me on WhatsApp:</p>`,
+    }),
+    deposit: (name, ref, deposit, balance) => ({
+      subject: `Deposit received for order ${ref}: I am starting your order`,
+      body: `<h2 style="color:#c9607f">Thank you, ${esc(name)}!</h2>
+        <p>I received your deposit of <strong>${esc(money(deposit))}</strong> for order <strong>${esc(ref)}</strong>.</p>
+        <p>I am starting your order now. The remaining balance is <strong>${esc(money(balance))}</strong>. I will contact you as soon as it is ready.</p>
+        <p>If you have any question, reply to this email or write to me on WhatsApp:</p>`,
+    }),
+  },
+  fr: {
+    received: (name, ref) => ({
+      subject: `Nous avons bien reçu votre commande ${ref}`,
+      intro: `<h2 style="color:#c9607f">Merci, ${esc(name)} !</h2>
+          <p>Nous avons bien reçu votre commande <strong>${ref}</strong>. Je vous contacterai bientôt pour confirmer les détails et le prix. Pour démarrer votre commande, un acompte de 50 % est demandé une fois le prix confirmé.</p>`,
+      outro: `<p style="margin-top:20px">Vous pouvez répondre directement à cet email, ou m'écrire sur WhatsApp :</p>`,
+    }),
+    confirmed: (name, ref, deposit, balance) => ({
+      subject: `Commande ${ref} confirmée : merci d'envoyer votre acompte de 50 %`,
+      head: `<h2 style="color:#c9607f">Votre commande ${esc(ref)} est confirmée</h2>
+        <p>Bonjour ${esc(name)}, merci pour votre commande. Pour commencer à la réaliser, je demande un acompte de 50 %.</p>`,
+      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Acompte à payer maintenant (50 %)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Reste à payer</strong></td><td>${esc(money(balance))}</td></tr>`,
+      how: `<h3>Comment payer l'acompte</h3>`,
+      after: `<p>Merci d'écrire <strong>${esc(ref)}</strong> comme référence du paiement. Après avoir payé, répondez à cet email avec l'identifiant de la transaction ou une capture d'écran. Je commence votre commande dès que je reçois l'acompte.</p>
+        <p>Une question ? Écrivez-moi sur WhatsApp :</p>`,
+    }),
+    deposit: (name, ref, deposit, balance) => ({
+      subject: `Acompte reçu pour la commande ${ref} : je commence votre commande`,
+      body: `<h2 style="color:#c9607f">Merci, ${esc(name)} !</h2>
+        <p>J'ai bien reçu votre acompte de <strong>${esc(money(deposit))}</strong> pour la commande <strong>${esc(ref)}</strong>.</p>
+        <p>Je commence votre commande maintenant. Le reste à payer est de <strong>${esc(money(balance))}</strong>. Je vous contacterai dès qu'elle sera prête.</p>
+        <p>Si vous avez une question, répondez à cet email ou écrivez-moi sur WhatsApp :</p>`,
+    }),
+  },
+};
+const langOf = (order) => (order && order.lang === "fr" ? "fr" : "en");
 
 // Owner confirms the order and asks for the 50% deposit
 async function doConfirm(sql, order, total, fee) {
@@ -375,6 +451,8 @@ async function doConfirm(sql, order, total, fee) {
   if (!instructions) throw userError("Add the variable PAYMENT_INSTRUCTIONS in Vercel (your mobile money number and name), then redeploy.");
   const deposit = Math.ceil(total / 2);
   const ref = refOf(order.id);
+  const lang = langOf(order);
+  const m = MAIL[lang].confirmed(order.name, ref, deposit, total - deposit);
   const { transporter, from, owner } = mailer();
   try {
     await transporter.sendMail({
@@ -382,20 +460,17 @@ async function doConfirm(sql, order, total, fee) {
       to: order.email,
       bcc: owner,
       replyTo: owner,
-      subject: `Order ${ref} confirmed: please send your 50% deposit`,
+      subject: m.subject,
       html: WRAP(`
-        <h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
-        <p>Hello ${esc(order.name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>
-        ${itemsTable({ ...order, delivery_fee: fee }, total)}
+        ${m.head}
+        ${itemsTable({ ...order, delivery_fee: fee }, total, true, lang)}
         <table style="border-collapse:collapse;font-size:15px;margin-top:12px">
-          <tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(total - deposit))}</td></tr>
+          ${m.rows}
         </table>
-        <h3>How to pay the deposit</h3>
+        ${m.how}
         <p style="background:#fff7f2;padding:12px;border-radius:8px">${esc(instructions).replace(/\r?\n/g, "<br>")}</p>
-        <p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, reply to this email with the transaction ID or a screenshot. I start your order as soon as I receive the deposit.</p>
-        <p>A question? Write to me on WhatsApp:</p>
-        ${waButton(ref)}
+        ${m.after}
+        ${waButton(ref, lang)}
         <p>Crochet Handcrafted Shop</p>`),
     });
   } catch (err) {
@@ -409,6 +484,8 @@ async function doConfirm(sql, order, total, fee) {
 // Owner received the deposit
 async function doDeposit(sql, order) {
   const ref = refOf(order.id);
+  const lang = langOf(order);
+  const m = MAIL[lang].deposit(order.name, ref, order.deposit || 0, (order.total || 0) - (order.deposit || 0));
   const { transporter, from, owner } = mailer();
   try {
     await transporter.sendMail({
@@ -416,13 +493,10 @@ async function doDeposit(sql, order) {
       to: order.email,
       bcc: owner,
       replyTo: owner,
-      subject: `Deposit received for order ${ref}: I am starting your order`,
+      subject: m.subject,
       html: WRAP(`
-        <h2 style="color:#c9607f">Thank you, ${esc(order.name)}!</h2>
-        <p>I received your deposit of <strong>${esc(money(order.deposit || 0))}</strong> for order <strong>${esc(ref)}</strong>.</p>
-        <p>I am starting your order now. The remaining balance is <strong>${esc(money((order.total || 0) - (order.deposit || 0)))}</strong>. I will contact you as soon as it is ready.</p>
-        <p>If you have any question, reply to this email or write to me on WhatsApp:</p>
-        ${waButton(ref)}
+        ${m.body}
+        ${waButton(ref, lang)}
         <p>Crochet Handcrafted Shop</p>`),
     });
   } catch (err) {
@@ -435,5 +509,5 @@ async function doDeposit(sql, order) {
 module.exports = {
   PRODUCTS, DELIVERY_FEES, has, esc, clean, money, refOf, userError, db, ensureSchema,
   ensureSocialSchema, validVid, buildStats, buildDownloads, labelOf, resolveProduct: catalog.resolveProduct, priceItems, orderLines, estimateOf, needsQuote, deliveryLabel, resolveConfirm, checkReadyDate, formatDate, todayEAT, addDays, sign, validToken, mailer, siteUrl, waButton,
-  itemsTable, WRAP, doConfirm, doDeposit,
+  itemsTable, WRAP, doConfirm, doDeposit, MAIL, langOf, tr,
 };

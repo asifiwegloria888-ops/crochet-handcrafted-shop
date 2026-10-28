@@ -196,6 +196,11 @@ window.updateCartBadge = function () {
   // the cart can be changed in another tab
   window.addEventListener("storage", function () { window.updateCartBadge(); window.updateFavBadge(); });
 
+  // Language of the site (French built in; other languages with Google Translate)
+  if (document.readyState === "loading") {
+    document.write('<script src="js/lang-fr.js"><\/script><script src="js/i18n.js"><\/script>');
+  }
+
   // Anonymous visit counting for the admin page (not counted on the owner's own device)
   if (!owner) {
     var page = location.pathname.split("/").pop() || "index.html";
