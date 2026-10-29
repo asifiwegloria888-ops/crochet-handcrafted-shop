@@ -26,11 +26,18 @@ var PRODUCTS = {
     sizes: { "Small": 50000, "Medium": 60000, "Large": 80000, "XL": 100000 },
     photos: ["23", "24", "30", "31"]
   },
-  "Small bag": {
+  "Small bag-22": {
     desc: "A small handmade crochet bag.",
     sizes: { "Small": 15000, "Big": 25000 },
     photos: ["22"]
   },
+
+  "Small bag-67": {
+    desc: "A small handmade crochet bag.",
+    sizes: { "Small": 15000, "Big": 25000 },
+    photos: ["67"]
+  },
+  
   "Crochet flower": {
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
