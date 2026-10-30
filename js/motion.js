@@ -1,12 +1,14 @@
 // Soft animations for the whole site, in one file. Nothing to write in your pages except one script line.
 //   1. Blocks (cards, sections) fade in gently when the visitor scrolls down to them.
 //   2. Cards zoom a little when touched or hovered.
-//   3. On the home page, the big photo changes by itself (soft cross-fade).
+//   3. (Only if you ask for it) On the home page, the big photo changes by itself (soft cross-fade).
 //
 // HOW TO USE: add   <script src="js/motion.js"></script>   just before <script src="js/site.js"></script>
 //             in the pages where you want it (index.html, creation.html, album.html...).
-// Home photo: it changes between photos taken from your articles. To choose them yourself, write on the
-//             <div class="home-photo" data-rotate="49,35,34,42"> the numbers of the photos.
+// Home photo: it stays still, unless you write  data-rotate  on the <div class="home-photo">:
+//             <div class="home-photo" data-rotate="49,35,34,42">   -> it changes between these photos
+//             <div class="home-photo" data-rotate="">              -> it changes between photos of your articles
+//             <div class="home-photo">  (or data-rotate="off")      -> it never changes
 // Everything stops by itself for visitors whose phone asks for "reduced motion", and nothing waits for the network.
 (function () {
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -88,6 +90,8 @@
     var holder = document.querySelector(".home-photo");
     var base = holder && holder.querySelector("img");
     if (!base || reduce) return;
+    var asked = holder.getAttribute("data-rotate");
+    if (asked === null || asked.trim().toLowerCase() === "off") return;   // no data-rotate written: the photo stays still
     if (navigator.connection && navigator.connection.saveData) return;   // visitor saves data: the photo stays still
 
     function begin() {
