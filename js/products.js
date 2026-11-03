@@ -323,6 +323,13 @@ var PRODUCTS = {
 
   },
 
+  "Two piece-70":{
+    title: "Two piece",
+    desc: "Two piece items are available. choose your color",
+    sizes: {"Small": 35000,"Medium": 35000,"Large":40000,"XL":50000},
+    photos: ["70"]
+  },
+
   "Two piece-43": {
     title: "Two piece",
     desc: "Two piece items are available. choose your color",
@@ -359,14 +366,14 @@ var PRODUCTS = {
   "Two pieces-61": {
     title: "Two piece",
     desc: "Two piece items are available. choose your color",
-    sizes: {"small": 25000,"large": 25000,"XL": 30000},
+    sizes: {"Small": 35000,"Medium": 35000,"Large":40000,"XL":50000},
     photos: ["61"]
   },
 
   "Two piece-62": { 
     title: "Two piece",
     desc: "Two piece items are available. choose your color",
-    sizes: {"small": 35000,"large": 35000,"XL": 40000},
+    sizes: {"Small": 35000,"Medium": 35000,"Large":40000,"XL":50000},
     photos: ["62"]
   },
 
