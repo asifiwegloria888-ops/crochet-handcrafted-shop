@@ -182,10 +182,10 @@ var PRODUCTS = {
   },
 
 
-  "Dress-31": {
-    title: "Dress",
+  "Short-31": {
+    title: "Short",
     desc: "Handmade to measure. Choose your size and your colors",
-    sizes: { "Small": 70000, "Medium": 80000, "Large": 90000, "XL": 100000 },
+    sizes: { "Small": 40000, "Medium": 45000, "Large": 50000, "XL": 55000 },
     photos: ["31"]
   },
   "Short-23": {
