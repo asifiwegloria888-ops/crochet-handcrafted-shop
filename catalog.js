@@ -16,7 +16,10 @@
     "Small bag":          { leadDays: 7,  cat: "accessoires" },
     "Two-piece":          { leadDays: 14,  cat: "vetements"},
     "Couple outfits":     { leadDays: 20, cat: "vetements"},
-    "Crochet flower":     { leadDays: 7,  cat: "accessoires" }
+    "Crochet flower":     { leadDays: 7,  cat: "accessoires" },
+    "Short":              { leadDays: 7,  cat: "vetements" },
+    "Scarf":              { leadDays: 2,  cat: "vetements" },
+    "Scarf and hat":      { leadDays: 4,  cat: "vetements" }
   };
 
   // used only if products.js has no COLORS list

@@ -18,6 +18,35 @@ var PRODUCTS = {
     sizes: { "Child": 15000, "Adult": 20000 },
     photos: ["3", "27", "29"]
   },
+
+  "Scarf-71": {
+    title: "Scarf",
+    desc: "A handmade scarf in the colors you like.",
+    sizes: { "Small": 15000, "Large": 20000 },
+    photos: ["71"]
+  },
+
+  "Scarf-72": {
+    title: "Scarf",
+    desc: "A handmade scarf in the colors you like.",
+    sizes: { "Small": 15000, "Large": 20000 },
+    photos: ["72"]
+  },
+
+  "Scarf and hat-74": {
+    title: "Scarf and hat",
+    desc: "A handmade scarf and hat in the colors you like.",
+    sizes: { "Small": 30000, "Large": 35000 },
+    photos: ["74"]
+  },
+
+  "Scarf and hat-78": {
+    title: "Scarf and hat",
+    desc: "A handmade scarf and hat in the colors you like.",
+    sizes: { "Small": 30000, "Large": 35000 },
+    photos: ["78"]
+  },
+
   "Crop top": {
     title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
@@ -132,7 +161,7 @@ var PRODUCTS = {
     sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 40000 },
     photos: ["54"]
   },
-  "dress-31": {
+  "Dress-31": {
     title: "Dress",
     desc: "Handmade to measure. Choose your size and your colors",
     sizes: { "Small": 70000, "Medium": 80000, "Large": 90000, "XL": 100000 },
@@ -150,13 +179,13 @@ var PRODUCTS = {
     sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 50000 },
     photos: ["24"]
   },
-  "dress-35": {
+  "Dress-35": {
     title: "Dress",
     desc: "A beautiful dress made with love. Choose your size and color",
     sizes: { "Small": 35000, "Medium": 35000, "Large": 40000, "XL": 45000 },
     photos: ["35"]
   },
-  "dress-34": {
+  "Dress-34": {
     title: "Dress",
     desc: "A beautiful dress made with love. Choose your size and color",
     sizes: { "Small": 60000, "Medium": 60000, "Large": 70000, "XL": 75000 },
@@ -311,6 +340,24 @@ var PRODUCTS = {
     desc: "Two-pieces items are available, choose your color",
     sizes: { "small": 45000, "large": 45000, "XL": 50000 },
     photos: ["46"]
+  },
+  "Short-23": {
+    title: "Short",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    photos: ["23"]
+  },
+  "Short-31": {
+    title: "Short",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    photos: ["31"]
+  },
+  "Short-69": {
+    title: "Short",
+    desc: "Handmade to measure, choose your colors.",
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    photos: ["69"]
   },
   "Shirt-1": {
     title: "Shirt",
