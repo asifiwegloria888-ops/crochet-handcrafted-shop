@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Track my order | Crochet Handcrafted Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tr { max-width: 640px; margin: 0 auto; padding: 0 14px 40px; text-align: left; }
+        .tr label { display: block; font-weight: bold; margin: 14px 0 4px; color: var(--rose-fonce); }
+        .tr input { width: 100%; padding: 12px; border: 1px solid var(--rose); border-radius: 10px; font-size: 1rem; font-family: inherit; background: #fff; box-sizing: border-box; }
+        .tr .hint { font-size: .85rem; color: #7a6a6e; margin: 4px 0 0; text-align: left; }
+        .tr button.submit { margin-top: 16px; }
+        .tr-msg { margin-top: 14px; padding: 10px 14px; border-radius: 10px; background: #fde4e4; color: #9b1c1c; text-align: left; }
+        .tr-msg:empty { display: none; }
+        .tr-card { background: #fff; border-radius: 18px; padding: 22px 18px; margin-top: 22px; box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+        .tr-ref { font-size: 1.2rem; font-weight: bold; color: var(--rose-fonce); margin: 0 0 4px; text-align: center; }
+        .tr-sub { text-align: center; margin: 0 0 22px; color: #7a6a6e; font-size: .9rem; }
+        .tr-track { position: relative; display: flex; justify-content: space-between; margin: 8px 6px 26px; }
+        .tr-line, .tr-fill { position: absolute; top: 19px; left: 19px; height: 4px; border-radius: 2px; }
+        .tr-line { right: 19px; background: #f0d5dd; }
+        .tr-fill { width: 0; background: var(--rose-fonce); transition: width 1.1s cubic-bezier(.2,.9,.2,1) .2s; }
+        .tr-step { position: relative; z-index: 1; width: 25%; text-align: center; }
+        .tr-dot { width: 42px; height: 42px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid #f0d5dd; color: #c4a5af; font-weight: bold; transition: background .4s, border-color .4s, color .4s, transform .4s; }
+        .tr-step.done .tr-dot { background: var(--rose-fonce); border-color: var(--rose-fonce); color: #fff; }
+        .tr-step.now .tr-dot { border-color: var(--rose-fonce); color: var(--rose-fonce); animation: tr-pulse 1.8s ease-out infinite; }
+        .tr-step.done.now .tr-dot { color: #fff; }
+        .tr-name { font-size: .85rem; font-weight: bold; }
+        .tr-date { font-size: .75rem; color: #7a6a6e; margin-top: 2px; }
+        .tr-text { text-align: center; margin: 0; padding: 12px 14px; background: #fff7f2; border-radius: 12px; }
+        .tr-extra { text-align: center; margin: 12px 0 0; font-size: .92rem; }
+        .tr-card.cancel .tr-text { background: #fde4e4; color: #9b1c1c; }
+        @keyframes tr-pulse { 0% { box-shadow: 0 0 0 0 rgba(201,96,127,.45); } 100% { box-shadow: 0 0 0 14px rgba(201,96,127,0); } }
+        @media (prefers-reduced-motion: reduce) { .tr-fill, .tr-dot { transition: none; } .tr-step.now .tr-dot { animation: none; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <p class="site-title"><a href="index.html">crochet handcrafted shop</a></p>
+            <nav class="main-nav" aria-label="main navigation">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="creation.html">Creation</a></li>
+                    <li><a href="album.html">Album</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="order.html">Order</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1>Track my order</h1>
+        <div class="tr">
+            <p>Write the reference you received by email (for example CH-0004) and the email you used for the order.</p>
+            <form id="t-form" novalidate>
+                <label for="t-ref">Order reference</label>
+                <input type="text" id="t-ref" placeholder="CH-0004" autocomplete="off" autocapitalize="characters" required>
+                <label for="t-email">Email</label>
+                <input type="email" id="t-email" autocomplete="email" required>
+                <button type="submit" class="submit" id="t-btn">Show my order</button>
+            </form>
+            <p id="t-msg" class="tr-msg" role="alert"></p>
+            <div id="t-out" hidden></div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
+        <p><a href="contact.html">contact us</a></p>
+    </footer>
+
+    <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      function t(s) { return typeof window.t === "function" ? window.t(s) : s; }
+      var locale = window.SHOP_LANG === "fr" ? "fr-FR" : "en-GB";
+      var STEPS = [["new", "Received", "created_at"], ["confirmed", "Confirmed", "confirmed_at"], ["paid", "Deposit received", "paid_at"], ["done", "Ready", ""]];
+      var TEXT = {
+        "new": "We received your order. I will contact you soon to confirm the price.",
+        "confirmed": "Your order is confirmed. Please send the 50% deposit: the details are in the email I sent you.",
+        "paid": "I received your deposit. I am making your order with love.",
+        "done": "Your order is ready or delivered. Thank you!",
+        "cancelled": "This order was cancelled. If this is a surprise, write to me on WhatsApp."
+      };
+      function day(v, utc) {
+        if (!v) return "";
+        var d = new Date(utc ? v + "T00:00:00Z" : v);
+        if (isNaN(d)) return "";
+        return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: utc ? "UTC" : undefined });
+      }
+      function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; }
+      function node(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+      var q = new URLSearchParams(location.search);
+      if (q.get("ref")) $("t-ref").value = q.get("ref");
+      try { var saved = localStorage.getItem("trackEmail"); if (saved) $("t-email").value = saved; } catch (e) {}
+
+      function show(o) {
+        var out = $("t-out"); out.innerHTML = ""; out.hidden = false;
+        var card = node("div", "tr-card" + (o.status === "cancelled" ? " cancel" : ""));
+        card.appendChild(node("p", "tr-ref", o.ref));
+        if (o.created_at) card.appendChild(node("p", "tr-sub", t("Ordered on") + " " + day(o.created_at)));
+
+        var idx = o.status === "cancelled" ? -1 : Math.max(0, STEPS.map(function (s) { return s[0]; }).indexOf(o.status));
+        if (o.status !== "cancelled") {
+          var track = node("div", "tr-track");
+          track.appendChild(node("div", "tr-line"));
+          var fill = node("div", "tr-fill"); track.appendChild(fill);
+          STEPS.forEach(function (s, i) {
+            var st = node("div", "tr-step" + (i <= idx ? " done" : "") + (i === idx ? " now" : ""));
+            st.appendChild(node("div", "tr-dot", i <= idx ? "\u2713" : String(i + 1)));
+            st.appendChild(node("div", "tr-name", t(s[1])));
+            var when = s[2] ? day(o[s[2]]) : "";
+            if (when && i <= idx) st.appendChild(node("div", "tr-date", when));
+            track.appendChild(st);
+          });
+          card.appendChild(track);
+          setTimeout(function () { fill.style.width = "calc((100% - 38px) * " + (idx / 3) + ")"; }, 60);   // the line fills up
+        }
+        card.appendChild(node("p", "tr-text", t(TEXT[o.status] || TEXT["new"])));
+        if (o.ready_date && o.status !== "cancelled" && o.status !== "done") card.appendChild(node("p", "tr-extra", t("Wanted ready by:") + " " + day(o.ready_date, true)));
+        if (o.status === "confirmed" && o.deposit) card.appendChild(node("p", "tr-extra", t("Deposit to pay now (50%)") + ": " + money(o.deposit)));
+        out.appendChild(card);
+        card.scrollIntoView && card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      $("t-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var msg = $("t-msg"), btn = $("t-btn");
+        msg.textContent = ""; $("t-out").hidden = true;
+        btn.disabled = true;
+        fetch("/api/order-status", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ref: $("t-ref").value, email: $("t-email").value })
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (res.ok && res.j.ok) { try { localStorage.setItem("trackEmail", $("t-email").value.trim()); } catch (e2) {} show(res.j); }
+            else msg.textContent = t(res.j.error || "Something went wrong. Please try again.");
+          })
+          .catch(function () { msg.textContent = t("Network problem. Please try again."); })
+          .then(function () { btn.disabled = false; });
+      });
+      if (q.get("ref") && $("t-email").value) $("t-form").dispatchEvent(new Event("submit", { cancelable: true }));
+    })();
+    </script>
+    <script src="js/site.js"></script>
+    <script src="js/extras.js"></script>
+</body>
+</html>
