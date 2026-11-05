@@ -245,12 +245,21 @@ var PRODUCTS = {
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["25", "26", "29", "52"]
   },
-  "Two-piece": {
+  "Two-piece-46": {
     title: "Two-piece",
     desc: "cute and comfy. choose your color",
     sizes: { "Small": 50000, "Medium": 60000, "Large": 70000, "XL": 90000 },
-    photos: ["46", "43"]
+    photos: ["46"]
   },
+
+  "Two-piece-43": {
+    title: "Two-piece",
+    desc: "cute and comfy. choose your color",
+    sizes: { "Small": 70000, "Medium": 70000, "Large": 80000, "XL": 90000 },
+    photos: ["43"]
+  },
+
+
   "Two-piece-56": {
     title: "Two-piece",
     desc: "cute and comfy. choose your color",
