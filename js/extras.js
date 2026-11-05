@@ -161,7 +161,15 @@
       var share = el("a", "ex-share", '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg><span></span>');
       share.querySelector("span").textContent = t("Share on WhatsApp");
       share.target = "_blank"; share.rel = "noopener";
-      share.href = "https://wa.me/?text=" + encodeURIComponent(title + " - " + location.origin + "/api/share?item=" + encodeURIComponent(id));
+      // the message: name + price in shillings AND dollars (written by the server, in the language of the visitor) + the link
+      var lang = window.SHOP_LANG === "fr" ? "fr" : "en";
+      var link = location.origin + "/api/share?item=" + encodeURIComponent(id) + (lang === "fr" ? "&lang=fr" : "");
+      var setShare = function (text) { share.href = "https://wa.me/?text=" + encodeURIComponent(text + "\n" + link); };
+      setShare(title);
+      fetch("/api/share?item=" + encodeURIComponent(id) + "&lang=" + lang + "&format=json")
+        .then(function (r) { return r.json(); })
+        .then(function (d) { if (d && d.ok && d.text) setShare(d.text); })
+        .catch(function () {});
       add.parentNode.insertBefore(share, add.nextSibling);
     }
     if (isPhone && "IntersectionObserver" in window && $("pd-total")) {

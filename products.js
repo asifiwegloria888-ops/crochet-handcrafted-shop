@@ -19,29 +19,29 @@ var PRODUCTS = {
     photos: ["3", "27", "29"]
   },
 
-  "Scarf-71": {
-    title: "Scarf",
+  "scarf-71": {
+    title: "scarf",
     desc: "A handmade scarf in the colors you like.",
     sizes: { "Small": 15000, "Large": 20000 },
     photos: ["71"]
   },
 
-  "Scarf-72": {
-    title: "Scarf",
+  "scarf-72": {
+    title: "scarf",
     desc: "A handmade scarf in the colors you like.",
     sizes: { "Small": 15000, "Large": 20000 },
     photos: ["72"]
   },
 
-  "Scarf and hat-74": {
-    title: "Scarf and hat",
+  "scarf and hat-74": {
+    title: "scarf and hat",
     desc: "A handmade scarf and hat in the colors you like.",
     sizes: { "Small": 30000, "Large": 35000 },
     photos: ["74"]
   },
 
-  "Scarf and hat-78": {
-    title: "Scarf and hat",
+  "scarf and hat-78": {
+    title: "scarf and hat",
     desc: "A handmade scarf and hat in the colors you like.",
     sizes: { "Small": 30000, "Large": 35000 },
     photos: ["78"]
@@ -124,6 +124,12 @@ var PRODUCTS = {
     desc: "A warm handmade crochet sweater, made to measure.",
     sizes: { "Small": 200000, "Medium": 200000, "Large": 200000, "XL": 210000 },
     photos: ["18"]
+  },
+  "Sweater-79": {
+    title: "Sweater",
+    desc: "A warm handmade crochet sweater, made to measure.",
+    sizes: { "Small": 80000, "XL": 100000 },
+    photos: ["79"]
   },
   "Sweater": {
     title: "Sweater",
