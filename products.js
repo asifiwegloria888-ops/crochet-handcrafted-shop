@@ -33,11 +33,11 @@ var PRODUCTS = {
     photos: ["72"]
   },
 
-  "scarf and hat-74": {
+  "scarf and hat-20": {
     title: "scarf and hat",
     desc: "A handmade scarf and hat in the colors you like.",
     sizes: { "Small": 30000, "Large": 35000 },
-    photos: ["74"]
+    photos: ["20"]
   },
 
   "scarf and hat-78": {
