@@ -38,7 +38,7 @@
     "Three crochet hair scrunchies in yellow, red and olive green": "Trois chouchous au crochet jaune, rouge et vert olive",
 
     // ---------- articles ----------
-    "Scrunchies": "Chouchous","Scarf": "Echarpe","Scarf and hat": "Echarpe et bonnet", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
+    "Scrunchies": "Chouchous","scarf": "Echarpe","scarf and hat": "Echarpe et bonnet", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
     "Skirt": "Jupe", "Small bag": "Petit sac", "Crochet flower": "Fleur au crochet",
     "Small": "Petit (S)", "Medium": "Moyen (M)", "Large": "Grand (L)", "XL": "XL", "Big": "Grand", "Child": "Enfant", "Adult": "Adulte",
     "Black": "Noir", "White": "Blanc", "Red": "Rouge", "Pink": "Rose", "Yellow": "Jaune", "Orange": "Orange", "Blue": "Bleu", "Green": "Vert",
