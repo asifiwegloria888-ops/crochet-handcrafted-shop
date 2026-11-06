@@ -25,34 +25,34 @@ var PRODUCTS = {
   "Bikini-74":{
     title: "Bikini",
     desc: "cute and confy. Many colors are available, tell us your favorite.",
-    price: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["74"]
 
   },
   "Bikini-80":{
     title: "Bikini",
     desc: "cute and confy. Many colors are available, tell us your favorite.",
-    price: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["80"]
   },
   "Bikini-82":{
     title: "Bikini",
     desc: "cute and confy. Many colors are available, tell us your favorite.",
-    price: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
+    sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
     photos: ["82"]
   },
 
   "Bikini-83":{
     title: "Bikini",
     desc: "cute and confy. Many colors are available, tell us your favorite.",
-    price: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
+    sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
     photos: ["83"]
 
   },
   "Bikini-84":{
     title: "Bikini",
     desc: "cute and confy. Many colors are available, tell us your favorite.",
-    price: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["84"]
 
   },
@@ -139,7 +139,7 @@ var PRODUCTS = {
   "Crop top-85":{
     title: "Bikini",
     desc: "Soft and cute. Many colors are available, tell us your favorite.",
-    price: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
+    sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["85"]
 
   },
