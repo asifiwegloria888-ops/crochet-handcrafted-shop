@@ -21,6 +21,40 @@ var PRODUCTS = {
     price: 5000,
     photos: ["55"]
   },
+  "scarf and hat-71": {
+    title: "scarf and hat",
+    desc: "A handmade scarf and hat in the colors you like.",
+    sizes: { "Small": 30000, "Large": 35000 },
+    photos: ["71"]
+  },
+
+  "scarf-72": {
+    title: "scarf",
+    desc: "A handmade scarf in the colors you like.",
+    sizes: { "Small": 15000, "Large": 20000 },
+    photos: ["72"]
+  },
+  
+  "scarf-73": {
+    title: "scarf",
+    desc: "A handmade scarf in the colors you like.",
+    sizes: { "Small": 15000, "Large": 20000 },
+    photos: ["73"]
+  },
+
+  "scarf and hat-20": {
+    title: "scarf and hat",
+    desc: "A handmade scarf and hat in the colors you like.",
+    sizes: { "Small": 30000, "Large": 35000 },
+    photos: ["20"]
+  },
+
+  "scarf and hat-78": {
+    title: "scarf and hat",
+    desc: "A handmade scarf and hat in the colors you like.",
+    sizes: { "Small": 30000, "Large": 35000 },
+    photos: ["78"]
+  },
 
   "Ruffle crochet hat-3": {
     title: "Ruffle crochet hat",
