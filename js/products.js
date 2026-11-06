@@ -127,6 +127,12 @@ var PRODUCTS = {
     sizes: { "Small": 200000, "Medium": 200000, "Large": 200000, "XL": 210000 },
     photos: ["18"]
   },
+  "Sweater-79": {
+    title: "Sweater",
+    desc: "A warm handmade crochet sweater, made to measure.",
+    sizes: { "Small": 80000, "XL": 100000 },
+    photos: ["79"]
+  },
   
   "Sweater-21": {
     title: "Sweater",
@@ -324,10 +330,10 @@ var PRODUCTS = {
     photos: ["70"]
   },
 
-  "Two piece-43": {
-    title: "Two piece",
-    desc: "Two piece items are available. choose your color",
-    sizes: {"Small": 50000,"Medium": 60000,"Large":70000,"XL":90000},
+  "Two-piece-43": {
+    title: "Two-piece",
+    desc: "cute and comfy. choose your color",
+    sizes: { "Small": 70000, "Medium": 70000, "Large": 80000, "XL": 90000 },
     photos: ["43"]
   },
 
