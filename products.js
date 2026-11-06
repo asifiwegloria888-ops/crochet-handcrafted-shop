@@ -16,7 +16,7 @@ var PRODUCTS = {
     title: "Ruffle crochet hat",
     desc: "A handmade ruffle hat in the colors you like.",
     sizes: { "Child": 15000, "Adult": 20000 },
-    photos: ["3", "27", "29"]
+    photos: ["3", "27",]
   },
 
   "scarf-71": {

@@ -36,12 +36,6 @@ var PRODUCTS = {
     photos: ["27"]
   },
 
-  "Ruffle crochet hat-29": {
-    title: "Ruffle crochet hat",
-    desc: "A handmade ruffle hat in the colors you like.",
-    sizes: { "Child": 15000, "Adult": 20000 },
-    photos: ["29"]
-  },
   "Crop top-4": {
     title: "Crop top",
     desc: "Handmade to measure. Choose your size and your colors.",
