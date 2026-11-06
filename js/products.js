@@ -137,7 +137,7 @@ var PRODUCTS = {
     photos: ["9"]
   },
   "Crop top-85":{
-    title: "Bikini",
+    title: "Crop top",
     desc: "Soft and cute. Many colors are available, tell us your favorite.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["85"]
