@@ -33,8 +33,15 @@
     ".produit{position:relative}" +
     ".ex-badge{position:absolute;top:10px;left:10px;z-index:3;padding:4px 12px;border-radius:14px;font-size:.78rem;font-weight:bold;color:#fff;background:#c9607f;box-shadow:0 2px 8px rgba(0,0,0,.25)}" +
     ".ex-badge.love{left:auto;right:10px;background:#e0245e}" +
-    ".ex-share{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0 8px;padding:9px 16px;border-radius:20px;border:2px solid #25D366;color:#1a9c4a!important;background:#fff;font:inherit;font-weight:bold;text-decoration:none;cursor:pointer}" +
-    ".ex-share:hover{background:#25D366;color:#fff!important}" +
+    ".ex-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 4px}" +
+    ".ex-actions #pd-add{margin:0}" +
+    ".ex-share{display:inline-flex;align-items:center;gap:8px;margin:0;padding:9px 18px;border-radius:8px;border:2px solid #c9607f;color:#c9607f!important;background:#fff;font:inherit;font-weight:bold;text-decoration:none;cursor:pointer;box-sizing:border-box}" +
+    ".ex-share:hover{background:#c9607f;color:#fff!important}" +
+    // comment form: the comment on top, then the name and the "Post" button on one line (same width as the comment)
+    "#pd-cform #pd-ctext{width:100%;box-sizing:border-box}" +
+    ".ex-row2{display:flex;align-items:center;gap:8px}" +
+    ".ex-row2 #pd-cname{flex:1;min-width:0}" +
+    ".ex-row2 .ig-post{flex:none;padding:9px 20px!important;border-radius:19px;background:#c9607f!important;color:#fff!important;white-space:nowrap}" +
     ".ex-sticky{position:fixed;left:0;right:0;bottom:0;z-index:48;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));" +
     "background:#fff;box-shadow:0 -4px 16px rgba(0,0,0,.18);transform:translateY(110%);transition:transform .3s ease}" +
     ".ex-sticky.on{transform:none}" +
@@ -170,7 +177,19 @@
         .then(function (r) { return r.json(); })
         .then(function (d) { if (d && d.ok && d.text) setShare(d.text); })
         .catch(function () {});
-      add.parentNode.insertBefore(share, add.nextSibling);
+      var actions = el("div", "ex-actions");                      // "Add to cart" and "Share" side by side
+      add.parentNode.insertBefore(actions, add);
+      actions.appendChild(add);
+      actions.appendChild(share);
+    }
+    var cform = $("pd-cform"), cname = $("pd-cname"), ctext = $("pd-ctext");
+    var cpost = cform && cform.querySelector(".ig-post"), crow = cform && cform.querySelector(".ig-row");
+    if (cform && cname && ctext && cpost && crow) {
+      var row2 = el("div", "ex-row2");
+      cform.insertBefore(ctext, cform.firstChild);                  // the comment first
+      row2.appendChild(cname); row2.appendChild(cpost);             // then the name (optional) and the button
+      cform.insertBefore(row2, crow);
+      crow.remove();
     }
     if (isPhone && "IntersectionObserver" in window && $("pd-total")) {
       var sticky = el("div", "ex-sticky");
