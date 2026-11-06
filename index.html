@@ -14,130 +14,6 @@
     <link rel="stylesheet" href="css/style.css">
     <script>document.documentElement.className+=" tx-pre";setTimeout(function(){document.documentElement.classList.remove("tx-pre")},2500)</script>
     <style>.tx-pre .home-hero .home-text>*,.tx-pre .home-hero .home-photo{opacity:0}</style>
-    <style>
-        /* Styles for the home page only. They use your colors from style.css */
-
-        /* Welcome section: text on the left, big photo on the right */
-        .home-hero {
-            max-width: 1000px;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 48px;
-            align-items: center;
-            padding: 48px 20px 24px;
-        }
-        .home-hero .label {
-            display: inline-block;
-            background: #fff;
-            color: var(--rose-fonce);
-            border: 2px solid var(--rose);
-            border-radius: 20px;
-            padding: 2px 14px;
-            font-size: 0.9rem;
-            margin: 0 0 14px;
-        }
-        .home-hero h1 {
-            text-align: left;
-            font-size: clamp(2rem, 5vw, 3.1rem);
-            line-height: 1.15;
-            margin: 0 0 16px;
-        }
-        .home-hero p { text-align: left; margin: 0 0 24px; }
-        .home-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-        .btn-outline {
-            background: #fff;
-            color: var(--rose-fonce) !important;
-            border: 2px solid var(--rose-fonce);
-            padding: 8px 20px;
-        }
-        .btn-outline:hover { background: var(--rose-fonce); color: #fff !important; }
-
-        .home-photo { padding: 0 14px 14px 0; }
-        .home-photo img {
-            width: 100%;
-            aspect-ratio: 4 / 5;
-            object-fit: cover;
-            margin: 0;
-            border-radius: 220px 220px 24px 24px;
-            box-shadow: 14px 14px 0 var(--rose);
-        }
-
-        /* What we do */
-        .services {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-top: 24px;
-        }
-        .service-card {
-            background: #fff;
-            border-radius: 16px;
-            border-top: 5px solid var(--rose);
-            padding: 24px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-        }
-        .service-card h3 { margin: 0 0 8px; color: var(--rose-fonce); text-align: center; }
-        .service-card p { margin: 0; }
-
-        /* A few creations */
-        .featured {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            margin: 24px 0;
-        }
-        .featured-item {
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding-bottom: 18px;
-        }
-        .featured-item img {
-            width: 100%;
-            height: 240px;
-            object-fit: cover;
-            margin: 0;
-            border-radius: 0;
-            box-shadow: none;
-        }
-        .featured-item h3 { margin: 14px 0 0; color: var(--rose-fonce); }
-        .featured-item .prix { margin: 4px 0 12px; font-weight: bold; }
-        .center { text-align: center; }
-
-        /* About me */
-        .about {
-            max-width: 760px;
-            background: #fff;
-            border-radius: 20px;
-            margin: 24px auto;
-            padding: 8px 28px 28px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Opening hours */
-        .hours {
-            max-width: 860px;
-            margin: 32px auto;
-            background: var(--rose);
-            color: #fff;
-            border-radius: 20px;
-            padding: 8px 20px 28px;
-            text-align: center;
-        }
-        .hours h2 { color: #fff; }
-        .hours h2::after { background: #fff; }
-        .hours p { margin: 0; }
-        .hours a { color: #fff !important; text-decoration: underline; }
-
-        @media (max-width: 760px) {
-            .home-hero { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; text-align: center; }
-            .home-hero h1, .home-hero p { text-align: center; }
-            .home-actions { justify-content: center; }
-            .home-photo { max-width: 380px; margin: 0 auto; }
-        }
-    </style>
 </head>
 <body>
     <header class="site-header">
@@ -217,7 +93,32 @@
             <p class="center"><a class="btn btn-outline" href="creation.html">See all creations</a></p>
         </section>
 
-        
+        <section aria-labelledby="why-heading">
+            <h2 id="why-heading">Why choose us</h2>
+            <div class="why">
+                <article class="why-item">
+                    <span class="why-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
+                    <h3>100% handmade</h3>
+                    <p>Every piece is crocheted by hand with soft, quality yarn.</p>
+                </article>
+                <article class="why-item">
+                    <span class="why-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.3 8.7 15.3 2.7a1 1 0 0 0-1.4 0L2.7 13.9a1 1 0 0 0 0 1.4l6 6a1 1 0 0 0 1.4 0L21.3 10.1a1 1 0 0 0 0-1.4z"/><path d="m7.5 10.5 2 2M10.5 7.5l2 2M13.5 4.5l2 2"/></svg></span>
+                    <h3>Made to measure</h3>
+                    <p>Choose your size and your colors, just the way you like it.</p>
+                </article>
+                <article class="why-item">
+                    <span class="why-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+                    <h3>Pick up or delivery</h3>
+                    <p>Come and get your order, or have it delivered to you.</p>
+                </article>
+                <article class="why-item">
+                    <span class="why-ico"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                    <h3>Simple and safe</h3>
+                    <p>I confirm the price by email, then you send a 50% deposit.</p>
+                </article>
+            </div>
+        </section>
+
         <div id="how-to-order"></div>
 
         <section class="about" aria-labelledby="about-heading">
@@ -235,8 +136,15 @@
     </main>
 
     <footer class="site-footer">
-        <p>&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
-        <p><a href="contact.html">contact us</a></p>
+        <p class="footer-brand">🧶 Crochet Handcrafted Shop</p>
+        <p>Handmade with love</p>
+        <div class="footer-links">
+            <a href="tel:+256791908861">+256 791908861</a>
+            <a href="mailto:asifiwegloria888@gmail.com">asifiwegloria888@gmail.com</a>
+            <a href="https://wa.me/256791908861" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="contact.html">contact us</a>
+        </div>
+        <p class="footer-copy">&copy; 2026 Crochet Handcrafted Shop. All rights reserved.</p>
     </footer>
     <script src="js/main.js"></script>
     <script src="js/strip.js"></script>
