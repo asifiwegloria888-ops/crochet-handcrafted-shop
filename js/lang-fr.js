@@ -38,7 +38,7 @@
     "Three crochet hair scrunchies in yellow, red and olive green": "Trois chouchous au crochet jaune, rouge et vert olive",
 
     // ---------- articles ----------
-    "Scrunchies": "Chouchous", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
+    "Scrunchies": "Chouchous","Scarf": "Echarpe","Scarf and hat": "Echarpe et bonnet", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
     "Skirt": "Jupe", "Small bag": "Petit sac", "Crochet flower": "Fleur au crochet",
     "Small": "Petit (S)", "Medium": "Moyen (M)", "Large": "Grand (L)", "XL": "XL", "Big": "Grand", "Child": "Enfant", "Adult": "Adulte",
     "Black": "Noir", "White": "Blanc", "Red": "Rouge", "Pink": "Rose", "Yellow": "Jaune", "Orange": "Orange", "Blue": "Bleu", "Green": "Vert",
@@ -149,6 +149,7 @@
     // extras: how to order, labels, share, order tracking
     "Back to top": "Retour en haut",
     "Track my order": "Suivre ma commande",
+    "Get yours today": "Procurez-vous le vôtre aujourd'hui",
     "New": "Nouveau",
     "Most loved": "Le plus aimé",
     "Share on WhatsApp": "Partager sur WhatsApp",
@@ -180,8 +181,11 @@
 
     // texts of the cards of the Creation page
     "Skirt are available, choose your color": "Des jupes sont disponibles, choisissez votre couleur",
+    "Get yours today": "Obtenez la vôtre aujourd'hui",
+    "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
     "Shirt for man are available, choose your color": "Des chemises pour hommes sont disponibles, choisissez votre couleur",
     "Beautiful shirt with beautiful colors are available": "De belles chemises aux belles couleurs sont disponibles",
+    "soft and confy. many colors are available, tell us your favorite": "Doux et confortable. De nombreuses couleurs sont disponibles, dites-nous votre préférée",
     "Beautiful crop top with beautiful colors are available": "De beaux crop tops aux belles couleurs sont disponibles",
     "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
     "Get for you one": "Procurez-vous-en une",
@@ -193,6 +197,7 @@
     "Beautiful dress": "Belle robe",
     "Beautiful crochet flower are available": "De belles fleurs au crochet sont disponibles",
     "Beautiful scrunchies": "De beaux chouchous",
+    "Get yours today": "Procurez-vous le vôtre aujourd'hui",
     "Beautiful two piece": "Bel ensemble deux pièces",
     "Beautiful item!": "Bel article !",
     "confy! Handmade to measure, choose your colors!": "Confortable ! Fait main sur mesure, choisissez vos couleurs !",

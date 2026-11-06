@@ -24,34 +24,34 @@ var PRODUCTS = {
 
   "Bikini-74":{
     title: "Bikini",
-    desc: "cute and confy. Many colors are available, tell us your favorite.",
+    desc: "",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["74"]
 
   },
   "Bikini-80":{
     title: "Bikini",
-    desc: "cute and confy. Many colors are available, tell us your favorite.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["80"]
   },
   "Bikini-82":{
     title: "Bikini",
-    desc: "cute and confy. Many colors are available, tell us your favorite.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
     photos: ["82"]
   },
 
   "Bikini-83":{
     title: "Bikini",
-    desc: "cute and confy. Many colors are available, tell us your favorite.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 30000, "Medium": 30000, "Large": 35000, "XL": 35000 },
     photos: ["83"]
 
   },
   "Bikini-84":{
     title: "Bikini",
-    desc: "cute and confy. Many colors are available, tell us your favorite.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["84"]
 
@@ -59,35 +59,35 @@ var PRODUCTS = {
 
   "scarf and hat-71": {
     title: "scarf and hat",
-    desc: "A handmade scarf and hat in the colors you like.",
+    desc: "Handmade to measure. Choose your size and your colors..",
     sizes: { "Small": 30000, "Large": 35000 },
     photos: ["71"]
   },
 
   "scarf-72": {
     title: "scarf",
-    desc: "A handmade scarf in the colors you like.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Large": 20000 },
     photos: ["72"]
   },
   
   "scarf-73": {
     title: "scarf",
-    desc: "A handmade scarf in the colors you like.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 15000, "Large": 20000 },
     photos: ["73"]
   },
 
   "scarf and hat-20": {
     title: "scarf and hat",
-    desc: "A handmade scarf and hat in the colors you like.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 30000, "Large": 35000 },
     photos: ["20"]
   },
 
   "scarf and hat-78": {
     title: "scarf and hat",
-    desc: "A handmade scarf and hat in the colors you like.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 30000, "Large": 35000 },
     photos: ["78"]
   },
@@ -138,7 +138,7 @@ var PRODUCTS = {
   },
   "Crop top-85":{
     title: "Crop top",
-    desc: "Soft and cute. Many colors are available, tell us your favorite.",
+    desc: "Handmade to measure. Choose your size and your colors.",
     sizes: { "Small": 20000, "Medium": 20000, "Large": 25000, "XL": 25000 },
     photos: ["85"]
 
