@@ -433,12 +433,6 @@ var PRODUCTS = {
     sizes: {"small": 30000,"large": 30000,"XL": 35000},
     photos: ["57"]
   },
-  "Two pieces-60": {
-    title: "Two piece",
-    desc: "Two piece items are available. choose your color",
-    sizes: {"small": 25000,"large": 25000,"XL": 30000},
-    photos: ["60"]
-  },
 
   "Two pieces-61": {
     title: "Two piece",
@@ -513,12 +507,6 @@ var PRODUCTS = {
     desc: "Two pieces items are available, choose your color",
     sizes: {"small": 35000,"large": 40000,"XL": 45000},
     photos: ["60"]
-  },
-  "Two piece-46": {
-    title: "Two piece",
-    desc: "Two pieces items are available, choose your color",
-    sizes: {"small": 45000,"large": 45000,"XL": 50000},
-    photos: ["46"]
   },
 
   "Shirt-1": {
