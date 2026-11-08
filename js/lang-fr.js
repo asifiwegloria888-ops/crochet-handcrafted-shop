@@ -243,6 +243,7 @@
     "Please write your review.": "Veuillez écrire votre avis.",
     "review": "avis", "reviews": "avis",
     "1 star": "1 étoile", "2 stars": "2 étoiles", "3 stars": "3 étoiles", "4 stars": "4 étoiles", "5 stars": "5 étoiles",
+    "Get yours today ! 😍": "Prenez la vôtre dès aujourd'hui ! 😍",
     "": ""
 
   };
