@@ -219,7 +219,19 @@
     "Please write the color you want for each item before you order.": "Veuillez écrire la couleur souhaitée pour chaque article avant de commander.",
     "Please write the color you want for each item in your cart before you order.": "Veuillez écrire la couleur souhaitée pour chaque article de votre panier avant de commander.",
     "Please reload the page and try again.": "Veuillez recharger la page et réessayer.",
+        // home page: "Why choose us" + contact page button
+    "Why choose us": "Pourquoi nous choisir",
+    "100% handmade": "100 % fait main",
+    "Every piece is crocheted by hand with soft, quality yarn.": "Chaque pièce est crochetée à la main dans un fil doux et de qualité.",
+    "Made to measure": "Sur mesure",
+    "Choose your size and your colors, just the way you like it.": "Choisissez votre taille et vos couleurs, exactement comme vous l'aimez.",
+    "Pick up or delivery": "Retrait ou livraison",
+    "Come and get your order, or have it delivered to you.": "Venez chercher votre commande, ou faites-vous livrer.",
+    "Simple and safe": "Simple et sécurisé",
+    "I confirm the price by email, then you send a 50% deposit.": "Je confirme le prix par email, puis vous envoyez un acompte de 50 %.",
+    "Call": "Appeler",
     "": ""
+
   };
   delete EXACT[""];
 
