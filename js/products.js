@@ -193,7 +193,7 @@ var PRODUCTS = {
   
   "Crop-top-37": {
     title: "Crop top",
-    desc: "choose your favotite color",
+    desc: "choose your favorite color",
     sizes: {"Small": 10000,"Medium": 10000,"Large": 15000,"XL": 20000},
     photos: ["37"]
   },
@@ -366,7 +366,7 @@ var PRODUCTS = {
   },
 
   "Crochet flower-25": {
-    title: "Crochet flowerg",
+    title: "Crochet flower",
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["25"]
@@ -484,14 +484,14 @@ var PRODUCTS = {
 
   "Skirt-45": {
     title: "Skirt",
-    desc: "Skirt are available, choose your color",
+    desc: "Skirts are available, choose your color",
     sizes: {"small": 20000,"large": 20000,"XL": 25000},
     photos: ["45"]
   },
 
   "Skirt-41": {
     title: "Skirt",
-    desc: "Skirt are available, choose your color",
+    desc: "Skirts are available, choose your color",
     sizes: {"small": 30000,"large": 30000,"XL": 35000},
     photos: ["41"]
   },
