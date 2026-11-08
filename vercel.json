@@ -1,4 +1,8 @@
 {
+  "redirects": [
+    { "source": "/album.html", "destination": "/creation.html", "permanent": true },
+    { "source": "/album", "destination": "/creation.html", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/js/(.*)",
