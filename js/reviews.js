@@ -76,7 +76,7 @@
       .then(function (res) {
         if (!res.ok || !res.data.ok) throw new Error(res.data.error || "Something went wrong.");
         form.reset();
-        showStatus("Thank you! ", "success");
+        showStatus("Thank you!", "success");
       })
       .catch(function (err) {
         showStatus(err && err.message && err.message !== "Failed to fetch" ? err.message : "Network problem. Please try again.", "error");
