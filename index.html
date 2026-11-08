@@ -119,6 +119,34 @@
             </div>
         </section>
 
+        <section class="reviews" aria-labelledby="reviews-heading">
+            <h2 id="reviews-heading">Customer reviews</h2>
+            <p class="reviews-sum" id="reviews-sum"></p>
+            <div class="reviews-list" id="reviews-list"></div>
+
+            <form class="review-form" id="review-form" novalidate>
+                <h3>Leave a review</h3>
+                <fieldset class="stars-field">
+                    <legend>Your rating</legend>
+                    <div class="stars">
+                        <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars"><span class="sr-only">5 stars</span>&#9733;</label>
+                        <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><span class="sr-only">4 stars</span>&#9733;</label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><span class="sr-only">3 stars</span>&#9733;</label>
+                        <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><span class="sr-only">2 stars</span>&#9733;</label>
+                        <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><span class="sr-only">1 star</span>&#9733;</label>
+                    </div>
+                </fieldset>
+                <input type="text" name="name" maxlength="40" placeholder="Your name" aria-label="Your name" autocomplete="name">
+                <textarea name="body" rows="4" maxlength="500" placeholder="Share your experience..." aria-label="Your review"></textarea>
+                <div class="hp" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+                    <label for="review-website">Website</label>
+                    <input type="text" id="review-website" name="website" tabindex="-1" autocomplete="off">
+                </div>
+                <button type="submit">Send my review</button>
+                <p id="review-status" class="review-status" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+
         <div id="how-to-order"></div>
 
         <section class="about" aria-labelledby="about-heading">
