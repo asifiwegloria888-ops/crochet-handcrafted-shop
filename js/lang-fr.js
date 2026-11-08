@@ -230,6 +230,19 @@
     "Simple and safe": "Simple et sécurisé",
     "I confirm the price by email, then you send a 50% deposit.": "Je confirme le prix par email, puis vous envoyez un acompte de 50 %.",
     "Call": "Appeler",
+        // customer reviews
+    "Customer reviews": "Avis des clients",
+    "Leave a review": "Laisser un avis",
+    "Your rating": "Votre note",
+    "Your review": "Votre avis",
+    "Share your experience...": "Partagez votre expérience...",
+    "Send my review": "Envoyer mon avis",
+    "No reviews yet. Be the first to share your experience!": "Pas encore d'avis. Soyez le premier à partager votre expérience !",
+    "Thank you! Your review will appear after I approve it.": "Merci ! Votre avis apparaîtra après mon approbation.",
+    "Please choose a rating from 1 to 5 stars.": "Veuillez choisir une note de 1 à 5 étoiles.",
+    "Please write your review.": "Veuillez écrire votre avis.",
+    "review": "avis", "reviews": "avis",
+    "1 star": "1 étoile", "2 stars": "2 étoiles", "3 stars": "3 étoiles", "4 stars": "4 étoiles", "5 stars": "5 étoiles",
     "": ""
 
   };
