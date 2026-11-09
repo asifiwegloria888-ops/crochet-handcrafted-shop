@@ -1,15 +1,19 @@
-// Page Creation: a click on a photo opens it big (like Instagram). Click it again to zoom, move to look around.
+// Pages Creation and Article (product.html): a click on a photo opens it big (like Instagram).
+// Click it again to zoom, move to look around.
 // Close with the cross at the top, the Escape key, or a click outside the photo.
-// Nothing else of the cards changes (price, sizes, colors, buttons stay as they are).
-// Add it to creation.html AFTER js/extras.js:   <script src="js/photo-viewer.js"></script>
+// Nothing else of the pages changes (price, sizes, colors, buttons, thumbnails stay as they are).
+// Add it to creation.html AND product.html AFTER js/extras.js:   <script src="js/photo-viewer.js"></script>
 (function () {
-  if (!document.querySelector(".grille")) return;
+  if (!document.querySelector(".grille") && !document.getElementById("pd-main")) return;
+
+  // the photos that open in the viewer: the cards of the Creation page, the big photo of an article page
+  var PHOTOS = ".grille .produit img, #pd-main";
 
   function t(s) { return typeof window.t === "function" ? window.t(s) : s; }   // French when the site is in French
 
   var css = document.createElement("style");
   css.textContent =
-    ".grille .produit img{cursor:zoom-in}" +
+    ".grille .produit img,#pd-main{cursor:zoom-in}" +
     ".pv{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;background:rgba(24,12,17,.93);overflow:hidden;overscroll-behavior:contain}" +
     ".pv.on{display:flex}" +
     ".pv-img{display:block;max-width:94vw;max-height:88vh;width:auto;height:auto;object-fit:contain;margin:0!important;border-radius:12px;box-shadow:none!important;cursor:zoom-in;transition:transform .25s ease;user-select:none;-webkit-user-drag:none}" +
@@ -80,8 +84,8 @@
   // a click on a photo of a card opens the viewer (runs before the page fade and before any link around the photo)
   document.addEventListener("click", function (e) {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    var img = e.target.closest ? e.target.closest(".grille .produit img") : null;
-    if (!img) return;
+    var img = e.target.closest ? e.target.closest(PHOTOS) : null;
+    if (!img || !(img.currentSrc || img.getAttribute("src"))) return;
     e.preventDefault();
     e.stopPropagation();
     open(img.currentSrc || img.src, img.alt);
