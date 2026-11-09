@@ -71,7 +71,7 @@
 
     // ---------- contact ----------
     "Contact Information": "Coordonnées", "Contact me": "Me contacter", "contact me": "me contacter",
-    "If you have any questions or would like to place an order, feel free to reach out!": "Pour toute question ou pour passer une commande, n'hésitez pas à me contacter !",
+    "If you have any questions or would like to place an order, feel free to reach out!": "Pour toute question ou pour passer une commande, n'hésitez pas à n contacter !",
     "Address:": "Adresse :", "telephone:": "téléphone :", "Email:": "Email :", "Email": "Email", "Name": "Nom", "Message": "Message", "Website": "Site web",
     "Send us a message": "Envoyez-nous un message", "Send Message": "Envoyer le message", "Send message": "Envoyer le message",
     "sunday - friday : 8 am- 8pm": "dimanche - vendredi : 8 h - 20 h",
