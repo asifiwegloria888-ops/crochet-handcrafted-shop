@@ -31,6 +31,15 @@
         .tr-text { text-align: center; margin: 0; padding: 12px 14px; background: #fff7f2; border-radius: 12px; }
         .tr-extra { text-align: center; margin: 12px 0 0; font-size: .92rem; }
         .tr-card.cancel .tr-text { background: #fde4e4; color: #9b1c1c; }
+        .tr-pay { margin-top: 16px; padding: 16px 14px; border: 2px dashed var(--rose); border-radius: 14px; background: #fffafc; text-align: left; }
+        .tr-pay h3 { margin: 0 0 10px; color: var(--rose-fonce); font-size: 1.05rem; text-align: left; }
+        .tr-pay .tr-line2 { display: flex; justify-content: space-between; gap: 10px; margin: 4px 0; font-size: .95rem; }
+        .tr-pay .tr-line2 b { text-align: right; }
+        .tr-pay .tr-box { margin: 12px 0; padding: 12px; background: #fff; border-radius: 10px; border: 1px solid #f0d5dd; white-space: pre-line; word-break: break-word; text-align: left; font-weight: bold; }
+        .tr-pay .tr-hint2 { margin: 6px 0 0; font-size: .85rem; color: #7a6a6e; text-align: left; }
+        .tr-pay .tr-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .tr-pay .tr-copy { all: unset; box-sizing: border-box; display: inline-block !important; padding: 10px 16px !important; border: 2px solid #c9607f !important; border-radius: 999px !important; background: #fff !important; color: #9e3c5a !important; -webkit-text-fill-color: #9e3c5a !important; font-family: inherit; font-size: .92rem !important; font-weight: bold; line-height: 1.2 !important; text-align: center; cursor: pointer; }
+        .tr-pay .tr-copy.ok { background: #c9607f !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
         @keyframes tr-pulse { 0% { box-shadow: 0 0 0 0 rgba(201,96,127,.45); } 100% { box-shadow: 0 0 0 14px rgba(201,96,127,0); } }
         @media (prefers-reduced-motion: reduce) { .tr-fill, .tr-dot { transition: none; } .tr-step.now .tr-dot { animation: none; } }
     </style>
@@ -98,6 +107,89 @@
       if (q.get("ref")) $("t-ref").value = q.get("ref");
       try { var saved = localStorage.getItem("trackEmail"); if (saved) $("t-email").value = saved; } catch (e) {}
 
+      // ---------- Payment instructions (shown only when the order is "confirmed") ----------
+      var FR = window.SHOP_LANG === "fr";
+      var PAY = FR ? {
+        intro: "Votre commande est confirmée. Merci d'envoyer l'acompte de 50 % avec les informations ci-dessous.",
+        title: "Comment payer l'acompte",
+        deposit: "Acompte à payer maintenant (50 %)",
+        balance: "Reste à payer",
+        ref: "Référence du paiement",
+        refHint: "Écrivez cette référence quand vous payez.",
+        copyNum: "Copier le numéro", copyRef: "Copier la référence", copyAll: "Copier les informations",
+        copied: "Copié ✓",
+        after: "Après le paiement, répondez à l'email que je vous ai envoyé avec l'identifiant de la transaction ou une capture d'écran, ou écrivez-moi sur WhatsApp."
+      } : {
+        intro: "Your order is confirmed. Please send the 50% deposit with the details below.",
+        title: "How to pay your deposit",
+        deposit: "Deposit to pay now (50%)",
+        balance: "Remaining balance",
+        ref: "Payment reference",
+        refHint: "Write this reference when you pay.",
+        copyNum: "Copy number", copyRef: "Copy reference", copyAll: "Copy details",
+        copied: "Copied ✓",
+        after: "After paying, reply to the email I sent you with the transaction ID or a screenshot, or write to me on WhatsApp."
+      };
+
+      // first phone-like number in the instructions (9 to 15 digits), without spaces
+      function findNumber(txt) {
+        var list = String(txt).match(/\+?\d[\d ]{7,}\d/g) || [];
+        for (var i = 0; i < list.length; i++) {
+          var d = list[i].replace(/[^\d+]/g, "");
+          var n = d.replace("+", "").length;
+          if (n >= 9 && n <= 15) return d;
+        }
+        return "";
+      }
+
+      function copyText(text, btn, label) {
+        function done() {
+          btn.textContent = PAY.copied; btn.classList.add("ok");
+          setTimeout(function () { btn.textContent = label; btn.classList.remove("ok"); }, 1800);
+        }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); done(); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+        else fallback();
+      }
+
+      function copyButton(label, text) {
+        var b = node("button", "tr-copy", label);
+        b.type = "button";
+        b.addEventListener("click", function () { copyText(text, b, label); });
+        return b;
+      }
+
+      function payBox(o) {
+        var box = node("div", "tr-pay");
+        box.appendChild(node("h3", "", PAY.title));
+        var l1 = node("div", "tr-line2"); l1.appendChild(node("span", "", PAY.deposit)); l1.appendChild(node("b", "", money(o.deposit)));
+        box.appendChild(l1);
+        if (o.pay.balance != null) {
+          var l2 = node("div", "tr-line2"); l2.appendChild(node("span", "", PAY.balance)); l2.appendChild(node("b", "", money(o.pay.balance)));
+          box.appendChild(l2);
+        }
+        var info = node("div", "tr-box", o.pay.instructions);
+        info.setAttribute("data-no-i18n", "");   // your own text: never translated or changed
+        box.appendChild(info);
+        var l3 = node("div", "tr-line2"); l3.appendChild(node("span", "", PAY.ref)); var rb = node("b", "", o.ref); rb.setAttribute("data-no-i18n", ""); l3.appendChild(rb);
+        box.appendChild(l3);
+        box.appendChild(node("p", "tr-hint2", PAY.refHint));
+        var btns = node("div", "tr-btns");
+        var num = findNumber(o.pay.instructions);
+        if (num) btns.appendChild(copyButton(PAY.copyNum, num));
+        else btns.appendChild(copyButton(PAY.copyAll, o.pay.instructions));
+        btns.appendChild(copyButton(PAY.copyRef, o.ref));
+        box.appendChild(btns);
+        box.appendChild(node("p", "tr-hint2", PAY.after));
+        return box;
+      }
+
       function show(o) {
         var out = $("t-out"); out.innerHTML = ""; out.hidden = false;
         var card = node("div", "tr-card" + (o.status === "cancelled" ? " cancel" : ""));
@@ -122,7 +214,12 @@
         }
         card.appendChild(node("p", "tr-text", t(TEXT[o.status] || TEXT["new"])));
         if (o.ready_date && o.status !== "cancelled" && o.status !== "done") card.appendChild(node("p", "tr-extra", t("Wanted ready by:") + " " + day(o.ready_date, true)));
-        if (o.status === "confirmed" && o.deposit) card.appendChild(node("p", "tr-extra", t("Deposit to pay now (50%)") + ": " + money(o.deposit)));
+        if (o.status === "confirmed" && o.pay && o.pay.instructions && o.deposit) {
+          card.querySelector(".tr-text").textContent = PAY.intro;
+          card.appendChild(payBox(o));
+        } else if (o.status === "confirmed" && o.deposit) {
+          card.appendChild(node("p", "tr-extra", t("Deposit to pay now (50%)") + ": " + money(o.deposit)));
+        }
         out.appendChild(card);
         card.scrollIntoView && card.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }

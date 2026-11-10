@@ -1,5 +1,7 @@
 // POST /api/order-status  {ref: "CH-0004", email: "..."}  ->  where the customer's order stands.
 // The reference alone is not enough (references are easy to guess): the email used for the order must match too.
+// When the order is "confirmed", the answer also carries the payment instructions (variable PAYMENT_INSTRUCTIONS in Vercel),
+// so the customer can pay the deposit straight from the tracking page.
 
 const L = require("./_lib");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -26,6 +28,14 @@ module.exports = async (req, res) => {
       await sleep(700); // slows down people who try to guess
       return res.status(404).json({ error: "We could not find this order. Please check the reference and the email." });
     }
+
+    // Payment details: only after the reference AND the email matched, and only while the order waits for its deposit.
+    const instructions = (process.env.PAYMENT_INSTRUCTIONS || "").trim();
+    const pay =
+      o.status === "confirmed" && instructions
+        ? { instructions, balance: o.total != null && o.deposit != null ? o.total - o.deposit : null }
+        : null;
+
     return res.status(200).json({
       ok: true,
       ref: L.refOf(o.id),
@@ -36,6 +46,7 @@ module.exports = async (req, res) => {
       ready_date: o.ready_date || "",
       total: o.total,
       deposit: o.deposit,
+      pay,
     });
   } catch (err) {
     console.error("Order status error:", err);
