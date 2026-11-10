@@ -7,6 +7,22 @@
   var grid = document.querySelector(".grille");
   if (!grid || typeof PRODUCTS === "undefined") return;
 
+  /* ---------- Style (inside this file, so only ONE file has to be updated) ---------- */
+  var css = document.createElement("style");
+  css.textContent = [
+    ".filtres{display:none}",
+    ".bx-tools{margin:16px 0}",
+    ".bx-tools .bx-search{display:block;width:100%!important;max-width:none!important;box-sizing:border-box;padding:12px 14px;font-size:16px;border:1px solid #e8a0b4;border-radius:10px;background:#fff;color:#3a2f33}",
+    ".bx-tools .bx-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}",
+    ".bx-tools .bx-row select{flex:1 1 150px;width:auto;box-sizing:border-box;padding:10px;font-size:16px;border:1px solid #e8a0b4;border-radius:10px;background:#fff;color:#3a2f33}",
+    ".bx-tools .bx-types{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}",
+    ".bx-tools .bx-chip{all:unset;box-sizing:border-box;display:inline-block!important;width:auto!important;height:auto!important;min-width:0!important;padding:8px 14px!important;border:1px solid #c9607f!important;border-radius:999px!important;background:#fff!important;color:#9e3c5a!important;font-family:inherit;font-size:14px!important;font-weight:bold;line-height:1.2!important;text-indent:0!important;text-align:center;white-space:nowrap;cursor:pointer;-webkit-text-fill-color:#9e3c5a!important}",
+    ".bx-tools .bx-chip.bx-on{background:#c9607f!important;color:#fff!important;-webkit-text-fill-color:#fff!important}",
+    ".bx-tools .bx-count{margin:8px 0;font-size:14px}",
+    ".bx-tools .bx-reset{all:unset;margin-left:8px;color:#c9607f;font-weight:bold;text-decoration:underline;cursor:pointer}"
+  ].join("\n");
+  document.head.appendChild(css);
+
   /* ---------- Texts (English / French) ---------- */
   var T = {
     en: {
