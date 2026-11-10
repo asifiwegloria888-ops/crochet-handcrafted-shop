@@ -190,9 +190,9 @@
     }).join("");
     elPrice.value = state.range;
 
-    var html = '<button type="button" data-type="all">' + t.all + " (" + cards.length + ")</button>";
+    var html = '<button type="button" class="bx-chip" data-type="all">' + t.all + "</button>";
     keys.forEach(function (k) {
-      html += '<button type="button" data-type="' + k + '">' + typeLabel(k, l) + " (" + counts[k] + ")</button>";
+      html += '<button type="button" class="bx-chip" data-type="' + k + '">' + typeLabel(k, l) + "</button>";
     });
     elTypes.innerHTML = html;
 
@@ -241,7 +241,9 @@
     sorted.forEach(function (c) { grid.appendChild(c.el); });
 
     Array.prototype.forEach.call(elTypes.querySelectorAll("button"), function (b) {
-      b.className = b.getAttribute("data-type") === state.type ? "bx-on" : "";
+      var on = b.getAttribute("data-type") === state.type;
+      b.className = on ? "bx-chip bx-on" : "bx-chip";
+      b.setAttribute("aria-pressed", on ? "true" : "false");
     });
 
     var active = state.q || state.type !== "all" || state.sort !== "default" || state.range !== "all";

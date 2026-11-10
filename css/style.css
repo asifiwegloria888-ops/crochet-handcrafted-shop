@@ -481,18 +481,17 @@ footer a { color: #fff; font-weight: 600; }
 .review-status.error { background: #fde4e4; color: #9b1c1c; padding: 10px 14px; border-radius: 10px; }
 .review-form button:disabled { opacity: 0.6; cursor: wait; }
 
-/* Recherche et filtres */
+/* Recherche et filtres (version 2) */
 .filtres { display: none; }
 .bx-tools { margin: 16px 0; }
-.bx-search { width: 100%; box-sizing: border-box; padding: 12px 14px; font-size: 16px; border: 1px solid #ccc; border-radius: 10px; }
-.bx-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-.bx-row select { flex: 1 1 140px; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 10px; background: #fff; }
-.bx-types { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
-.bx-types button { padding: 8px 12px; border: 1px solid #ccc; border-radius: 999px; background: #fff; font-size: 14px; cursor: pointer; }
-.bx-types button.bx-on { background: #333; color: #fff; border-color: #333; }
-.bx-count { margin: 8px 0; font-size: 14px; }
-.bx-reset { margin-left: 8px; border: 0; background: none; text-decoration: underline; cursor: pointer; }
-.bx-price-tag { font-weight: bold; margin: 6px 0; }
+.bx-tools .bx-search { display: block; width: 100% !important; max-width: none !important; box-sizing: border-box; padding: 12px 14px; font-size: 16px; border: 1px solid #e8a0b4; border-radius: 10px; background: #fff; color: #3a2f33; }
+.bx-tools .bx-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.bx-tools .bx-row select { flex: 1 1 150px; width: auto; box-sizing: border-box; padding: 10px; font-size: 16px; border: 1px solid #e8a0b4; border-radius: 10px; background: #fff; color: #3a2f33; }
+.bx-tools .bx-types { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+.bx-tools .bx-chip { all: unset; box-sizing: border-box; display: inline-block !important; width: auto !important; height: auto !important; min-width: 0 !important; padding: 8px 14px !important; border: 1px solid #c9607f !important; border-radius: 999px !important; background: #fff !important; color: #9e3c5a !important; font-family: inherit; font-size: 14px !important; font-weight: bold; line-height: 1.2 !important; text-indent: 0 !important; text-align: center; white-space: nowrap; cursor: pointer; }
+.bx-tools .bx-chip.bx-on { background: #c9607f !important; color: #fff !important; }
+.bx-tools .bx-count { margin: 8px 0; font-size: 14px; }
+.bx-tools .bx-reset { all: unset; margin-left: 8px; color: #c9607f; font-weight: bold; text-decoration: underline; cursor: pointer; }
 /* ---------- Mobile ---------- */
 @media (max-width: 760px) {
   .home-hero { grid-template-columns: 1fr; gap: 28px; padding-top: 24px; text-align: center; }
