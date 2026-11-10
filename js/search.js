@@ -134,18 +134,11 @@
     var prices = p ? pricesOf(p) : [];
     var min = prices.length ? Math.min.apply(null, prices) : null;
     var max = prices.length ? Math.max.apply(null, prices) : null;
-    var tag = document.createElement("p");
-    tag.className = "bx-price-tag";
-    var infos = el.querySelector(".infos");
-    var btn = infos && infos.querySelector(".btn");
-    if (infos) infos.insertBefore(tag, btn || null);
     return {
       el: el,
       index: i,
       key: typeKey(p ? p.title : (h3 ? h3.textContent : "")),
       min: min,
-      range: min !== null && max !== min,
-      tag: tag,
       own: norm((h3 ? h3.textContent : "") + " " + (d ? d.textContent : "") + " " + (p ? p.desc : ""))
     };
   });
@@ -204,8 +197,6 @@
     elTypes.innerHTML = html;
 
     cards.forEach(function (c) {
-      c.tag.textContent = c.min === null ? "" :
-        (c.range ? t.from + " " : "") + fmt(c.min, l) + " " + t.cur;
       // search words in both languages, so "robe" and "dress" both work
       var tp = TYPES[c.key];
       c.text = c.own + " " + norm(tp ? tp.en + " " + tp.fr : c.key);
