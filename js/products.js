@@ -546,8 +546,11 @@ var PRODUCTS = {
 // Delivery options: the key is what the customer picks, the value is the fee in UGX.
 // "Delivery" has no fixed fee (null): the customer types his address and YOU tell him the price when you confirm.
 var DELIVERY_FEES = { "Pickup": 0, "Delivery": null };
+// Exchange rate: shillings for 1 dollar. The server uses it for the link preview (api/share.js).
+// Keep the same number as UGX_PER_USD in js/i18n.js.
+var USD_RATE = 3700;
 
 // Lets the server (Node) use this same file. The browser ignores this line.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { PRODUCTS: PRODUCTS, DELIVERY_FEES: DELIVERY_FEES };
+  module.exports = { PRODUCTS: PRODUCTS, DELIVERY_FEES: DELIVERY_FEES, USD_RATE: USD_RATE };
 }
