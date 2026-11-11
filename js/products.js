@@ -191,7 +191,7 @@ var PRODUCTS = {
     photos: ["16"]
   },
   
-  "Crop-top-37": {
+  "Crop top-37": {
     title: "Crop top",
     desc: "choose your favorite color",
     sizes: {"Small": 10000,"Medium": 10000,"Large": 15000,"XL": 20000},
@@ -372,21 +372,21 @@ var PRODUCTS = {
     photos: ["25"]
   },
 
-  "Crochet flower26": {
-    title: "Crochet flowerg",
+  "Crochet flower-26": {
+    title: "Crochet flower",
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["26"]
   },
   "Crochet flower-29": {
-    title: "Crochet flowerg",
+    title: "Crochet flower",
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["29"]
   },
 
   "Crochet flower-52": {
-    title: "Crochet flowerg",
+    title: "Crochet flower",
     desc: "Handmade crochet flowers, choose your colors.",
     sizes: { "Small": 50000, "Big": 80000 },
     photos: ["52"]
@@ -407,8 +407,8 @@ var PRODUCTS = {
     photos: ["70"]
   },
 
-  "Two-piece-43": {
-    title: "Two-piece",
+  "Two piece-43": {
+    title: "Two piece",
     desc: "cute and comfy. choose your color",
     sizes: { "Small": 70000, "Medium": 70000, "Large": 80000, "XL": 90000 },
     photos: ["43"]
@@ -420,7 +420,7 @@ var PRODUCTS = {
     sizes: {"Small": 30000,"Medium": 30000,"Large":35000,"XL":35000},
     photos: ["56"]
   },
-  "Two piece 42": {
+  "Two piece-42": {
     title: "Two piece",
     desc: "Two piece items are available. choose your color",
     sizes: {"small": 40000,"large": 45000,"XL": 50000},

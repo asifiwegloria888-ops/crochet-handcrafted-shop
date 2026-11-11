@@ -2,6 +2,7 @@
 // 1) checks everything  2) computes the prices itself  3) saves in the database  4) emails customer and owner
 
 const L = require("./_lib");
+const notifyOwner = require("./_notify");
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -64,6 +65,14 @@ module.exports = async (req, res) => {
   }
   const reference = L.refOf(order.id);
 
+  // ---- Phone notification (ntfy). Started now, runs while the emails are sent. No customer name in it, only the reference. ----
+  const site0 = L.siteUrl();
+  const notified = notifyOwner({
+    title: "Nouvelle commande " + reference,
+    message: "Ouvre ton admin pour la confirmer.",
+    click: site0 ? site0 + "/admin.html" : undefined,
+  });
+
   // ---- 2. Emails (the order is already saved, so an email problem never loses it) ----
   let customerEmailSent = false;
   try {
@@ -125,6 +134,8 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error("Email setup error:", err);
   }
+
+  await notified; // never throws; Vercel must not stop the function before the notification has left
 
   return res.status(200).json({ ok: true, reference, emailSent: customerEmailSent });
 };
