@@ -1,0 +1,13 @@
+# Crochet Handcrafted Shop: what Google may visit
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /cart.html
+Disallow: /order.html
+Disallow: /track-order.html
+Disallow: /favorites.html
+# the link preview of an article (WhatsApp, Facebook) stays open
+Allow: /api/share
+Disallow: /api/
+
+Sitemap: https://glo-crochet.vercel.app/sitemap.xml
