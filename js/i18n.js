@@ -5,7 +5,8 @@
 
 (function () {
   var LANGS = [["en", "English"], ["fr", "Français"], ["sw", "Kiswahili"], ["lg", "Luganda"], ["ln", "Lingála"], ["rw", "Kinyarwanda"],
-    ["ar", "العربية"], ["es", "Español"], ["pt", "Português"], ["de", "Deutsch"], ["it", "Italiano"], ["zh-CN", "中文"]];
+    ["ar", "العربية"], ["es", "Español"], ["pt", "Português"], ["de", "Deutsch"], ["it", "Italiano"], ["zh-CN", "中文"],
+    ["rn", "Kirundi"], ["am", "አማርኛ"], ["so", "Soomaali"], ["hi", "हिन्दी"], ["tr", "Türkçe"], ["ru", "Русский"], ["nl", "Nederlands"]];
   var known = {};
   LANGS.forEach(function (l) { known[l[0].toLowerCase()] = l[0]; });
 
