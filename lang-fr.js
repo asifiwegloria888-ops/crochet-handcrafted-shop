@@ -20,12 +20,12 @@
     // ---------- home page ----------
     "Welcome to Crochet Handcrafted Shop": "Bienvenue chez Crochet Handcrafted Shop",
     "Handmade with love": "Fait main avec amour",
-    "Welcome to my little corner of handmade crochet treasures. Every piece here is lovingly crafted by hand, from cozy blankets to delicate accessories.":
-      "Bienvenue dans mon petit coin de trésors faits main au crochet. Chaque pièce est confectionnée à la main avec amour, des couvertures douillettes aux accessoires délicats.",
+    "Welcome to my little corner of handmade crochet treasures. Every piece here is lovingly crafted by hand, from sweater to delicate accessories.":
+      "Bienvenue dans mon petit coin de trésors faits main au crochet. Chaque pièce est confectionnée à la main avec amour, des tricots aux accessoires délicats.",
     "Order now": "Commander", "ORDER NOW": "COMMANDER", "Browse our creations": "Découvrir nos créations", "See all creations": "Voir toutes les créations",
     "What we do": "Ce que nous faisons", "Handmade crochet creations": "Créations au crochet faites main",
-    "Cozy blankets, cute baby hats, tote bags, skirts, dresses, crop tops and many more. Each lovingly crafted by hand with soft, quality yarn.":
-      "Couvertures douillettes, jolis bonnets pour bébé, sacs cabas, jupes, robes, hauts courts et bien d'autres choses. Chaque pièce est faite à la main avec amour, dans un fil doux et de qualité.",
+    "Sweater, shirt, short, skirts, dresses, crop tops and many more. Each lovingly crafted by hand with soft, quality yarn.":
+      "Tricots, chemises, culottes, jupes, robes, hauts courts et bien d'autres choses. Chaque pièce est faite à la main avec amour, dans un fil doux et de qualité.",
     "Custom orders & accessories": "Commandes sur mesure et accessoires",
     "Choose your colors, size, and style. I also make hair accessories, hair scrunchies, and home decor, made just for you.":
       "Choisissez vos couleurs, votre taille et votre style. Je réalise aussi des accessoires pour cheveux, des chouchous et de la décoration d'intérieur, faits rien que pour vous.",
