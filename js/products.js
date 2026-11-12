@@ -241,7 +241,7 @@ var PRODUCTS = {
   "Dress-51": {
     title: "Dress",
     desc: "Handmade to measure, choose your colors.",
-    sizes: { "Small": 60000, "Medium": 65000, "Large": 70000, "XL": 70000 },
+    sizes: { "Small": 80000, "Medium": 85000, "Large": 90000, "XL": 95000 },
     photos: ["51"]
   },
   "Dress-53": {
