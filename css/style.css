@@ -362,7 +362,20 @@ footer a { color: #fff; font-weight: 600; }
 }
 .featured-item h3 { margin: 14px 0 0; color: var(--rose-fonce); }
 .featured-item .prix { margin: 4px 0 12px; font-weight: 700; }
+.featured-item a.featured-img { display: block; }
+.size-link { margin-top: 6px; }
 .center { text-align: center; }
+
+/* Size guide page */
+.size-wrap { overflow-x: auto; margin: 20px 0; border-radius: 18px; box-shadow: var(--ombre); background: #fff; }
+.size-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 1rem; }
+.size-table th, .size-table td { padding: 12px 10px; border-bottom: 1px solid var(--rose-pale); }
+.size-table thead th { background: var(--rose-fonce); color: #fff; font-family: var(--titre); }
+.size-table tbody th { color: var(--rose-profond); font-weight: 700; background: var(--rose-pale); }
+.size-table tbody tr:last-child th, .size-table tbody tr:last-child td { border-bottom: 0; }
+.measure { list-style: none; padding: 0; margin: 20px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.measure li { background: #fff; border-radius: 16px; padding: 16px 18px; box-shadow: var(--ombre); text-align: center; }
+.measure b { display: block; color: var(--rose-fonce); font-family: var(--titre); margin-bottom: 4px; }
 
 /* Why choose us */
 .why {
@@ -500,6 +513,10 @@ footer a { color: #fff; font-weight: 600; }
   .home-photo { max-width: 380px; margin: 0 auto; }
 }
 @media (max-width: 600px) {
+  .featured { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .featured-item img { height: 170px; }
+  .featured-item h3 { font-size: 1rem; margin-top: 10px; }
+  .featured-item .btn { padding: 9px 12px; font-size: 0.9rem; }
   body { font-size: 1rem; }
   header { padding: 10px 10px 8px; }
   header .site-title a { font-size: 1.3rem; }
