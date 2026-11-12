@@ -13,16 +13,27 @@
     USD: 1,
     EUR: 0.90,
     KES: 130,
+    TZS: 2660,
     RWF: 1474,
-    CDF: 2320
+    CDF: 2320,
+    BIF: 3002,   // official rate; the street rate in Burundi is much higher, change it if you know the one used by your customers
+    ETB: 161,
+    SOS: 571,
+    NGN: 1347,
+    ZAR: 16.6,
+    AED: 3.67,
+    INR: 95,
+    CNY: 6.67,
+    GBP: 0.75
   };
   // ===========================================================================================
 
-  var CODES = ["UGX", "USD", "EUR", "KES", "RWF", "CDF"];          // order of the selector
-  var SYMBOL = { USD: "$", EUR: "€" };                              // written before the number; the others are written after
+  var CODES = ["UGX", "USD", "EUR", "GBP", "KES", "TZS", "RWF", "CDF", "BIF", "ETB", "SOS", "NGN", "ZAR", "AED", "INR", "CNY"];          // order of the selector
+  var SYMBOL = { USD: "$", EUR: "€", GBP: "£" };                              // written before the number; the others are written after
   // default currency guessed from the country of the visitor's phone (the visitor can change it)
   // country (2 letters) -> its money. Any other country: dollars only.
-  var BY_REGION = { UG: "UGX", US: "USD", KE: "KES", RW: "RWF", CD: "CDF",
+  var BY_REGION = { UG: "UGX", US: "USD", KE: "KES", TZ: "TZS", RW: "RWF", CD: "CDF", BI: "BIF", ET: "ETB", SO: "SOS", NG: "NGN", ZA: "ZAR",
+    AE: "AED", IN: "INR", CN: "CNY", GB: "GBP",
     FR: "EUR", BE: "EUR", DE: "EUR", IT: "EUR", ES: "EUR", PT: "EUR", NL: "EUR", IE: "EUR", AT: "EUR", LU: "EUR", FI: "EUR", GR: "EUR" };
 
   function isCode(c) { return Object.prototype.hasOwnProperty.call(PER_USD, c) && typeof c === "string"; }
@@ -32,7 +43,7 @@
   // "$8.11", "€7.30", "1 474 RWF"
   function format(ugx, code) {
     var v = convert(ugx, code);
-    var text = v === 0 ? "0" : (code === "USD" || code === "EUR") ? (v >= 100 ? group(Math.round(v)) : v.toFixed(2)) : group(Math.round(v));
+    var text = v === 0 ? "0" : (code === "USD" || code === "EUR" || code === "GBP") ? (v >= 100 ? group(Math.round(v)) : v.toFixed(2)) : group(Math.round(v));
     return SYMBOL[code] ? SYMBOL[code] + text : text + " " + code;
   }
   // What the CUSTOMER sees: the money of his country first, the dollars in brackets.
