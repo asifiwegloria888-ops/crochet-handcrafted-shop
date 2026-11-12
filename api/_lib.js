@@ -18,9 +18,9 @@ const esc = (s) =>
 const clean = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 // money(30000)                 -> "30 000 UGX"
 // money(30000, "RWF")          -> "30 000 UGX (≈ $8.11 · 11 951 RWF)"   (for you: the real price + the customer's money)
-// money(30000, "RWF", true)    -> "≈ $8.11 · 11 951 RWF"                 (for the customer outside Uganda: no shillings)
+// money(30000, "RWF", true)    -> "11 951 RWF (≈ $8.11)"                 (for the customer: his money, dollars in brackets, no shillings outside Uganda)
 const money = (n, cur, noShillings) => {
-  if (noShillings) { const o = RATES.only(n, cur); if (o) return o; }
+  if (noShillings) { const o = RATES.show(n, cur); if (o) return o; }
   const base = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
   const a = RATES.approx(n, cur);
   return a ? base + " " + a : base;

@@ -113,8 +113,8 @@
   }
 
   // ---------- prices in the visitor's currency next to the shillings ----------
-  // Outside Uganda, every "15 000 UGX" written on the page becomes "≈ $4.05 · 6 000 RWF": the dollars and the money of the visitor's country
-  // (found automatically; the visitor can change it with the small selector at the bottom left). Only the display changes: the real prices stay in UGX on the server.
+  // every "15 000 UGX" written on the page becomes the money of the visitor's country with the dollars in brackets:
+  // "6 000 RWF (≈ $4.05)" (Uganda: "15 000 UGX (≈ $4.05)"). Country found automatically; the visitor can change it with the small selector. Only the display changes: the real prices stay in UGX on the server.
   // The currencies and their rates are in js/rates.js (change the numbers there).
   var SELF = document.currentScript && document.currentScript.src ? document.currentScript.src : "";
 
@@ -190,7 +190,7 @@
       window.SHOP_CURRENCY = c;
       sel.value = c;
       remember(c);
-      if (c !== "UGX") convertPrices(c);   // shillings only: nothing to add
+      convertPrices(c);
     }
 
     function convertPrices(cur) {
@@ -214,7 +214,7 @@
       if (!p || skipped(p)) return;
       var out = v.replace(PRICE, function (m, num) {
         var n = parseInt(num.replace(/\D/g, ""), 10);
-        return isNaN(n) ? m : (R.only(n, cur) || m);   // "15 000 UGX" becomes "≈ $4.05 · 6 000 RWF": no shillings outside Uganda
+        return isNaN(n) ? m : (R.show(n, cur) || m);   // "15 000 UGX" becomes "6 000 RWF (≈ $4.05)": the money of the country, dollars in brackets
       });
       if (out !== v) node.nodeValue = out;
     }

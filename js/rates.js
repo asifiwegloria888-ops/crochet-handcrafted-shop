@@ -35,11 +35,15 @@
     var text = v === 0 ? "0" : (code === "USD" || code === "EUR") ? (v >= 100 ? group(Math.round(v)) : v.toFixed(2)) : group(Math.round(v));
     return SYMBOL[code] ? SYMBOL[code] + text : text + " " + code;
   }
-  // Same amounts WITHOUT the shillings: "≈ $8.11 · 11 951 RWF". Used for customers who are not in Uganda. "" for shillings/unknown.
-  function only(ugx, code) {
-    if (!isCode(code) || code === "UGX" || !(ugx >= 0)) return "";
+  // What the CUSTOMER sees: the money of his country first, the dollars in brackets.
+  //   Rwanda "11 951 RWF (≈ $8.11)"   France "€7.30 (≈ $8.11)"   Uganda "30 000 UGX (≈ $8.11)"   dollars "$8.11"
+  // Shillings only appear for customers in Uganda. "" when the currency is unknown.
+  function show(ugx, code) {
+    if (!isCode(code) || !(ugx >= 0)) return "";
     if (ugx === 0) return "0";
-    return "≈ " + format(ugx, "USD") + (code === "USD" ? "" : " · " + format(ugx, code));
+    if (code === "USD") return format(ugx, "USD");
+    var local = code === "UGX" ? group(Math.round(ugx)) + " UGX" : format(ugx, code);
+    return local + " (≈ " + format(ugx, "USD") + ")";
   }
   // "(≈ $8.11)" for dollars, "(≈ $8.11 · 10 785 RWF)" for the money of the customer's country (dollars are always shown),
   // or "" when there is nothing to add (shillings or unknown currency)
@@ -50,5 +54,5 @@
   // 1 unit of this currency = ... shillings (to tell the owner which rate was used)
   function ugxPer(code) { return Math.round(PER_USD.UGX / PER_USD[code] * 10) / 10; }
 
-  return { PER_USD: PER_USD, CODES: CODES, BY_REGION: BY_REGION, isCode: isCode, convert: convert, format: format, approx: approx, only: only, ugxPer: ugxPer, group: group };
+  return { PER_USD: PER_USD, CODES: CODES, BY_REGION: BY_REGION, isCode: isCode, convert: convert, format: format, approx: approx, show: show, ugxPer: ugxPer, group: group };
 });
