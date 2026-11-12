@@ -70,6 +70,8 @@
         #pd-ctext { flex: 1; min-width: 0; box-sizing: border-box; min-height: 38px; max-height: 200px; padding: 8px 14px; font: inherit; font-size: 0.95rem; line-height: 1.35; border: 1px solid var(--rose); border-radius: 19px; background: #fff; resize: none; overflow-y: auto; }
         .ig-row .ig-post { padding: 8px 6px; }
         [hidden] { display: none !important; }
+        .pd-sizeguide { margin: 6px 0 0; font-size: 0.9rem; }
+        .pd-sizeguide a { color: var(--rose-fonce); font-weight: bold; text-decoration: underline; }
         @media (max-width: 700px) { .pd { grid-template-columns: 1fr; grid-template-areas: "photo" "info" "cm"; grid-template-rows: none; } }
     </style>
 </head>
@@ -110,6 +112,7 @@
                 <table id="pd-table"></table>
                 <label for="pd-size">Size</label>
                 <select id="pd-size"></select>
+                <p id="pd-sizeguide" class="pd-sizeguide"><a href="sizes.html" target="_blank" rel="noopener">📏 Size guide</a></p>
                 <div id="pd-color-box">
                     <label for="pd-color">Color</label>
                     <input type="text" id="pd-color" maxlength="100" placeholder="Write the color you want (ex: red and white)">
@@ -184,6 +187,8 @@
         tr.appendChild(a); tr.appendChild(b); table.appendChild(tr);
         sizeSel.parentNode.removeChild(sizeSel.previousElementSibling);
         sizeSel.parentNode.removeChild(sizeSel);
+        var guide = $("pd-sizeguide");
+        if (guide) guide.parentNode.removeChild(guide);
       }
 
       // color: nothing is proposed, each customer writes the color he wants
