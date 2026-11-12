@@ -267,6 +267,25 @@
     "Choose my creation": "Choisir ma création",
     "Find your size | Crochet Handcrafted Shop": "Trouvez votre taille | Crochet Handcrafted Shop",
     "84 - 88 cm": "84 - 88 cm",
+
+        // ---------- size guide page (sizes.html) ----------
+    "Size guide": "Guide des tailles",
+    "Find your size": "Trouvez votre taille",
+    "Every piece is made to measure. These measurements help you to choose between Small, Medium, Large and XL.":
+      "Chaque pièce est faite sur mesure. Ces mesures vous aident à choisir entre Petit (S), Moyen (M), Grand (L) et XL.",
+    "The measurements below are a guide, in centimeters.": "Les mesures ci-dessous sont indicatives, en centimètres.",
+    "Bust": "Tour de poitrine",
+    "Waist": "Tour de taille",
+    "Hips": "Tour de hanches",
+    "Take your measurements": "Prenez vos mesures",
+    "Around the fullest part of your chest, with the tape flat.": "Autour de la partie la plus large de votre poitrine, avec le mètre à plat.",
+    "Around the narrowest part of your body, above the belly button.": "Autour de la partie la plus étroite de votre corps, au-dessus du nombril.",
+    "Around the widest part of your hips and bottom.": "Autour de la partie la plus large de vos hanches et de vos fesses.",
+    "Between two sizes, or a very special body shape? No problem: write your measurements in the box \"Anything else?\" when you order, and I make your piece to measure.":
+      "Entre deux tailles, ou une morphologie très particulière ? Pas de problème : écrivez vos mesures dans la case « Autre chose ? » au moment de commander, et je fais votre pièce sur mesure.",
+    "Choose my creation": "Choisir ma création",
+    "Size guide: bust, waist and hip measurements in centimeters to choose your size (Small, Medium, Large, XL). Every crochet piece is made to measure.":
+      "Guide des tailles : tour de poitrine, de taille et de hanches en centimètres pour choisir votre taille (S, M, L, XL). Chaque pièce au crochet est faite sur mesure.",
     "": ""
 
   };
