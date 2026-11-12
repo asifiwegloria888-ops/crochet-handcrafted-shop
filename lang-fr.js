@@ -262,7 +262,7 @@
     "Around the narrowest part of your body, above the belly button.": "Autour de la partie la plus fine du corps, au-dessus du nombril.",
     "Around the widest part of your hips and bottom.": "Autour de la partie la plus large des hanches et des fesses.",
     "Between two sizes, or a very special body shape? No problem: write your measurements in the box \"Anything else?\" when you order, and I make your piece to measure.":
-      "Entre deux tailles, ou une morphologie particulière ? Pas de problème : écrivez vos mensurations dans la case « Autre chose ? » au moment de commander, et je réalise votre pièce sur mesure.",
+    "Entre deux tailles, ou une morphologie particulière ? Pas de problème : écrivez vos mensurations dans la case « Autre chose ? » au moment de commander, et je réalise votre pièce sur mesure.",
     "The measurements below are a guide, in centimeters.": "Les mensurations ci-dessous sont un repère, en centimètres.",
     "Choose my creation": "Choisir ma création",
     "Find your size | Crochet Handcrafted Shop": "Trouvez votre taille | Crochet Handcrafted Shop",
@@ -272,7 +272,7 @@
     "Size guide": "Guide des tailles",
     "Find your size": "Trouvez votre taille",
     "Every piece is made to measure. These measurements help you to choose between Small, Medium, Large and XL.":
-      "Chaque pièce est faite sur mesure. Ces mesures vous aident à choisir entre Petit (S), Moyen (M), Grand (L) et XL.",
+    "Chaque pièce est faite sur mesure. Ces mesures vous aident à choisir entre Petit (S), Moyen (M), Grand (L) et XL.",
     "The measurements below are a guide, in centimeters.": "Les mesures ci-dessous sont indicatives, en centimètres.",
     "Bust": "Tour de poitrine",
     "Waist": "Tour de taille",
