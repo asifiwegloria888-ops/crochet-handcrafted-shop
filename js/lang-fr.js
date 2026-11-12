@@ -270,6 +270,8 @@
     "Choose my creation": "Choisir ma création",
     "Size guide: bust, waist and hip measurements in centimeters to choose your size (Small, Medium, Large, XL). Every crochet piece is made to measure.":
       "Guide des tailles : tour de poitrine, de taille et de hanches en centimètres pour choisir votre taille (S, M, L, XL). Chaque pièce au crochet est faite sur mesure.",
+    "Between two sizes? Choose the closest one and write your measurements in \"Anything else?\" when you order.":
+      "Entre deux tailles ? Choisissez la plus proche et écrivez vos mesures dans « Autre chose ? » au moment de commander.",
     "": ""
 
   };

@@ -72,6 +72,7 @@
         [hidden] { display: none !important; }
         .pd-sizeguide { margin: 6px 0 0; font-size: 0.9rem; }
         .pd-sizeguide a { color: var(--rose-fonce); font-weight: bold; text-decoration: underline; }
+        .pd-sizehint { color: #7a6a6e; font-size: 0.85rem; }
         @media (max-width: 700px) { .pd { grid-template-columns: 1fr; grid-template-areas: "photo" "info" "cm"; grid-template-rows: none; } }
     </style>
 </head>
@@ -112,7 +113,7 @@
                 <table id="pd-table"></table>
                 <label for="pd-size">Size</label>
                 <select id="pd-size"></select>
-                <p id="pd-sizeguide" class="pd-sizeguide"><a href="sizes.html" target="_blank" rel="noopener">📏 Size guide</a></p>
+                <p id="pd-sizeguide" class="pd-sizeguide"><a href="sizes.html">📏 Size guide</a><br><span class="pd-sizehint">Between two sizes? Choose the closest one </span></p>
                 <div id="pd-color-box">
                     <label for="pd-color">Color</label>
                     <input type="text" id="pd-color" maxlength="100" placeholder="Write the color you want (ex: red and white)">
