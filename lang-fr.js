@@ -38,7 +38,7 @@
     "Three crochet hair scrunchies in yellow, red and olive green": "Trois chouchous au crochet jaune, rouge et vert olive",
 
     // ---------- articles ----------
-    "Scrunchies": "Chouchous", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
+    "Scrunchies": "Chouchous","scarf": "Echarpe","scarf and hat": "Echarpe et bonnet", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
     "Skirt": "Jupe", "Small bag": "Petit sac", "Crochet flower": "Fleur au crochet",
     "Small": "Petit (S)", "Medium": "Moyen (M)", "Large": "Grand (L)", "XL": "XL", "Big": "Grand", "Child": "Enfant", "Adult": "Adulte",
     "Black": "Noir", "White": "Blanc", "Red": "Rouge", "Pink": "Rose", "Yellow": "Jaune", "Orange": "Orange", "Blue": "Bleu", "Green": "Vert",
@@ -71,7 +71,7 @@
 
     // ---------- contact ----------
     "Contact Information": "Coordonnées", "Contact me": "Me contacter", "contact me": "me contacter",
-    "If you have any questions or would like to place an order, feel free to reach out!": "Pour toute question ou pour passer une commande, n'hésitez pas à me contacter !",
+    "If you have any questions or would like to place an order, feel free to reach out!": "Pour toute question ou pour passer une commande, n'hésitez pas à nous contacter !",
     "Address:": "Adresse :", "telephone:": "téléphone :", "Email:": "Email :", "Email": "Email", "Name": "Nom", "Message": "Message", "Website": "Site web",
     "Send us a message": "Envoyez-nous un message", "Send Message": "Envoyer le message", "Send message": "Envoyer le message",
     "sunday - friday : 8 am- 8pm": "dimanche - vendredi : 8 h - 20 h",
@@ -149,6 +149,7 @@
     // extras: how to order, labels, share, order tracking
     "Back to top": "Retour en haut",
     "Track my order": "Suivre ma commande",
+    "Get yours today": "Procurez-vous le vôtre aujourd'hui",
     "New": "Nouveau",
     "Most loved": "Le plus aimé",
     "Share on WhatsApp": "Partager sur WhatsApp",
@@ -180,8 +181,11 @@
 
     // texts of the cards of the Creation page
     "Skirt are available, choose your color": "Des jupes sont disponibles, choisissez votre couleur",
+    "Get yours today": "Obtenez la vôtre aujourd'hui",
+    "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
     "Shirt for man are available, choose your color": "Des chemises pour hommes sont disponibles, choisissez votre couleur",
     "Beautiful shirt with beautiful colors are available": "De belles chemises aux belles couleurs sont disponibles",
+    "soft and confy. many colors are available, tell us your favorite": "Doux et confortable. De nombreuses couleurs sont disponibles, dites-nous votre préférée",
     "Beautiful crop top with beautiful colors are available": "De beaux crop tops aux belles couleurs sont disponibles",
     "Beautiful skirt with beautiful colors are available": "De belles jupes aux belles couleurs sont disponibles",
     "Get for you one": "Procurez-vous-en une",
@@ -193,6 +197,7 @@
     "Beautiful dress": "Belle robe",
     "Beautiful crochet flower are available": "De belles fleurs au crochet sont disponibles",
     "Beautiful scrunchies": "De beaux chouchous",
+    "Get yours today": "Procurez-vous le vôtre aujourd'hui",
     "Beautiful two piece": "Bel ensemble deux pièces",
     "Beautiful item!": "Bel article !",
     "confy! Handmade to measure, choose your colors!": "Confortable ! Fait main sur mesure, choisissez vos couleurs !",
@@ -214,7 +219,56 @@
     "Please write the color you want for each item before you order.": "Veuillez écrire la couleur souhaitée pour chaque article avant de commander.",
     "Please write the color you want for each item in your cart before you order.": "Veuillez écrire la couleur souhaitée pour chaque article de votre panier avant de commander.",
     "Please reload the page and try again.": "Veuillez recharger la page et réessayer.",
+        // home page: "Why choose us" + contact page button
+    "Why choose us": "Pourquoi nous choisir",
+    "100% handmade": "100 % fait main",
+    "Every piece is crocheted by hand with soft, quality yarn.": "Chaque pièce est crochetée à la main dans un fil doux et de qualité.",
+    "Made to measure": "Sur mesure",
+    "Choose your size and your colors, just the way you like it.": "Choisissez votre taille et vos couleurs, exactement comme vous l'aimez.",
+    "Pick up or delivery": "Retrait ou livraison",
+    "Come and get your order, or have it delivered to you.": "Venez chercher votre commande, ou faites-vous livrer.",
+    "Simple and safe": "Simple et sécurisé",
+    "I confirm the price by email, then you send a 50% deposit.": "Je confirme le prix par email, puis vous envoyez un acompte de 50 %.",
+    "Call": "Appeler",
+        // customer reviews
+    "Customer reviews": "Avis des clients",
+    "Leave a review": "Laisser un avis",
+    "Your rating": "Votre note",
+    "Your review": "Votre avis",
+    "Share your experience...": "Partagez votre expérience...",
+    "Send my review": "Envoyer mon avis",
+    "No reviews yet. Be the first to share your experience!": "Pas encore d'avis. Soyez le premier à partager votre expérience !",
+    "Thank you! Your review will appear after I approve it.": "Merci ! Votre avis apparaîtra après mon approbation.",
+    "Please choose a rating from 1 to 5 stars.": "Veuillez choisir une note de 1 à 5 étoiles.",
+    "Please write your review.": "Veuillez écrire votre avis.",
+    "review": "avis", "reviews": "avis",
+    "1 star": "1 étoile", "2 stars": "2 étoiles", "3 stars": "3 étoiles", "4 stars": "4 étoiles", "5 stars": "5 étoiles",
+    "Get yours today ! 😍": "Prenez la vôtre dès aujourd'hui ! 😍",
+    // home page (new texts) and size guide
+    "Welcome to my little corner of handmade crochet treasures. Every piece is crocheted by hand and made to measure, from dresses and two pieces to bikinis, tops, skirts and bags.":
+      "Bienvenue dans mon petit coin de trésors faits main au crochet. Chaque pièce est crochetée à la main et faite sur mesure, des robes et ensembles deux pièces aux bikinis, hauts, jupes et sacs.",
+    "Dresses, two pieces, bikinis, crop tops, skirts, sweaters, bags, scarves and hats. Each lovingly crafted by hand with soft, quality yarn.":
+      "Robes, ensembles deux pièces, bikinis, crop tops, jupes, pulls, sacs, écharpes et chapeaux. Chaque pièce est faite à la main avec amour, dans un fil doux et de qualité.",
+    "Three handmade crochet outfits on mannequins": "Trois tenues au crochet faites main sur des mannequins",
+    "Bikini": "Bikini", "Short": "Short",
+    "Size guide": "Guide des tailles", "📏 Size guide": "📏 Guide des tailles",
+    "Size guide | Crochet Handcrafted Shop": "Guide des tailles | Crochet Handcrafted Shop",
+    "Find your size": "Trouvez votre taille",
+    "Every piece is made to measure. These measurements help you to choose between Small, Medium, Large and XL.":
+      "Chaque pièce est faite sur mesure. Ces mensurations vous aident à choisir entre Petit, Moyen, Grand et XL.",
+    "Bust": "Poitrine", "Waist": "Taille (ventre)", "Hips": "Hanches", "cm": "cm",
+    "Take your measurements": "Prenez vos mensurations",
+    "Around the fullest part of your chest, with the tape flat.": "Autour de la partie la plus forte de la poitrine, le mètre bien à plat.",
+    "Around the narrowest part of your body, above the belly button.": "Autour de la partie la plus fine du corps, au-dessus du nombril.",
+    "Around the widest part of your hips and bottom.": "Autour de la partie la plus large des hanches et des fesses.",
+    "Between two sizes, or a very special body shape? No problem: write your measurements in the box \"Anything else?\" when you order, and I make your piece to measure.":
+      "Entre deux tailles, ou une morphologie particulière ? Pas de problème : écrivez vos mensurations dans la case « Autre chose ? » au moment de commander, et je réalise votre pièce sur mesure.",
+    "The measurements below are a guide, in centimeters.": "Les mensurations ci-dessous sont un repère, en centimètres.",
+    "Choose my creation": "Choisir ma création",
+    "Find your size | Crochet Handcrafted Shop": "Trouvez votre taille | Crochet Handcrafted Shop",
+    "84 - 88 cm": "84 - 88 cm",
     "": ""
+
   };
   delete EXACT[""];
 
