@@ -112,20 +112,94 @@
     }
   }
 
-  // ---------- prices in dollars next to the shillings (every language, English included) ----------
-  // Every "15 000 UGX" written on the page becomes "15 000 UGX (≈ $4.05)". Only the display changes:
-  // the real prices stay in UGX on the server, and you confirm the final price in UGX.
-  var UGX_PER_USD = 3700;   // <-- CHANGE THIS NUMBER when the exchange rate changes (1 dollar = ... UGX)
+  // ---------- prices in the visitor's currency next to the shillings ----------
+  // Outside Uganda, every "15 000 UGX" written on the page becomes "≈ $4.05 · 6 000 RWF": the dollars and the money of the visitor's country
+  // (found automatically; the visitor can change it with the small selector at the bottom left). Only the display changes: the real prices stay in UGX on the server.
+  // The currencies and their rates are in js/rates.js (change the numbers there).
+  var SELF = document.currentScript && document.currentScript.src ? document.currentScript.src : "";
 
-  function startDollars() {
-    var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1 };
-    // a price already followed by "(≈ $" is skipped, so a price is never converted twice
-    var PRICE = /(\d[\d   ]*)\s*UGX(?!\s*\(≈)/g;
+  // rates.js is normally loaded by the page; if a page forgot it, it is loaded from here
+  function withRates(go) {
+    if (window.SHOP_RATES) return go();
+    if (!SELF) return;
+    var s = document.createElement("script");
+    s.src = SELF.replace(/i18n\.js(\?.*)?$/, "rates.js");
+    s.onload = go;
+    document.head.appendChild(s);
+  }
 
-    function usd(ugx) {
-      var d = ugx / UGX_PER_USD;
-      return "(≈ $" + (d >= 100 ? Math.round(d).toLocaleString("en-US") : d.toFixed(2)) + ")";
+  function savedCurrency(R) {
+    try { var s = localStorage.getItem("currency"); if (s && R.isCode(s)) return s; } catch (e) {}
+    return "";
+  }
+
+  // The country of the visitor: asked once to the site (api/country.js) and remembered on the phone.
+  function detectCountry(done) {
+    try { var c = localStorage.getItem("geo"); if (c) return done(c); } catch (e) {}
+    var finished = false;
+    function end(c) { if (finished) return; finished = true; try { if (c) localStorage.setItem("geo", c); } catch (e) {} done(c || ""); }
+    setTimeout(function () { end(""); }, 2500);
+    try {
+      fetch("/api/country", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : {}; })
+        .then(function (d) { end(String((d && d.country) || "").toUpperCase()); })
+        .catch(function () { end(""); });
+    } catch (e) { end(""); }
+  }
+
+  // second chance when the country is unknown: the region of the phone's language ("fr-CD" -> Congo)
+  function guessFromLanguage(R) {
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+    for (var i = 0; i < list.length; i++) {
+      var region = String(list[i]).split("-")[1];
+      if (region && R.BY_REGION[region.toUpperCase()]) return R.BY_REGION[region.toUpperCase()];
     }
+    return "";
+  }
+
+  function startCurrency(box) {
+    var R = window.SHOP_RATES;
+    var cur = savedCurrency(R);
+    // the server reads this cookie when an order is placed, to write the prices in this currency in the emails
+    function remember(c) { try { document.cookie = "shopcur=" + c + "; path=/; max-age=31536000; SameSite=Lax"; } catch (e) {} }
+
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Currency / Devise");
+    sel.style.marginLeft = "6px";
+    R.CODES.forEach(function (c) {
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+    sel.value = cur || "USD";
+    sel.addEventListener("change", function () {
+      try { localStorage.setItem("currency", sel.value); } catch (e) {}
+      remember(sel.value);
+      location.reload();
+    });
+    box.appendChild(sel);
+
+    // the visitor never chose: use the money of the country he is visiting from
+    if (cur) return apply(cur);
+    detectCountry(function (country) {
+      apply(R.BY_REGION[country] || guessFromLanguage(R) || "USD");
+    });
+
+    function apply(c) {
+      cur = c;
+      window.SHOP_CURRENCY = c;
+      sel.value = c;
+      remember(c);
+      if (c !== "UGX") convertPrices(c);   // shillings only: nothing to add
+    }
+
+    function convertPrices(cur) {
+    // the admin page keeps the real prices in shillings (you need them to confirm an order)
+    if (/\/admin(\.html)?\/?$/.test(location.pathname)) return;
+    var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1 };
+    // a price already followed by "(≈" is skipped, so a price is never converted twice
+    var PRICE = /(\d[\d   ]*)\s*UGX(?!\s*\(≈)/g;
+
     function skipped(el) {
       for (var e = el; e && e !== document.documentElement; e = e.parentElement) {
         if (SKIP[e.tagName] || (e.hasAttribute && (e.hasAttribute("data-no-i18n") || e.getAttribute("translate") === "no")) ||
@@ -140,7 +214,7 @@
       if (!p || skipped(p)) return;
       var out = v.replace(PRICE, function (m, num) {
         var n = parseInt(num.replace(/\D/g, ""), 10);
-        return isNaN(n) ? m : m + " " + usd(n);   // "15 000 UGX (≈ $4.05)": shillings first, dollars next to it
+        return isNaN(n) ? m : (R.only(n, cur) || m);   // "15 000 UGX" becomes "≈ $4.05 · 6 000 RWF": no shillings outside Uganda
       });
       if (out !== v) node.nodeValue = out;
     }
@@ -161,6 +235,7 @@
         else if (c.type === "characterData") convertText(c.target);
       });
     }).observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
   }
 
   // ---------- other languages: Google Translate (only for these visitors) ----------
@@ -223,15 +298,16 @@
     css.textContent =
       ".lang-box{position:fixed;left:12px;bottom:12px;z-index:50;background:#fff;border:2px solid #e8a0b4;border-radius:22px;padding:4px 8px 4px 10px;" +
       "box-shadow:0 3px 10px rgba(0,0,0,.18);font-size:.85rem;line-height:1}" +
-      ".lang-box select{border:none;background:transparent;font:inherit;color:#c9607f;font-weight:bold;cursor:pointer;max-width:120px}";
+      ".lang-box select{border:none;background:transparent;font:inherit;color:#c9607f;font-weight:bold;cursor:pointer;max-width:120px}.lang-box select+select{max-width:80px}";
     document.head.appendChild(css);
     document.body.appendChild(box);
+    return box;
   }
 
-  addSelector();
+  var selectorBox = addSelector();
   // French first, then the dollars: the French rules (for example "... UGX each") must see the price before it gets its dollar amount
   if (french) startFrench();
   else if (lang !== "en") startGoogle(lang);
   else clearGoogle();
-  startDollars();   // for every language, English included
+  withRates(function () { startCurrency(selectorBox); });   // for every language, English included
 })();

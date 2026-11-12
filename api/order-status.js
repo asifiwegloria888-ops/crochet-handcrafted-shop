@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   try {
     const sql = L.db();
     await L.ensureSchema(sql);
-    const rows = await sql`SELECT id, email, status, created_at, confirmed_at, paid_at, ready_date, total, deposit FROM orders WHERE id = ${parseInt(m[1], 10)}`;
+    const rows = await sql`SELECT id, email, status, created_at, confirmed_at, paid_at, ready_date, total, deposit, currency FROM orders WHERE id = ${parseInt(m[1], 10)}`;
     const o = rows[0];
     if (!o || String(o.email || "").trim().toLowerCase() !== email) {
       await sleep(700); // slows down people who try to guess
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
     }
 
     // Payment details: only after the reference AND the email matched, and only while the order waits for its deposit.
-    const instructions = (process.env.PAYMENT_INSTRUCTIONS || "").trim();
+    const instructions = L.paymentFor(o.currency);   // the text for the customer's currency, or the general one
     const pay =
       o.status === "confirmed" && instructions
         ? { instructions, balance: o.total != null && o.deposit != null ? o.total - o.deposit : null }

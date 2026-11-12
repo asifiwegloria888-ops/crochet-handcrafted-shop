@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const LANG_FR = require("../js/lang-fr.js");
 const tr = (lang, s) => (lang === "fr" ? LANG_FR.translate(s) : s);   // translate a text for a French customer
+const RATES = require("../js/rates.js");   // currencies and exchange rates (same file as the website)
 const base = require("../js/products.js");
 const catalog = require("../js/catalog.js")(base); // fills in titles, colors, preparation days (see js/catalog.js)
 const { PRODUCTS, DELIVERY_FEES } = base;
@@ -15,7 +16,25 @@ const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const esc = (s) =>
   String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const clean = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
-const money = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
+// money(30000)                 -> "30 000 UGX"
+// money(30000, "RWF")          -> "30 000 UGX (≈ $8.11 · 11 951 RWF)"   (for you: the real price + the customer's money)
+// money(30000, "RWF", true)    -> "≈ $8.11 · 11 951 RWF"                 (for the customer outside Uganda: no shillings)
+const money = (n, cur, noShillings) => {
+  if (noShillings) { const o = RATES.only(n, cur); if (o) return o; }
+  const base = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX";
+  const a = RATES.approx(n, cur);
+  return a ? base + " " + a : base;
+};
+// The currency of the customer: the one chosen on the site (cookie "shopcur"), otherwise the money of his country
+// (Vercel tells the country in the header x-vercel-ip-country). "" when unknown.
+const currencyOf = (req) => {
+  const h = (req && req.headers) || {};
+  const m = /(?:^|;\s*)shopcur=([A-Z]{3})/.exec(h.cookie || "");
+  if (m && RATES.isCode(m[1])) return m[1];
+  return RATES.BY_REGION[String(h["x-vercel-ip-country"] || "").toUpperCase()] || "";
+};
+// Payment instructions: PAYMENT_INSTRUCTIONS_RWF, _CDF, _KES, _EUR, _USD, _UGX if you wrote one for that currency, otherwise PAYMENT_INSTRUCTIONS.
+const paymentFor = (cur) => ((cur && process.env["PAYMENT_INSTRUCTIONS_" + cur]) || process.env.PAYMENT_INSTRUCTIONS || "").trim();
 const refOf = (id) => "CH-" + String(id).padStart(4, "0");
 const userError = (message) => Object.assign(new Error(message), { user: true });
 
@@ -51,6 +70,7 @@ async function ensureSchema(sql) {
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_date TEXT`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS lang TEXT`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS currency TEXT`;
   schemaReady = true;
 }
 
@@ -348,13 +368,14 @@ function itemsTable(order, confirmedTotal, publicNames, lang) {
   const fr = lang === "fr";
   const w = LBL[fr ? "fr" : "en"];
   const lines = orderLines(order);
+  const m = (n) => money(n, order.currency, publicNames);   // customer: dollars + his money (no shillings). You: shillings + his money
   const rows = lines
     .map((l) => {
       const name = publicNames ? String(l.label || l.item).replace(/ #\d+$/, "") : l.label || l.item;
       return `<tr>
       <td ${TD}>${esc(tr(lang, name))}${l.size ? " (" + esc(tr(lang, l.size)) + ")" : ""}${l.colors ? `<br><span style="color:#7a6a6e;font-size:13px">${w.colors} ${esc(tr(lang, l.colors))}</span>` : ""}</td>
       <td ${TD}>${esc(l.quantity)}</td>
-      <td ${TD} align="right">${l.line_total != null ? esc(money(l.line_total)) : w.toQuote}</td></tr>`;
+      <td ${TD} align="right">${l.line_total != null ? esc(m(l.line_total)) : w.toQuote}</td></tr>`;
     })
     .join("");
   const quote = needsQuote(order);
@@ -364,17 +385,17 @@ function itemsTable(order, confirmedTotal, publicNames, lang) {
 
   let deliveryCell, totalLabel, totalCell;
   if (confirmedTotal != null) {
-    deliveryCell = quote ? w.included : esc(money(order.delivery_fee || 0));
+    deliveryCell = quote ? w.included : esc(m(order.delivery_fee || 0));
     totalLabel = w.totalPrice;
-    totalCell = esc(money(confirmedTotal));
+    totalCell = esc(m(confirmedTotal));
   } else if (quote) {
     deliveryCell = w.toQuote;
     totalLabel = w.itemsQuote;
-    totalCell = itemsSum != null ? esc(money(itemsSum)) + w.plusDelivery : w.toConfirm;
+    totalCell = itemsSum != null ? esc(m(itemsSum)) + w.plusDelivery : w.toConfirm;
   } else {
-    deliveryCell = esc(money(order.delivery_fee || 0));
+    deliveryCell = esc(m(order.delivery_fee || 0));
     totalLabel = w.estTotal;
-    totalCell = estimate != null ? esc(money(estimate)) : w.toConfirm;
+    totalCell = estimate != null ? esc(m(estimate)) : w.toConfirm;
   }
 
   return `<table style="border-collapse:collapse;font-size:15px;width:100%;max-width:520px">
@@ -383,6 +404,7 @@ function itemsTable(order, confirmedTotal, publicNames, lang) {
     <tr><td ${TD} colspan="2">${esc(deliveryLabel(order.delivery, lang))}</td><td ${TD} align="right">${deliveryCell}</td></tr>
     <tr><td ${TD} colspan="2"><strong>${totalLabel}</strong></td><td ${TD} align="right"><strong>${totalCell}</strong></td></tr>
   </table>
+  ${!publicNames && RATES.isCode(order.currency) && order.currency !== "UGX" ? `<p style="margin:10px 0"><strong>${fr ? "Devise du client :" : "Customer's currency:"}</strong> ${order.currency} <span style="color:#7a6a6e;font-size:13px">(1 ${order.currency} = ${esc(RATES.group(RATES.ugxPer(order.currency)))} UGX)</span></p>` : ""}
   ${order.address ? `<p style="margin:10px 0"><strong>${w.address}</strong> ${esc(order.address)}</p>` : ""}
   ${order.ready_date ? `<p style="margin:10px 0"><strong>${w.ready}</strong> ${esc(formatDate(order.ready_date, lang))}</p>` : ""}
   ${order.notes ? `<p style="margin:10px 0"><strong>${w.notes}</strong> ${esc(order.notes)}</p>` : ""}`;
@@ -391,6 +413,13 @@ function itemsTable(order, confirmedTotal, publicNames, lang) {
 const WRAP = (inner) => `<div style="font-family:Arial,sans-serif;color:#3a2f33;max-width:560px">${inner}</div>`;
 
 // The emails the CUSTOMER receives, in English or French (the language the customer used on the site)
+// A short note when the customer chose another currency than shillings
+const payNote = (cur, lang) =>
+  !RATES.isCode(cur) || cur === "UGX" ? "" :
+  lang === "fr"
+    ? `<p style="color:#7a6a6e;font-size:13px">Les montants indiqués ci-dessus sont approximatifs (taux du jour). Avant de payer, écrivez-moi sur WhatsApp pour confirmer le montant exact à envoyer en ${cur}.</p>`
+    : `<p style="color:#7a6a6e;font-size:13px">The amounts shown above are approximate (today's rate). Before paying, write to me on WhatsApp to confirm the exact amount to send in ${cur}.</p>`;
+
 const MAIL = {
   en: {
     received: (name, ref) => ({
@@ -399,21 +428,21 @@ const MAIL = {
           <p>We have received your order <strong>${ref}</strong>. I will contact you soon to confirm the details and the price. To start your order, a 50% deposit is requested once the price is confirmed.</p>`,
       outro: `<p style="margin-top:20px">You can reply directly to this email, or write to me on WhatsApp:</p>`,
     }),
-    confirmed: (name, ref, deposit, balance, instructions) => ({
+    confirmed: (name, ref, deposit, balance, cur) => ({
       subject: `Order ${ref} confirmed: please send your 50% deposit`,
       head: `<h2 style="color:#c9607f">Your order ${esc(ref)} is confirmed</h2>
         <p>Hello ${esc(name)}, thank you for your order. To start working on it, I ask for a 50% deposit.</p>`,
-      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(balance))}</td></tr>`,
-      how: `<h3>How to pay the deposit</h3>`,
+      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Deposit to pay now (50%)</strong></td><td><strong>${esc(money(deposit, cur, true))}</strong></td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Remaining balance</strong></td><td>${esc(money(balance, cur, true))}</td></tr>`,
+      how: `<h3>How to pay the deposit</h3>${payNote(cur, "en")}`,
       after: `<p>Please write <strong>${esc(ref)}</strong> as the payment reference. After paying, reply to this email with the transaction ID or a screenshot. I start your order as soon as I receive the deposit.</p>
         <p>A question? Write to me on WhatsApp:</p>`,
     }),
-    deposit: (name, ref, deposit, balance) => ({
+    deposit: (name, ref, deposit, balance, cur) => ({
       subject: `Deposit received for order ${ref}: I am starting your order`,
       body: `<h2 style="color:#c9607f">Thank you, ${esc(name)}!</h2>
-        <p>I received your deposit of <strong>${esc(money(deposit))}</strong> for order <strong>${esc(ref)}</strong>.</p>
-        <p>I am starting your order now. The remaining balance is <strong>${esc(money(balance))}</strong>. I will contact you as soon as it is ready.</p>
+        <p>I received your deposit of <strong>${esc(money(deposit, cur, true))}</strong> for order <strong>${esc(ref)}</strong>.</p>
+        <p>I am starting your order now. The remaining balance is <strong>${esc(money(balance, cur, true))}</strong>. I will contact you as soon as it is ready.</p>
         <p>If you have any question, reply to this email or write to me on WhatsApp:</p>`,
     }),
   },
@@ -424,21 +453,21 @@ const MAIL = {
           <p>Nous avons bien reçu votre commande <strong>${ref}</strong>. Je vous contacterai bientôt pour confirmer les détails et le prix. Pour démarrer votre commande, un acompte de 50 % est demandé une fois le prix confirmé.</p>`,
       outro: `<p style="margin-top:20px">Vous pouvez répondre directement à cet email, ou m'écrire sur WhatsApp :</p>`,
     }),
-    confirmed: (name, ref, deposit, balance) => ({
+    confirmed: (name, ref, deposit, balance, cur) => ({
       subject: `Commande ${ref} confirmée : merci d'envoyer votre acompte de 50 %`,
       head: `<h2 style="color:#c9607f">Votre commande ${esc(ref)} est confirmée</h2>
         <p>Bonjour ${esc(name)}, merci pour votre commande. Pour commencer à la réaliser, je demande un acompte de 50 %.</p>`,
-      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Acompte à payer maintenant (50 %)</strong></td><td><strong>${esc(money(deposit))}</strong></td></tr>
-          <tr><td style="padding:6px 12px 6px 0"><strong>Reste à payer</strong></td><td>${esc(money(balance))}</td></tr>`,
-      how: `<h3>Comment payer l'acompte</h3>`,
+      rows: `<tr><td style="padding:6px 12px 6px 0"><strong>Acompte à payer maintenant (50 %)</strong></td><td><strong>${esc(money(deposit, cur, true))}</strong></td></tr>
+          <tr><td style="padding:6px 12px 6px 0"><strong>Reste à payer</strong></td><td>${esc(money(balance, cur, true))}</td></tr>`,
+      how: `<h3>Comment payer l'acompte</h3>${payNote(cur, "fr")}`,
       after: `<p>Merci d'écrire <strong>${esc(ref)}</strong> comme référence du paiement. Après avoir payé, répondez à cet email avec l'identifiant de la transaction ou une capture d'écran. Je commence votre commande dès que je reçois l'acompte.</p>
         <p>Une question ? Écrivez-moi sur WhatsApp :</p>`,
     }),
-    deposit: (name, ref, deposit, balance) => ({
+    deposit: (name, ref, deposit, balance, cur) => ({
       subject: `Acompte reçu pour la commande ${ref} : je commence votre commande`,
       body: `<h2 style="color:#c9607f">Merci, ${esc(name)} !</h2>
-        <p>J'ai bien reçu votre acompte de <strong>${esc(money(deposit))}</strong> pour la commande <strong>${esc(ref)}</strong>.</p>
-        <p>Je commence votre commande maintenant. Le reste à payer est de <strong>${esc(money(balance))}</strong>. Je vous contacterai dès qu'elle sera prête.</p>
+        <p>J'ai bien reçu votre acompte de <strong>${esc(money(deposit, cur, true))}</strong> pour la commande <strong>${esc(ref)}</strong>.</p>
+        <p>Je commence votre commande maintenant. Le reste à payer est de <strong>${esc(money(balance, cur, true))}</strong>. Je vous contacterai dès qu'elle sera prête.</p>
         <p>Si vous avez une question, répondez à cet email ou écrivez-moi sur WhatsApp :</p>`,
     }),
   },
@@ -447,12 +476,12 @@ const langOf = (order) => (order && order.lang === "fr" ? "fr" : "en");
 
 // Owner confirms the order and asks for the 50% deposit
 async function doConfirm(sql, order, total, fee) {
-  const instructions = (process.env.PAYMENT_INSTRUCTIONS || "").trim();
+  const instructions = paymentFor(order.currency);
   if (!instructions) throw userError("Add the variable PAYMENT_INSTRUCTIONS in Vercel (your mobile money number and name), then redeploy.");
   const deposit = Math.ceil(total / 2);
   const ref = refOf(order.id);
   const lang = langOf(order);
-  const m = MAIL[lang].confirmed(order.name, ref, deposit, total - deposit);
+  const m = MAIL[lang].confirmed(order.name, ref, deposit, total - deposit, order.currency);
   const { transporter, from, owner } = mailer();
   try {
     await transporter.sendMail({
@@ -485,7 +514,7 @@ async function doConfirm(sql, order, total, fee) {
 async function doDeposit(sql, order) {
   const ref = refOf(order.id);
   const lang = langOf(order);
-  const m = MAIL[lang].deposit(order.name, ref, order.deposit || 0, (order.total || 0) - (order.deposit || 0));
+  const m = MAIL[lang].deposit(order.name, ref, order.deposit || 0, (order.total || 0) - (order.deposit || 0), order.currency);
   const { transporter, from, owner } = mailer();
   try {
     await transporter.sendMail({
@@ -509,5 +538,5 @@ async function doDeposit(sql, order) {
 module.exports = {
   PRODUCTS, DELIVERY_FEES, has, esc, clean, money, refOf, userError, db, ensureSchema,
   ensureSocialSchema, validVid, buildStats, buildDownloads, labelOf, resolveProduct: catalog.resolveProduct, priceItems, orderLines, estimateOf, needsQuote, deliveryLabel, resolveConfirm, checkReadyDate, formatDate, todayEAT, addDays, sign, validToken, mailer, siteUrl, waButton,
-  itemsTable, WRAP, doConfirm, doDeposit, MAIL, langOf, tr,
+  itemsTable, WRAP, doConfirm, doDeposit, MAIL, langOf, tr, currencyOf, paymentFor, RATES,
 };

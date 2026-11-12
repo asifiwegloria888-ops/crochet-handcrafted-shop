@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
     notes: L.clean(body.notes, 1500),
     ready_date: L.clean(body.ready_date, 10),
     lang: body.lang === "fr" ? "fr" : "en",
+    currency: L.currencyOf(req),   // the currency chosen on the site (cookie), "" if unknown
   };
   const priced = L.priceItems(body.items);
 
@@ -53,10 +54,10 @@ module.exports = async (req, res) => {
     const sql = L.db();
     await L.ensureSchema(sql);
     const rows = await sql`
-      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date, lang)
+      INSERT INTO orders (name, email, phone, item, colors, size, quantity, notes, photo, address, delivery, delivery_fee, items, total, ready_date, lang, currency)
       VALUES (${customer.name}, ${customer.email}, ${customer.phone}, ${summary}, ${""}, ${""}, ${quantity},
               ${customer.notes}, ${firstPhoto}, ${customer.address}, ${customer.delivery}, ${fee},
-              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date}, ${customer.lang})
+              ${JSON.stringify(items)}::jsonb, ${total}, ${customer.ready_date}, ${customer.lang}, ${customer.currency})
       RETURNING id`;
     order = { id: rows[0].id, ...customer, items, delivery_fee: fee, total, status: "new" };
   } catch (err) {
