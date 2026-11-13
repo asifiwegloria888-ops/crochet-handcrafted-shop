@@ -208,15 +208,31 @@
             share.addEventListener("click", function () { track("share", id); });
       // the message: name + price in shillings AND dollars (written by the server, in the language of the visitor) + the link
       var lang = window.SHOP_LANG === "fr" ? "fr" : "en";
-       // APRÈS
       var me = typeof window.visitorId === "function" ? window.visitorId().slice(0, 8) : "";
-      var link = location.origin + "/api/share?item=" + encodeURIComponent(id) + (lang === "fr" ? "&lang=fr" : "") + (me ? "&s=" + encodeURIComponent(me) : "");
+
+      // la monnaie que la personne voit sur le site (choisie, ou trouvée d'après son pays)
+      var myCur = function () {
+        var c = window.SHOP_CURRENCY || "";
+        if (!c) { try { c = localStorage.getItem("currency") || ""; } catch (e) {} }
+        if (!c) { var m = /(?:^|; )shopcur=([A-Z]{3})/.exec(document.cookie); c = m ? m[1] : ""; }
+        return /^[A-Z]{3}$/.test(c) ? c : "";
+      };
+
+      var link = "";
       var setShare = function (text) { share.href = "https://wa.me/?text=" + encodeURIComponent(text + "\n" + link); };
-      setShare(title);
-      fetch("/api/share?item=" + encodeURIComponent(id) + "&lang=" + lang + "&format=json")
-        .then(function (r) { return r.json(); })
-        .then(function (d) { if (d && d.ok && d.text) setShare(d.text); })
-        .catch(function () {});
+      var build = function () {
+        var cur = myCur();
+        var qs = "item=" + encodeURIComponent(id) + (lang === "fr" ? "&lang=fr" : "") + (cur ? "&c=" + cur : "") + (me ? "&s=" + encodeURIComponent(me) : "");
+        link = location.origin + "/api/share?" + qs;
+        setShare(title);
+        fetch("/api/share?" + qs + "&format=json")
+          .then(function (r) { return r.json(); })
+          .then(function (d) { if (d && d.ok && d.text) setShare(d.text); })
+          .catch(function () {});
+      };
+      // la monnaie est trouvée un instant après le chargement de la page : on l'attend (5 secondes au plus)
+      var waited = 0;
+      (function wait() { if (myCur() || ++waited > 12) build(); else setTimeout(wait, 400); })();
       var actions = el("div", "ex-actions");                      // "Add to cart" and "Share" side by side
       add.parentNode.insertBefore(actions, add);
       actions.appendChild(add);
