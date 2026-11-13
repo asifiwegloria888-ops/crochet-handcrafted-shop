@@ -188,8 +188,16 @@
         tr.appendChild(a); tr.appendChild(b); table.appendChild(tr);
         sizeSel.parentNode.removeChild(sizeSel.previousElementSibling);
         sizeSel.parentNode.removeChild(sizeSel);
-        var guide = $("pd-sizeguide");
-        if (guide) guide.parentNode.removeChild(guide);
+        
+      }
+            // Le guide des tailles (poitrine, taille, hanches) est seulement pour les vêtements en S / M / L / XL.
+      // Chapeaux (Child / Adult) et sacs (Big / Small) : on le retire.
+      var guide = $("pd-sizeguide");
+      if (guide) {
+        var isClothes = !!p.sizes && Object.keys(p.sizes).some(function (s) {
+          return /^(medium|xl)$/i.test(s.trim());
+        });
+        if (!isClothes) guide.parentNode.removeChild(guide);
       }
 
       // color: nothing is proposed, each customer writes the color he wants
