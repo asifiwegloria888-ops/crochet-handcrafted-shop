@@ -3,8 +3,9 @@
 // Never stores: name, email, IP address.
 
 const L = require("./_lib");
+const AppEvents = require("./_appevents");
 
-const PAGES = ["index.html", "creation.html", "album.html", "contact.html", "order.html", "cart.html", "product.html", "favorites.html"];
+const PAGES = ["index.html", "creation.html", "album.html", "contact.html", "order.html", "cart.html", "product.html", "favorites.html", "sizes.html", "track-order.html"];
 
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
@@ -33,6 +34,25 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     } catch (err) {
       console.error("Download track error:", err);
+      return res.status(200).json({ ok: false });
+    }
+  }
+    // événements de l'application : installation, ouverture dans l'app, partage, visite venue d'un partage
+  if (AppEvents.KINDS.includes(b.kind)) {
+    const itemId = L.clean(b.item, 60);
+    const ev = {
+      vid,
+      kind: b.kind,
+      item: L.has(L.PRODUCTS, itemId) ? itemId : "",
+      via: /^[A-Za-z0-9-]{8}$/.test(String(b.s || "")) ? String(b.s) : "",
+      device: b.device === "phone" ? "phone" : "computer",
+      country: /^[A-Z]{2}$/.test(String(req.headers["x-vercel-ip-country"] || "")) ? req.headers["x-vercel-ip-country"] : "",
+    };
+    try {
+      await AppEvents.record(L.db(), ev);
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error("App event error:", err);
       return res.status(200).json({ ok: false });
     }
   }

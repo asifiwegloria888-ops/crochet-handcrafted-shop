@@ -18,6 +18,43 @@
   var isPhone = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
   function t(s) { return typeof window.t === "function" ? window.t(s) : s; }   // French when the site is in French (js/lang-fr.js)
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+    // ---------- statistiques : installations, ouvertures dans l'app, partages ----------
+  var isOwner = false;
+  try { isOwner = localStorage.getItem("shopAdmin") === "1"; } catch (e) {}   // ton propre téléphone n'est pas compté
+
+  function track(kind, item, extra) {
+    if (isOwner || typeof window.visitorId !== "function") return;
+    var data = {
+      kind: kind,
+      vid: window.visitorId(),
+      page: location.pathname.split("/").pop() || "index.html",
+      item: item || new URLSearchParams(location.search).get("item") || "",
+      device: window.innerWidth < 700 ? "phone" : "computer"
+    };
+    if (extra && extra.s) data.s = extra.s;
+    try {
+      fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+
+  // ouverture dans l'application (icône de l'écran d'accueil) : une fois par jour et par téléphone
+  var inApp = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+  if (inApp) {
+    var todayKey = new Date().toISOString().slice(0, 10), lastOpen = "";
+    try { lastOpen = localStorage.getItem("appOpen") || ""; } catch (e) {}
+    if (lastOpen !== todayKey) { track("app_open"); try { localStorage.setItem("appOpen", todayKey); } catch (e) {} }
+  }
+
+  // installation (Android et ordinateur) : le navigateur envoie "appinstalled"
+  window.addEventListener("appinstalled", function () { track("install"); });
+
+  // visite venue d'un lien partagé : le lien contient &s=<code du visiteur qui a partagé>
+  var sBy = new URLSearchParams(location.search).get("s") || "";
+  if (/^[A-Za-z0-9-]{8}$/.test(sBy) && typeof window.visitorId === "function" && sBy !== window.visitorId().slice(0, 8)) {
+    var seenKey = "shv-" + sBy, seen = "";
+    try { seen = sessionStorage.getItem(seenKey) || ""; } catch (e) {}
+    if (!seen) { track("share_visit", "", { s: sBy }); try { sessionStorage.setItem(seenKey, "1"); } catch (e) {} }
+  }
 
   // ---------- styles ----------
   var css = document.createElement("style");
@@ -168,9 +205,12 @@
       var share = el("a", "ex-share", '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg><span></span>');
       share.querySelector("span").textContent = t("Share on WhatsApp");
       share.target = "_blank"; share.rel = "noopener";
+            share.addEventListener("click", function () { track("share", id); });
       // the message: name + price in shillings AND dollars (written by the server, in the language of the visitor) + the link
       var lang = window.SHOP_LANG === "fr" ? "fr" : "en";
-      var link = location.origin + "/api/share?item=" + encodeURIComponent(id) + (lang === "fr" ? "&lang=fr" : "");
+       // APRÈS
+      var me = typeof window.visitorId === "function" ? window.visitorId().slice(0, 8) : "";
+      var link = location.origin + "/api/share?item=" + encodeURIComponent(id) + (lang === "fr" ? "&lang=fr" : "") + (me ? "&s=" + encodeURIComponent(me) : "");
       var setShare = function (text) { share.href = "https://wa.me/?text=" + encodeURIComponent(text + "\n" + link); };
       setShare(title);
       fetch("/api/share?item=" + encodeURIComponent(id) + "&lang=" + lang + "&format=json")

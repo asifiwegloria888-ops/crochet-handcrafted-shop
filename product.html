@@ -164,7 +164,8 @@
       var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UGX"; };
       var photo = params.get("photo");
       if (p.photos.indexOf(photo) === -1) photo = p.photos[0];
-      try { history.replaceState(null, "", "product.html?item=" + encodeURIComponent(name).replace(/%20/g, "+") + "&photo=" + photo); } catch (e) {}
+      var sBy = params.get("s");
+      try { history.replaceState(null, "", "product.html?item=" + encodeURIComponent(name).replace(/%20/g, "+") + "&photo=" + photo + (sBy ? "&s=" + encodeURIComponent(sBy) : "")); } catch (e) {}
 
       var label = labelOf(name);
       document.title = label + " | Crochet Handcrafted Shop";

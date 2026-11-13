@@ -93,6 +93,10 @@ module.exports = async (req, res) => {
 
     if (b.action === "check") return res.status(200).json({ ok: true });
 
+    if (req.body && req.body.action === "appstats") {
+      return res.status(200).json(await require("./_appevents").stats(require("./_lib").db()));
+  }
+
     if (b.action === "count") {
       const rows = await sql`SELECT COUNT(*)::int AS n FROM orders WHERE status = 'new'`;
       await L.ensureSocialSchema(sql);

@@ -35,6 +35,7 @@ module.exports = async (req, res) => {
   const q = req.query || {};
   const item = L.clean(q.item, 60);
   const lang = q.lang === "fr" ? "fr" : "en";
+  const s = /^[A-Za-z0-9-]{8}$/.test(String(q.s || "")) ? String(q.s) : "";
   if (!L.has(L.PRODUCTS, item)) {
     if (q.format === "json") return res.status(404).json({ ok: false });
     res.writeHead(302, { Location: site + "/creation.html" });
@@ -45,8 +46,8 @@ module.exports = async (req, res) => {
   const price = priceText(p, lang);
   const photo = String((p.photos || [""])[0]);
   const image = site + "/" + encodeURIComponent(photo) + ".jpeg";
-  const target = site + "/product.html?item=" + encodeURIComponent(item) + "&photo=" + encodeURIComponent(photo);
-  const shareUrl = site + "/api/share?item=" + encodeURIComponent(item) + (lang === "fr" ? "&lang=fr" : "");
+  const target = site + "/product.html?item=" + encodeURIComponent(item) + "&photo=" + encodeURIComponent(photo) + (s ? "&s=" + s : "");
+  const shareUrl = site + "/api/share?item=" + encodeURIComponent(item) + (lang === "fr" ? "&lang=fr" : "") + (s ? "&s=" + s : "");
   const desc = L.tr(lang, (p.desc || (lang === "fr" ? "Crochet fait main, avec amour." : "Handmade crochet, made with love.")).trim());
 
   if (q.format === "json") {
