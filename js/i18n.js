@@ -300,16 +300,8 @@
       ".lang-box{position:fixed;left:12px;bottom:12px;z-index:50;background:#fff;border:2px solid #e8a0b4;border-radius:22px;padding:4px 8px 4px 10px;" +
       "box-shadow:0 3px 10px rgba(0,0,0,.18);font-size:.85rem;line-height:1}" +
       ".lang-box select{border:none;background:transparent;font:inherit;color:#c9607f;font-weight:bold;cursor:pointer;max-width:120px;padding:2px 0 !important;margin:0;width:auto;box-shadow:none;border-radius:0}.lang-box select+select{max-width:80px}";
-    // In the header (small, top right; on phones a small line above the title). Pages without a header keep the bottom left corner.
-    css.textContent +=
-      ".lang-box.lang-top{position:absolute;left:auto;bottom:auto;top:8px;right:12px;z-index:5;border:1px solid #fff;padding:3px 8px 3px 8px;" +
-      "box-shadow:none;font-size:.75rem;background:rgba(255,255,255,.92)}" +
-      ".lang-box.lang-top select{max-width:96px}.lang-box.lang-top select+select{max-width:66px}" +
-      "@media (max-width:900px){.lang-box.lang-top{position:static;display:block;width:max-content;margin:0 auto 6px}}";
     document.head.appendChild(css);
-    var header = document.querySelector("header");
-    if (header) { box.className += " lang-top"; header.insertBefore(box, header.firstChild); }
-    else document.body.appendChild(box);
+    document.body.appendChild(box);
     return box;
   }
 
