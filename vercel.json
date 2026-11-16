@@ -16,5 +16,11 @@
       "source": "/thumbs/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }]
     }
+  ],
+
+  
+  "rewrites": [
+    { "source": "/:file([A-Za-z0-9_-]+).jpeg", "destination": "/album/:file.jpeg" }
   ]
+
 }
