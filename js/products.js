@@ -8,6 +8,13 @@ var PRODUCTS = {
     photos: ["7","55"]
   },
 
+  "Crochet bows-86": {
+    title: "Crochet bows",
+    desc: "Handmade crochet bows. Many colors are available, tell us your favorite.",
+    price: 5000,
+    photos: ["86"]
+  },
+
   "Scrunchies-10": {
     title: "Scrunchies",
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
