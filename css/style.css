@@ -727,3 +727,84 @@ h2 {
         font-size: 1.35rem;
     }
 }
+
+/* =================================
+   NOUVEAU DESIGN - BANNIERE ACCUEIL
+================================= */
+
+.home-hero {
+    max-width: 1200px;
+    width: 94%;
+    margin: 25px auto;
+    padding: 45px 35px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    align-items: center;
+    gap: 35px;
+    background: linear-gradient(120deg, #fff1f4, #f9dce5);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.home-text {
+    text-align: center;
+}
+
+.home-text .label {
+    color: #a83d60;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.home-text h1 {
+    color: #8f294b;
+    font-family: Georgia, serif;
+    font-size: clamp(32px, 4vw, 55px);
+    line-height: 1.15;
+    margin: 18px 0;
+}
+
+.home-text p {
+    color: #59434b;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.home-photo img {
+    width: 100%;
+    height: 390px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(120, 50, 70, 0.16);
+}
+
+.home-actions a {
+    display: inline-block;
+    background: #d95e89;
+    color: white;
+    padding: 13px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.home-actions a:hover {
+    background: #9e3c5a;
+    transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+    .home-hero {
+        grid-template-columns: 1fr;
+        padding: 25px 18px;
+        gap: 22px;
+    }
+
+    .home-photo img {
+        height: 280px;
+    }
+}
+
