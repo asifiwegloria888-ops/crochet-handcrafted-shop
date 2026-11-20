@@ -534,3 +534,196 @@ footer a { color: #fff; font-weight: 600; }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+
+/* ===== DESIGN MODERNE - CROCHET HANDCRAFTED SHOP ===== */
+
+/* Page générale */
+body {
+    background: #fff9f6;
+    color: #4a3b3f;
+}
+
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 25px 24px;
+}
+
+main > section {
+    max-width: 1100px;
+    margin: 35px auto;
+    padding: 35px 24px;
+}
+
+/* Menu */
+.site-header {
+    padding: 16px 24px;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+}
+
+header .site-title a {
+    font-size: 1.8rem;
+}
+
+.main-nav ul {
+    gap: 10px;
+}
+
+.main-nav a {
+    border-radius: 25px;
+    padding: 9px 17px;
+    transition: 0.25s ease;
+}
+
+.main-nav a:hover {
+    background: #fff;
+    color: #c9607f;
+    text-decoration: none;
+}
+
+/* Section d'accueil */
+.home-hero {
+    max-width: 1100px;
+    min-height: 440px;
+    padding: 55px 35px;
+    gap: 55px;
+}
+
+.home-hero h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.home-hero .label {
+    background: #fbe6ec;
+    border: none;
+    padding: 8px 17px;
+}
+
+.home-photo img {
+    box-shadow: 14px 14px 0 #e8a0b4;
+}
+
+/* Boutons */
+.btn {
+    border-radius: 30px;
+    padding: 13px 25px;
+    transition: all 0.25s ease;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+}
+
+/* Cartes des créations */
+.featured {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 28px;
+}
+
+.featured-item {
+    border: 1px solid #f8e3e9;
+    border-radius: 20px;
+    padding-bottom: 22px;
+}
+
+.featured-item img {
+    height: 280px;
+    object-fit: cover;
+}
+
+.featured-item h3 {
+    font-size: 1.25rem;
+}
+
+/* Cartes des services */
+.service-card,
+.why-item,
+.review-card {
+    border-radius: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-card:hover,
+.why-item:hover,
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(120, 50, 70, 0.16);
+}
+
+/* Titres */
+h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-bottom: 25px;
+}
+
+/* Formulaire d'avis */
+.review-form {
+    border: 1px solid #f8e3e9;
+    border-radius: 22px;
+}
+
+/* Pied de page */
+.site-footer {
+    padding: 40px 20px 25px;
+}
+
+/* Affichage sur téléphone */
+@media (max-width: 760px) {
+    main {
+        padding: 12px;
+    }
+
+    main > section {
+        padding: 25px 14px;
+        margin: 20px auto;
+    }
+
+    .home-hero {
+        grid-template-columns: 1fr;
+        padding: 30px 15px;
+        gap: 30px;
+    }
+
+    .home-hero h1,
+    .home-hero p {
+        text-align: center;
+    }
+
+    .home-actions {
+        justify-content: center;
+    }
+
+    .home-photo {
+        max-width: 350px;
+        margin: auto;
+    }
+
+    .main-nav ul {
+        gap: 5px;
+    }
+
+    .main-nav a {
+        padding: 7px 11px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 450px) {
+    .featured {
+        grid-template-columns: 1fr;
+    }
+
+    .featured-item img {
+        height: 280px;
+    }
+
+    header .site-title a {
+        font-size: 1.35rem;
+    }
+}
