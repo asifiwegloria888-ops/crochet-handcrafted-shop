@@ -535,3 +535,172 @@ footer a { color: #fff; font-weight: 600; }
   * { transition: none !important; }
 }
 
+/* =====================================================
+   MAQUETTE : à coller tout à la FIN de css/style.css
+   (ne remplace rien, ajoute seulement le nouveau look)
+   ===================================================== */
+
+:root {
+  --vin: #9b3358;
+  --vin-fonce: #6e2340;
+  --script: "Great Vibes", "Brush Script MT", cursive;
+}
+
+/* ---------- En-tête (reste fixe en haut) ---------- */
+header.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  padding: 0;
+  text-align: left;
+  box-shadow: 0 2px 10px rgba(120, 50, 70, 0.18);
+}
+/* Petite barre rose au-dessus */
+header.site-header::before {
+  content: "Handmade with love ♡";
+  display: block;
+  background: var(--rose);
+  color: #fff;
+  font-family: var(--titre);
+  font-size: 0.85rem;
+  padding: 5px 6%;
+}
+.site-header .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 10px 6%;
+}
+.site-header .site-title a {
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--vin);
+  text-shadow: none;
+}
+.site-header nav ul {
+  margin: 0;
+  justify-content: flex-end;
+}
+.site-header .main-nav a {
+  color: var(--texte);
+  font-family: var(--titre);
+  font-weight: 600;
+}
+.site-header .main-nav a:hover {
+  background: var(--rose-pale);
+  text-decoration: none;
+}
+.site-header .main-nav a[aria-current="page"] {
+  background: var(--rose);
+  color: #fff;
+}
+
+/* ---------- Titres avec traits de chaque côté ---------- */
+section > h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: var(--vin);
+}
+section > h2::before,
+section > h2::after {
+  content: "";
+  display: block;
+  flex: 0 0 min(12vw, 100px);
+  width: auto;
+  height: 2px;
+  margin: 0;
+  border-radius: 0;
+  background: var(--vin);
+  opacity: 0.7;
+}
+.hours h2::before,
+.hours h2::after { background: #fff; }
+
+/* ---------- Bannière d'accueil pleine largeur ---------- */
+.home-hero {
+  background: #fbdbe5;
+  box-shadow: 0 0 0 100vmax #fbdbe5;
+  clip-path: inset(0 -100vmax);
+  padding: 48px 20px;
+}
+.home-hero h1 {
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  line-height: 1;
+  color: var(--vin-fonce);
+}
+.home-hero .label {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: var(--vin);
+  color: var(--vin);
+}
+.home-photo img { box-shadow: 14px 14px 0 var(--rose); }
+
+/* ---------- Cartes de catégories ---------- */
+.cats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.cat {
+  display: block;
+  background: var(--rose);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--ombre);
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+.cat:hover { transform: translateY(-4px); text-decoration: none; }
+.cat img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.cat span {
+  display: block;
+  padding: 8px;
+  text-align: center;
+  color: #fff;
+  font-family: var(--titre);
+  font-weight: 600;
+}
+
+/* ---------- À propos ---------- */
+.about { background: var(--rose-pale); box-shadow: none; }
+
+/* ---------- Pied de page bordeaux ---------- */
+.site-footer {
+  background: var(--vin);
+  padding-bottom: 0;
+}
+.site-footer .footer-brand {
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+.site-footer .footer-copy {
+  background: var(--vin-fonce);
+  margin: 18px -20px 0;
+  padding: 12px 20px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .site-header .header-inner { justify-content: center; }
+  .site-header nav ul { justify-content: center; }
+  .site-header .site-title a { font-size: 2rem; }
+}
