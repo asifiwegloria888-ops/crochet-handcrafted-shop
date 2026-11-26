@@ -5,7 +5,25 @@ var PRODUCTS = {
     title: "Scrunchies",
     desc: "Soft handmade scrunchies. Many colors are available, tell us your favorite.",
     price: 5000,
-    photos: ["7","55"]
+    photos: ["7","55","90"]
+  },
+  "Crochet bonnet-87": {
+    title: "Crochet bonnet",
+    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    price: 20000,
+    photos: ["87"]
+  },
+   "Crochet bonnet-88": {
+    title: "Crochet bonnet",
+    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    price: 20000,
+    photos: ["88"]
+  },
+   "Crochet bonnet-89": {
+    title: "Crochet bonnet",
+    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    price: 20000,
+    photos: ["89"]
   },
 
   "Crochet bows-86": {
