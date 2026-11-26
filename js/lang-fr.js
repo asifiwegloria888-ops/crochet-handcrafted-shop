@@ -39,7 +39,7 @@
 
     // ---------- articles ----------
     "Scrunchies": "Chouchous","scarf": "Echarpe","scarf and hat": "Echarpe et bonnet", "Crop top": "Haut court", "Ruffle crochet hat": "Chapeau au crochet à volants", "Sweater": "Pull", "Dress": "Robe",
-    "Skirt": "Jupe", "Small bag": "Petit sac", "Crochet flower": "Fleur au crochet",
+    "Skirt": "Jupe", "Small bag": "Petit sac", "Crochet flower": "Fleur au crochet","Crochet bows": "Noeuds au crochet","crochet sandals": "Babouches","crochet socks": "Chaussettes au crochet","crochet bonnet": "Bonnet au crochet", "Two piece": "Ensemble deux pièces", "Bikini": "Bikini", "Shirt": "Chemise", "T-shirt": "T-shirt",
     "Small": "Petit (S)", "Medium": "Moyen (M)", "Large": "Grand (L)", "XL": "XL", "Big": "Grand", "Child": "Enfant", "Adult": "Adulte",
     "Black": "Noir", "White": "Blanc", "Red": "Rouge", "Pink": "Rose", "Yellow": "Jaune", "Orange": "Orange", "Blue": "Bleu", "Green": "Vert",
     "Purple": "Violet", "Brown": "Marron", "Beige": "Beige", "Grey": "Gris",
@@ -208,6 +208,10 @@
     "soft, cute & comfy. custom size & color available": "Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
     "Handmade to measure, choose your colors": "Fait main sur mesure, choisissez vos couleurs",
     "Choose your color": "Choisissez votre couleur",
+    "Crochet bonnet. Many colors are available, tell us your favorite.": "Bonnet au crochet . De nombreuses couleurs sont disponibles",
+    "Crochet sandals. Many colors are available, tell us your favorite.": "Babouches au crochet . De nombreuses couleurs sont disponibles",
+    "Crochet socks. Many colors are available, tell us your favorite.": "Chaussettes au crochet . De nombreuses couleurs sont disponibles",
+    "Crochet bows. Many colors are available, tell us your favorite.": "Noeuds au crochet . De nombreuses couleurs sont disponibles",
 
     // comments, favorites, download, color
     "Comment": "Commenter", "Add a comment": "Ajouter un commentaire", "Your name (optional)": "Votre nom (facultatif)",

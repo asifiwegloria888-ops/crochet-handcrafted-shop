@@ -9,88 +9,88 @@ var PRODUCTS = {
   },
   "Crochet bonnet-87": {
     title: "Crochet bonnet",
-    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    desc: "Crochet bonnet. Many colors are available, tell us your favorite.",
     price: 20000,
     photos: ["87"]
   },
    "Crochet bonnet-88": {
     title: "Crochet bonnet",
-    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    desc: "Crochet bonnet. Many colors are available, tell us your favorite.",
     price: 20000,
     photos: ["88"]
   },
    "Crochet bonnet-89": {
     title: "Crochet bonnet",
-    desc: "Handmade crochet bonnet. Many colors are available, tell us your favorite.",
+    desc: "Crochet bonnet. Many colors are available, tell us your favorite.",
     price: 20000,
     photos: ["89"]
   },
 
   "Crochet socks-91": {
     title: "Crochet socks",
-    desc: "Handmade crochet socks. Many colors are available, tell us your favorite.",
+    desc: "Crochet socks. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["91"]
   },
   "Crochet socks-92": {
     title: "Crochet socks",
-    desc: "Handmade crochet socks. Many colors are available, tell us your favorite.",
+    desc: "Crochet socks. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["92"]
   },
   "Crochet socks-93": {
     title: "Crochet socks",
-    desc: "Handmade crochet socks. Many colors are available, tell us your favorite.",
+    desc: "Crochet socks. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["93"]
   },
   "Crochet socks-94": {
     title: "Crochet socks",
-    desc: "Handmade crochet socks. Many colors are available, tell us your favorite.",
+    desc: "Crochet socks. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["94"]
   },
-  "Crochet flip-flops-103": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-103": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["103"]
   },
-  "Crochet flip-flops-102": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-102": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["102"]
   },
-  "Crochet flip-flops-99": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-99": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["99"]
   },
-  "Crochet flip-flops-105": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-105": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["105"]
   },
-  "Crochet flip-flops-100": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-100": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["100"]
   },
 
-  "Crochet flip-flops-106": {
-    title: "Crochet flip-flops",
-    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+  "Crochet sandals-106": {
+    title: "Crochet sandals",
+    desc: "Crochet sandals. Many colors are available, tell us your favorite.",
     price: 15000,
     photos: ["106"]
   },
 
   "Crochet bows-86": {
     title: "Crochet bows",
-    desc: "Handmade crochet bows. Many colors are available, tell us your favorite.",
+    desc: "Crochet bows. Many colors are available, tell us your favorite.",
     price: 5000,
     photos: ["86"]
   },
