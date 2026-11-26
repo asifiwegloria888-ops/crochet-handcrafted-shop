@@ -204,7 +204,7 @@
     "cute, beautiful, comfy. choose your favorite color!": "Mignon, beau et confortable. Choisissez votre couleur préférée !",
     "Couple outfit": "Tenue de couple",
     "Scrunchie": "Chouchou",
-    "Handmade two-piece set. soft, cute & comfy. custom size & color available": "Ensemble deux pièces fait main. Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
+    "Handmade two-piece set. soft, cute & comfy. custom size & color available": "Ensemble deux pièces. Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
     "soft, cute & comfy. custom size & color available": "Doux, mignon et confortable. Taille et couleur sur mesure disponibles",
     "Handmade to measure, choose your colors": "Fait main sur mesure, choisissez vos couleurs",
     "Choose your color": "Choisissez votre couleur",
