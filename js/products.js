@@ -74,6 +74,13 @@ var PRODUCTS = {
     price: 15000,
     photos: ["105"]
   },
+  "Crochet flip-flops-100": {
+    title: "Crochet flip-flops",
+    desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
+    price: 15000,
+    photos: ["100"]
+  },
+
   "Crochet flip-flops-106": {
     title: "Crochet flip-flops",
     desc: "Handmade crochet flip-flops. Many colors are available, tell us your favorite.",
