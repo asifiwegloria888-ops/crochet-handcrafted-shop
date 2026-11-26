@@ -209,12 +209,12 @@
       // gallery
       var main = $("pd-main"), thumbs = $("pd-thumbs");
       function setPhoto(id) {
-        photo = id; main.src = id + ".jpeg"; main.alt = label;
+        photo = id; main.src ="album/" + id + ".jpeg"; main.alt = label;
         Array.prototype.forEach.call(thumbs.children, function (t) { t.classList.toggle("on", t.dataset.id === id); });
       }
       p.photos.forEach(function (id) {
         var t = document.createElement("img");
-        t.src = id + ".jpeg"; t.alt = label; t.dataset.id = id; t.loading = "lazy";
+        t.src = "album/" + id + ".jpeg"; t.alt = label; t.dataset.id = id; t.loading = "lazy";
         t.addEventListener("click", function () { setPhoto(id); });
         thumbs.appendChild(t);
       });
