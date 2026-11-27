@@ -603,38 +603,26 @@ footer a { color: #fff; font-weight: 600; }
 
 /* MENU HAMBURGER SUR TELEPHONE */
 
-@media screen and (max-width: 760px) {
 
-    header.site-header {
-        position: sticky;
-        top: 0;
-        z-index: 9999;
-        overflow: visible;
-    }
+@media screen and (max-width: 760px) {
 
     .header-inner {
         position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .menu-btn {
-        display: block;
-        position: relative;
-        z-index: 10001;
     }
 
     .main-nav {
         display: none !important;
         position: absolute;
         top: 100%;
-        left: 0;
-        width: 100%;
+        right: 0;
+        left: auto;
+        width: 210px;
         background: white;
-        padding: 15px 0;
+        padding: 12px;
+        border-radius: 0 0 12px 12px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         z-index: 10000;
+        box-sizing: border-box;
     }
 
     .main-nav.show {
@@ -644,10 +632,10 @@ footer a { color: #fff; font-weight: 600; }
     .main-nav ul {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        align-items: stretch;
+        gap: 8px;
         margin: 0;
-        padding: 10px;
+        padding: 0;
         list-style: none;
     }
 
@@ -659,7 +647,6 @@ footer a { color: #fff; font-weight: 600; }
     .main-nav a {
         display: block;
         color: #c9607f !important;
-        text-decoration: none;
         padding: 10px;
     }
 }
