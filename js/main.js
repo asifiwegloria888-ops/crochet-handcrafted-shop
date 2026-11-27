@@ -12,3 +12,13 @@ boutons.forEach((b) => {
     });
   });
 });
+
+const menuBtn = document.getElementById("menuBtn");
+const mainNav = document.querySelector("main-nav");
+
+if (menuBtn && mainNav) {
+  menuBtn.addEventListener("click", () => {
+    mainNav.classList.toggle("show");
+    menuBtn.textContent = mainNav.classList.contains("show") ? "✕" : "☰";
+  });
+}
