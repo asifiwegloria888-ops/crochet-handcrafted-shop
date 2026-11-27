@@ -19,14 +19,11 @@ boutons.forEach((b) => {
   });
 });
 
-
 // MENU HAMBURGER
 const menuBtn = document.getElementById("menuBtn");
 const mainNav = document.getElementById("mainNav");
 
 if (menuBtn && mainNav) {
-
-  // Ouvrir et fermer le menu
   menuBtn.addEventListener("click", () => {
     const ouvert = mainNav.classList.toggle("show");
 
@@ -34,7 +31,6 @@ if (menuBtn && mainNav) {
     menuBtn.setAttribute("aria-expanded", ouvert);
   });
 
-  // Fermer le menu après avoir choisi une page
   const liens = mainNav.querySelectorAll("a");
 
   liens.forEach((lien) => {
