@@ -563,73 +563,32 @@ footer a { color: #fff; font-weight: 600; }
         box-shadow: none !important;
         font-size: 30px !important;
         padding: 5px 10px !important;
-        border-radius: 0 !important;
         cursor: pointer;
     }
 
-    /* Hide navigation by default */
-    .main-nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: -10px;
-        width: calc(100% + 20px);
-        background: white;
-        padding: 15px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        z-index: 1000;
-    }
-
-    /* Show navigation when clicked */
-    .main-nav.show {
-        display: block;
-    }
-
-    .main-nav ul {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        margin: 0;
-    }
-
-    .main-nav a {
-        color: #c9607f;
-        display: block;
-        width: 100%;
-        text-align: center;
-    }
-}
-
-/* MENU HAMBURGER SUR TELEPHONE */
-
-
-@media screen and (max-width: 760px) {
-
-    .header-inner {
-        position: relative;
-    }
-
-    .main-nav {
+    /* Petit menu à droite */
+    header .main-nav {
         display: none !important;
         position: absolute;
-        top: 100%;
+        top: calc(100% + 8px);
         right: 0;
         left: auto;
         width: 210px;
+        max-width: calc(100vw - 24px);
         background: white;
         padding: 12px;
-        border-radius: 0 0 12px 12px;
+        border-radius: 12px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         z-index: 10000;
         box-sizing: border-box;
+        text-align: center;
     }
 
-    .main-nav.show {
+    header .main-nav.show {
         display: block !important;
     }
 
-    .main-nav ul {
+    header .main-nav ul {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -639,14 +598,15 @@ footer a { color: #fff; font-weight: 600; }
         list-style: none;
     }
 
-    .main-nav li {
+    header .main-nav li {
         width: 100%;
-        text-align: center;
     }
 
-    .main-nav a {
+    header .main-nav a {
         display: block;
+        width: 100%;
         color: #c9607f !important;
         padding: 10px;
+        text-align: center;
     }
 }

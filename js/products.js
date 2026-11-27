@@ -41,50 +41,50 @@ var PRODUCTS = {
   "Crochet socks-93": {
     title: "Crochet socks",
     desc: "Crochet socks. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["93"]
   },
   "Crochet socks-94": {
     title: "Crochet socks",
     desc: "Crochet socks. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["94"]
   },
   "Crochet sandals-103": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["103"]
   },
   "Crochet sandals-102": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["102"]
   },
   "Crochet sandals-99": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["99"]
   },
   "Crochet sandals-105": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["105"]
   },
   "Crochet sandals-100": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["100"]
   },
 
   "Crochet sandals-106": {
     title: "Crochet sandals",
     desc: "Crochet sandals. Many colors are available, tell us your favorite.",
-    price: 15000,
+    price: 20000,
     photos: ["106"]
   },
 
