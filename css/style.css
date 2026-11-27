@@ -602,11 +602,24 @@ footer a { color: #fff; font-weight: 600; }
         width: 100%;
     }
 
-    header .main-nav a {
-        display: block;
-        width: 100%;
-        color: #c9607f !important;
-        padding: 10px;
-        text-align: center;
-    }
+     
+header .main-nav a {
+    display: block;
+    width: 100%;
+    color: #c9607f !important;
+    background: #fbe6ec;
+    padding: 10px;
+    text-align: center;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid #e8a0b4;
+    transition: 0.3s;
+}
+
+header .main-nav a:hover {
+    background: #c9607f;
+    color: white !important;
+}
+
 }
