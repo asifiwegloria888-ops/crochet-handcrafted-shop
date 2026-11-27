@@ -535,37 +535,68 @@ footer a { color: #fff; font-weight: 600; }
   * { transition: none !important; }
 }
 
+
+/* ==============================
+   RESPONSIVE HAMBURGER MENU
+============================== */
+
+/* Desktop */
 .menu-btn {
-  display: none;
-  font-size: 28px;
-  background: none;
-  border: none;
-  cursor: pointer;
+    display: none;
 }
 
-@media (max-width: 760px) {
+/* Mobile */
+@media screen and (max-width: 760px) {
 
-  .header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .menu-btn {
-    display: block;
-  }
-  .main-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: white;
-    padding: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-   }
-  .main-nav.show {
-    display: block;
-   }
-  .main-nav ul { flex-direction: column; gap: 15px;  }
+    .header-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .menu-btn {
+        display: block;
+        background: transparent !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-size: 30px !important;
+        padding: 5px 10px !important;
+        border-radius: 0 !important;
+        cursor: pointer;
+    }
+
+    /* Hide navigation by default */
+    .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: -10px;
+        width: calc(100% + 20px);
+        background: white;
+        padding: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    /* Show navigation when clicked */
+    .main-nav.show {
+        display: block;
+    }
+
+    .main-nav ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .main-nav a {
+        color: #c9607f;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
 }
